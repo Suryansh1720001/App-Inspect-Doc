@@ -8,9 +8,15 @@
         name="description"
         content="AppInspect is an Android in-app inspector for developers and testers. Learn how to integrate it from Maven Central and enable network, storage, WorkManager, and runtime inspection."
     >
+    <meta name="theme-color" content="#176c67">
     <script>
         document.documentElement.classList.add("js");
     </script>
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -29,7 +35,16 @@
                     <span>Android in-app inspector</span>
                 </span>
             </a>
-            <nav class="site-nav" aria-label="Primary">
+            <button
+                class="nav-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="site-nav"
+                aria-label="Toggle navigation"
+            >
+                Menu
+            </button>
+            <nav class="site-nav" id="site-nav" aria-label="Primary">
                 <a href="#about">About</a>
                 <a href="#install">Install</a>
                 <a href="#configure">Configure</a>
@@ -472,10 +487,41 @@
                     </div>
                 </div>
             </section>
+
+            <section class="section section-compact reveal" id="developer">
+                <div class="developer-card">
+                    <div class="developer-copy">
+                        <span class="eyebrow">Developer</span>
+                        <h2>Built and maintained by Suryansh Prajapati</h2>
+                        <p>
+                            AppInspect is published on Maven Central and maintained by Suryansh
+                            Prajapati. You can connect through GitHub or LinkedIn below.
+                        </p>
+                    </div>
+                    <div class="developer-links">
+                        <a
+                            class="button button-secondary"
+                            href="https://github.com/Suryansh1720001"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            GitHub
+                        </a>
+                        <a
+                            class="button button-secondary"
+                            href="https://www.linkedin.com/in/itssuryansh/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            LinkedIn
+                        </a>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <footer class="site-footer">
-            <p>AppInspect documentation landing page for Maven Central integration.</p>
+            <p>AppInspect documentation landing page by Suryansh Prajapati.</p>
             <a
                 href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
                 target="_blank"
