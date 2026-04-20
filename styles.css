@@ -345,6 +345,16 @@ pre {
     color: var(--secondary);
 }
 
+a.tag {
+    display: inline-block;
+    transition: color 180ms ease;
+}
+
+a.tag:hover,
+a.tag:focus-visible {
+    color: var(--primary);
+}
+
 .package-grid code {
     display: block;
     width: 100%;
@@ -585,12 +595,25 @@ pre {
     gap: 22px;
 }
 
-.steps-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+.step-card {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 28px;
+    align-items: start;
+    padding: 28px;
 }
 
-.step-card {
-    padding: 24px;
+.step-meta {
+    min-width: 0;
+}
+
+.step-code {
+    min-width: 0;
+}
+
+.step-code > .snippet-card:first-child,
+.step-code > .snippet-tabs:first-child {
+    margin-top: 0;
 }
 
 .step-number {
@@ -827,9 +850,13 @@ ul {
 }
 
 @media (max-width: 980px) {
-    .steps-grid,
     .benefit-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .step-card {
+        grid-template-columns: 180px 1fr;
+        gap: 22px;
     }
 }
 
@@ -925,9 +952,13 @@ ul {
         grid-template-columns: 1fr;
     }
 
-    .benefit-grid,
-    .steps-grid {
+    .benefit-grid {
         grid-template-columns: 1fr;
+    }
+
+    .step-card {
+        grid-template-columns: 1fr;
+        gap: 18px;
     }
 
     .cta-card,

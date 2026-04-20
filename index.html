@@ -79,7 +79,12 @@
                     <div class="package-card">
                         <div class="package-header">
                             <h2>Package details</h2>
-                            <span class="tag">Current docs version: 0.1.0</span>
+                            <a
+                                class="tag"
+                                href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >Latest version → Maven Central</a>
                         </div>
                         <div class="package-grid">
                             <div>
@@ -92,7 +97,7 @@
                             </div>
                             <div>
                                 <span class="label">Dependency</span>
-                                <code>implementation("io.github.suryansh1720001.appinspect:appinspect:0.1.0")</code>
+                                <code>implementation("io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;")</code>
                             </div>
                         </div>
                     </div>
@@ -187,97 +192,109 @@
 
                 <div class="steps-grid">
                     <article class="step-card">
-                        <div class="step-number">1</div>
-                        <h3>Add repositories</h3>
-                        <p>Make sure your project resolves dependencies from Google and Maven Central.</p>
-                        <div class="snippet-tabs">
-                            <div class="snippet-card">
-                                <div class="snippet-head">
-                                    <span>Kotlin DSL</span>
-                                    <button class="copy-button" type="button" data-copy-target="repo-kts">Copy</button>
-                                </div>
-                                <pre><code id="repo-kts">dependencyResolutionManagement {
+                        <div class="step-meta">
+                            <div class="step-number">1</div>
+                            <h3>Add repositories</h3>
+                            <p>Make sure your project resolves dependencies from Google and Maven Central.</p>
+                        </div>
+                        <div class="step-code">
+                            <div class="snippet-tabs">
+                                <div class="snippet-card">
+                                    <div class="snippet-head">
+                                        <span>Kotlin DSL</span>
+                                        <button class="copy-button" type="button" data-copy-target="repo-kts">Copy</button>
+                                    </div>
+                                    <pre><code id="repo-kts">dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
     }
 }</code></pre>
-                            </div>
-                            <div class="snippet-card">
-                                <div class="snippet-head">
-                                    <span>Groovy</span>
-                                    <button class="copy-button" type="button" data-copy-target="repo-groovy">Copy</button>
                                 </div>
-                                <pre><code id="repo-groovy">dependencyResolutionManagement {
+                                <div class="snippet-card">
+                                    <div class="snippet-head">
+                                        <span>Groovy</span>
+                                        <button class="copy-button" type="button" data-copy-target="repo-groovy">Copy</button>
+                                    </div>
+                                    <pre><code id="repo-groovy">dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
     }
 }</code></pre>
+                                </div>
                             </div>
                         </div>
                     </article>
 
                     <article class="step-card">
-                        <div class="step-number">2</div>
-                        <h3>Add the library</h3>
-                        <p>
-                            The umbrella dependency gives you the default AppInspect setup and pulls
-                            the rest of the AppInspect stack transitively.
-                        </p>
-                        <div class="snippet-tabs">
-                            <div class="snippet-card">
-                                <div class="snippet-head">
-                                    <span>build.gradle.kts</span>
-                                    <button class="copy-button" type="button" data-copy-target="dependency-kts">Copy</button>
-                                </div>
-                                <pre><code id="dependency-kts">dependencies {
-    implementation("io.github.suryansh1720001.appinspect:appinspect:0.1.0")
-}</code></pre>
-                            </div>
-                            <div class="snippet-card">
-                                <div class="snippet-head">
-                                    <span>build.gradle</span>
-                                    <button class="copy-button" type="button" data-copy-target="dependency-groovy">Copy</button>
-                                </div>
-                                <pre><code id="dependency-groovy">dependencies {
-    implementation 'io.github.suryansh1720001.appinspect:appinspect:0.1.0'
-}</code></pre>
-                            </div>
+                        <div class="step-meta">
+                            <div class="step-number">2</div>
+                            <h3>Add the library</h3>
+                            <p>
+                                The umbrella dependency gives you the default AppInspect setup and pulls
+                                the rest of the AppInspect stack transitively.
+                            </p>
                         </div>
-                        <div class="note-card note-card-soft">
-                            <strong>Default behavior after adding the dependency</strong>
-                            <ul>
-                                <li>Auto-install at app startup through AndroidX Startup</li>
-                                <li>Built-in full-screen inspector activity</li>
-                                <li>Launcher shortcut and shake entry point support</li>
-                                <li>Compose and View long-press trigger helpers</li>
-                            </ul>
+                        <div class="step-code">
+                            <div class="snippet-tabs">
+                                <div class="snippet-card">
+                                    <div class="snippet-head">
+                                        <span>build.gradle.kts</span>
+                                        <button class="copy-button" type="button" data-copy-target="dependency-kts">Copy</button>
+                                    </div>
+                                    <pre><code id="dependency-kts">dependencies {
+    implementation("io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;")
+}</code></pre>
+                                </div>
+                                <div class="snippet-card">
+                                    <div class="snippet-head">
+                                        <span>build.gradle</span>
+                                        <button class="copy-button" type="button" data-copy-target="dependency-groovy">Copy</button>
+                                    </div>
+                                    <pre><code id="dependency-groovy">dependencies {
+    implementation 'io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;'
+}</code></pre>
+                                </div>
+                            </div>
+                            <div class="note-card note-card-soft">
+                                <strong>Default behavior after adding the dependency</strong>
+                                <ul>
+                                    <li>Auto-install at app startup through AndroidX Startup</li>
+                                    <li>Built-in full-screen inspector activity</li>
+                                    <li>Launcher shortcut and shake entry point support</li>
+                                    <li>Compose and View long-press trigger helpers</li>
+                                </ul>
+                            </div>
                         </div>
                     </article>
 
                     <article class="step-card">
-                        <div class="step-number">3</div>
-                        <h3>Enable network capture</h3>
-                        <p>
-                            AppInspect can open without this step, but automatic network logging needs
-                            the OkHttp interceptor.
-                        </p>
-                        <div class="snippet-card">
-                            <div class="snippet-head">
-                                <span>OkHttp setup</span>
-                                <button class="copy-button" type="button" data-copy-target="okhttp-setup">Copy</button>
-                            </div>
-                            <pre><code id="okhttp-setup">val client = OkHttpClient.Builder()
+                        <div class="step-meta">
+                            <div class="step-number">3</div>
+                            <h3>Enable network capture</h3>
+                            <p>
+                                AppInspect can open without this step, but automatic network logging needs
+                                the OkHttp interceptor.
+                            </p>
+                        </div>
+                        <div class="step-code">
+                            <div class="snippet-card">
+                                <div class="snippet-head">
+                                    <span>OkHttp setup</span>
+                                    <button class="copy-button" type="button" data-copy-target="okhttp-setup">Copy</button>
+                                </div>
+                                <pre><code id="okhttp-setup">val client = OkHttpClient.Builder()
     .addAppInspectInterceptor()
     .build()</code></pre>
-                        </div>
-                        <div class="snippet-card">
-                            <div class="snippet-head">
-                                <span>Open the inspector</span>
-                                <button class="copy-button" type="button" data-copy-target="open-setup">Copy</button>
                             </div>
-                            <pre><code id="open-setup">AppInspect.open(context)</code></pre>
+                            <div class="snippet-card">
+                                <div class="snippet-head">
+                                    <span>Open the inspector</span>
+                                    <button class="copy-button" type="button" data-copy-target="open-setup">Copy</button>
+                                </div>
+                                <pre><code id="open-setup">AppInspect.open(context)</code></pre>
+                            </div>
                         </div>
                     </article>
                 </div>
