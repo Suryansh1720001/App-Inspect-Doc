@@ -1,0 +1,269 @@
+<style>
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
+  .card { border: 2px solid #d9e2df; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 200ms, box-shadow 200ms; background: #fff; }
+  .card:hover { border-color: #145f5b; box-shadow: 0 4px 20px rgba(20,95,91,0.13); }
+  .card.selected { border-color: #145f5b; box-shadow: 0 0 0 4px rgba(20,95,91,0.15); }
+  .card-image { background: #f1f5f4; padding: 24px 20px; display: flex; align-items: center; justify-content: center; min-height: 300px; }
+  .card-body { padding: 16px 18px 18px; border-top: 1px solid #eef4f2; }
+  .card-body h3 { margin: 0 0 6px; font-size: 1rem; color: #111b22; }
+  .card-body p { margin: 0; font-size: 0.84rem; color: #53636f; line-height: 1.55; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 800; margin-left: 6px; vertical-align: middle; }
+  .tag-green { background: #dff1ee; color: #0e4541; }
+  .tag-blue { background: #e2edf5; color: #315b7c; }
+
+  /* Window */
+  .win { border: 1px solid #26333b; border-radius: 9px; overflow: hidden; box-shadow: 0 12px 36px rgba(17,27,34,0.35); width: 100%; max-width: 380px; }
+  .win-bar { background: #1b2932; padding: 9px 13px; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid #26333b; }
+  .dots { display:flex; gap:5px; }
+  .dot { width:9px; height:9px; border-radius:50%; }
+  .dr{background:#f07080;} .dy{background:#f0b040;} .dg{background:#4cd9a0;}
+  .win-label { font-size: 8.5px; font-weight: 700; color: #aebbc4; }
+  .win-top-tabs { display: flex; background: #111b22; border-bottom: 1px solid #26333b; }
+  .wtab { padding: 7px 10px; font-size: 8px; font-weight: 700; color: #53636f; white-space: nowrap; }
+  .wtab.on { color: #5cd8cc; border-bottom: 2px solid #5cd8cc; }
+  .split { display: grid; grid-template-columns: 40fr 60fr; }
+
+  /* List */
+  .col-l { background: #0d1620; border-right: 1px solid #26333b; }
+  .lrow { display: flex; align-items: center; gap: 6px; padding: 8px 9px; border-bottom: 1px solid #161f28; }
+  .lrow.sel { background: #172535; }
+  .badge { font-size: 6.5px; font-weight: 800; padding: 2px 5px; border-radius: 3px; min-width: 24px; text-align: center; }
+  .bg{background:#1a4f3a;color:#4cd9a0;} .bp{background:#3a2a14;color:#f0b040;} .be{background:#3a1520;color:#f07080;}
+  .lurl { font-size: 7px; color: #aebbc4; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lmeta { display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
+  .lcode { font-size: 7px; font-weight: 700; }
+  .ok{color:#4cd9a0;} .err{color:#f07080;}
+  .lms { font-size: 6px; color: #53636f; }
+
+  /* Detail */
+  .col-r { background: #111b22; }
+  .dtabs { display:flex; background:#0d1620; border-bottom:1px solid #1a2530; }
+  .dtab { padding:5px 8px; font-size:7px; font-weight:700; color:#53636f; }
+  .dtab.on { color:#5cd8cc; border-bottom:2px solid #5cd8cc; }
+  .dbody { padding: 9px 11px; }
+  .slabel { font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: #53636f; margin: 7px 0 3px; }
+  .slabel:first-child { margin-top: 0; }
+  .kv { font-size: 7px; margin-bottom: 2px; } .k{color:#7ab8d8;} .v{color:#c8e0ec;}
+  .div { height:1px; background:#1a2530; margin:5px 0; }
+  .jl { font-size: 6.5px; font-family: monospace; margin: 1.5px 0; }
+  .jk{color:#7ab8d8;} .js{color:#90d490;} .jn{color:#f0b040;} .jb{color:#aebbc4;}
+  .chips { display:flex; gap:4px; flex-wrap:wrap; }
+  .chip { background:#1a2530; border:1px solid #26333b; border-radius:3px; padding:3px 5px; font-size:6px; color:#5cd8cc; font-weight:700; }
+
+  /* Animation for option B */
+  @keyframes pulse-tab { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .anim-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #5cd8cc; margin-right: 5px; animation: pulse-tab 1.8s ease-in-out infinite; }
+
+  /* Cycling animation */
+  @keyframes fadeInTab { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  .anim-content { animation: fadeInTab 0.4s ease forwards; }
+
+  .storage-row { display:flex; align-items:center; justify-content:space-between; padding:6px 9px; border-bottom:1px solid #161f28; font-size:7px; }
+  .skey{color:#aebbc4;} .sval{color:#90d490;}
+  .stype{font-size:6px;color:#53636f;background:#1a2530;padding:1px 4px;border-radius:3px;}
+</style>
+
+<h2>Static showcase or animated tabs?</h2>
+<p class="subtitle">The left panel is always the request list. The question is whether the top tabs auto-cycle to show more of the inspector.</p>
+
+<div class="cards">
+
+  <!-- Option A: Static -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="win">
+        <div class="win-bar">
+          <div class="dots"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div></div>
+          <span class="win-label">AppInspect</span>
+        </div>
+        <div class="win-top-tabs">
+          <div class="wtab on">Network</div><div class="wtab">Storage</div><div class="wtab">Work</div><div class="wtab">Crashes</div><div class="wtab">Runtime</div>
+        </div>
+        <div class="split">
+          <div class="col-l">
+            <div class="lrow"><span class="badge bg">GET</span><span class="lurl">/api/v2/user/profile</span><div class="lmeta"><span class="lcode ok">200</span><span class="lms">124ms</span></div></div>
+            <div class="lrow sel"><span class="badge bp">POST</span><span class="lurl">/api/v2/auth/refresh</span><div class="lmeta"><span class="lcode ok">201</span><span class="lms">88ms</span></div></div>
+            <div class="lrow"><span class="badge be">GET</span><span class="lurl">/api/v2/upload/avatar</span><div class="lmeta"><span class="lcode err">404</span><span class="lms">42ms</span></div></div>
+            <div class="lrow"><span class="badge bg">GET</span><span class="lurl">/api/v2/feed/items</span><div class="lmeta"><span class="lcode ok">200</span><span class="lms">310ms</span></div></div>
+          </div>
+          <div class="col-r">
+            <div class="dtabs">
+              <div class="dtab">Overview</div><div class="dtab">Request</div><div class="dtab on">Response</div><div class="dtab">Tools</div>
+            </div>
+            <div class="dbody">
+              <div class="slabel">Status · 201 Created · 88ms</div>
+              <div class="div"></div>
+              <div class="slabel">Response body</div>
+              <div class="jl"><span class="jb">{</span></div>
+              <div class="jl">&nbsp;&nbsp;<span class="jk">"access_token"</span>: <span class="js">"eyJhbGci…"</span>,</div>
+              <div class="jl">&nbsp;&nbsp;<span class="jk">"token_type"</span>: <span class="js">"Bearer"</span>,</div>
+              <div class="jl">&nbsp;&nbsp;<span class="jk">"expires_in"</span>: <span class="jn">3600</span></div>
+              <div class="jl"><span class="jb">}</span></div>
+              <div class="div"></div>
+              <div class="slabel">Tools</div>
+              <div class="chips"><span class="chip">Copy cURL</span><span class="chip">HAR</span><span class="chip">Share</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Static <span class="tag tag-blue">Simple</span></h3>
+      <p>Network tab always shown. Clean, no moving parts. Works everywhere with zero JS. The JSON body and tools are always visible.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Animated tab cycling -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="win">
+        <div class="win-bar">
+          <div class="dots"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div></div>
+          <span class="win-label">AppInspect</span>
+        </div>
+        <div class="win-top-tabs" id="cycle-tabs">
+          <div class="wtab on" id="tab-net">Network</div>
+          <div class="wtab" id="tab-sto">Storage</div>
+          <div class="wtab" id="tab-cra">Crashes</div>
+          <div class="wtab" id="tab-run">Runtime</div>
+        </div>
+        <div class="split">
+          <div class="col-l" id="cycle-list">
+            <div class="lrow"><span class="badge bg">GET</span><span class="lurl">/api/v2/user/profile</span><div class="lmeta"><span class="lcode ok">200</span><span class="lms">124ms</span></div></div>
+            <div class="lrow sel"><span class="badge bp">POST</span><span class="lurl">/api/v2/auth/refresh</span><div class="lmeta"><span class="lcode ok">201</span><span class="lms">88ms</span></div></div>
+            <div class="lrow"><span class="badge be">GET</span><span class="lurl">/api/v2/upload/avatar</span><div class="lmeta"><span class="lcode err">404</span><span class="lms">42ms</span></div></div>
+            <div class="lrow"><span class="badge bg">GET</span><span class="lurl">/api/v2/feed/items</span><div class="lmeta"><span class="lcode ok">200</span><span class="lms">310ms</span></div></div>
+          </div>
+          <div class="col-r" id="cycle-detail">
+            <div class="dtabs">
+              <div class="dtab on" id="dtab-active">Response</div><div class="dtab">Overview</div><div class="dtab">Request</div><div class="dtab">Tools</div>
+            </div>
+            <div class="dbody anim-content" id="cycle-body">
+              <div class="slabel">Status · 201 Created</div>
+              <div class="div"></div>
+              <div class="jl"><span class="jk">"access_token"</span>: <span class="js">"eyJhbGci…"</span>,</div>
+              <div class="jl"><span class="jk">"expires_in"</span>: <span class="jn">3600</span></div>
+              <div class="div"></div>
+              <div class="chips"><span class="chip">Copy cURL</span><span class="chip">HAR</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:5px;padding:6px;background:#0d1620;border-top:1px solid #26333b;">
+          <span class="anim-dot"></span>
+          <span style="font-size:6.5px;color:#53636f;">Auto-cycling tabs every 2.5s</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Animated tab cycling <span class="tag tag-green">Engaging</span></h3>
+      <p>Tabs cycle every 2.5 s — Network → Storage → Crashes → Runtime — each with matching content. Shows all six inspector areas without extra scrolling.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Animate option B preview
+  const tabContents = [
+    {
+      topTab: 'tab-net', label: 'Network',
+      list: `
+        <div class="lrow"><span class="badge bg">GET</span><span class="lurl">/api/v2/user/profile</span><div class="lmeta"><span class="lcode ok">200</span><span class="lms">124ms</span></div></div>
+        <div class="lrow sel"><span class="badge bp">POST</span><span class="lurl">/api/v2/auth/refresh</span><div class="lmeta"><span class="lcode ok">201</span><span class="lms">88ms</span></div></div>
+        <div class="lrow"><span class="badge be">GET</span><span class="lurl">/api/v2/upload/avatar</span><div class="lmeta"><span class="lcode err">404</span><span class="lms">42ms</span></div></div>
+        <div class="lrow"><span class="badge bg">GET</span><span class="lurl">/api/v2/feed/items</span><div class="lmeta"><span class="lcode ok">200</span><span class="lms">310ms</span></div></div>`,
+      dtab: 'Response',
+      body: `<div class="slabel">POST /auth/refresh · 201 · 88ms</div><div class="div"></div>
+        <div class="jl"><span class="jk">"access_token"</span>: <span class="js">"eyJhbGci…"</span>,</div>
+        <div class="jl"><span class="jk">"expires_in"</span>: <span class="jn">3600</span></div>
+        <div class="div"></div><div class="chips"><span class="chip">Copy cURL</span><span class="chip">HAR</span><span class="chip">Share</span></div>`
+    },
+    {
+      topTab: 'tab-sto', label: 'Storage',
+      list: `
+        <div class="lrow sel" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#5cd8cc;font-weight:700;">shared_prefs / app_prefs.xml</span>
+          <span style="font-size:6px;color:#53636f;">4 keys</span>
+        </div>
+        <div class="lrow" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#aebbc4;">shared_prefs / user_session.xml</span>
+          <span style="font-size:6px;color:#53636f;">2 keys</span>
+        </div>
+        <div class="lrow" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#aebbc4;">databases / app.db</span>
+          <span style="font-size:6px;color:#53636f;">3 tables · 1.2 MB</span>
+        </div>`,
+      dtab: 'Preferences',
+      body: `<div class="slabel">app_prefs.xml</div><div class="div"></div>
+        <div class="storage-row"><span class="skey">dark_mode</span><span class="stype">BOOLEAN</span><span class="sval">true</span></div>
+        <div class="storage-row"><span class="skey">onboarding_done</span><span class="stype">BOOLEAN</span><span class="sval">true</span></div>
+        <div class="storage-row"><span class="skey">last_sync</span><span class="stype">LONG</span><span class="sval">1748432…</span></div>
+        <div class="storage-row"><span class="skey">user_id</span><span class="stype">STRING</span><span class="sval">"usr_4812"</span></div>`
+    },
+    {
+      topTab: 'tab-cra', label: 'Crashes',
+      list: `
+        <div class="lrow sel" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#f07080;font-weight:700;">NullPointerException</span>
+          <span style="font-size:6px;color:#53636f;">ProfileFragment · 2m ago</span>
+        </div>
+        <div class="lrow" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#f0b040;">IllegalStateException</span>
+          <span style="font-size:6px;color:#53636f;">NetworkRepo · 1h ago</span>
+        </div>
+        <div class="lrow" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#f07080;">OutOfMemoryError</span>
+          <span style="font-size:6px;color:#53636f;">ImageLoader · yesterday</span>
+        </div>`,
+      dtab: 'Stack trace',
+      body: `<div class="slabel">NullPointerException · main thread</div><div class="div"></div>
+        <div class="jl" style="color:#f07080;">java.lang.NullPointerException:</div>
+        <div class="jl" style="color:#aebbc4;">&nbsp;Attempt to invoke virtual</div>
+        <div class="jl" style="color:#aebbc4;">&nbsp;method on null object</div>
+        <div class="div"></div>
+        <div class="jl" style="color:#7ab8d8;">at ProfileFragment.kt:84</div>
+        <div class="jl" style="color:#53636f;">at MainActivity.kt:112</div>
+        <div class="div"></div>
+        <div class="chips"><span class="chip">Copy</span><span class="chip">Share</span></div>`
+    },
+    {
+      topTab: 'tab-run', label: 'Runtime',
+      list: `
+        <div class="lrow sel" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#5cd8cc;font-weight:700;">App info</span>
+        </div>
+        <div class="lrow" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#aebbc4;">Device</span>
+        </div>
+        <div class="lrow" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span style="font-size:6.5px;color:#aebbc4;">Session</span>
+        </div>`,
+      dtab: 'App info',
+      body: `<div class="slabel">Application</div><div class="div"></div>
+        <div class="kv"><span class="k">Package: </span><span class="v">com.example.app</span></div>
+        <div class="kv"><span class="k">Version: </span><span class="v">2.4.1 (182)</span></div>
+        <div class="kv"><span class="k">Build tier: </span><span class="v">DEBUG</span></div>
+        <div class="div"></div>
+        <div class="slabel">Device</div>
+        <div class="kv"><span class="k">Model: </span><span class="v">Pixel 8 Pro</span></div>
+        <div class="kv"><span class="k">Android: </span><span class="v">14 (API 34)</span></div>`
+    }
+  ];
+
+  let current = 0;
+  function cycleTabs() {
+    const tabs = ['tab-net','tab-sto','tab-cra','tab-run'];
+    tabs.forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('on'); });
+    const t = tabContents[current];
+    const activeTab = document.getElementById(t.topTab);
+    if (activeTab) activeTab.classList.add('on');
+    const list = document.getElementById('cycle-list');
+    const body = document.getElementById('cycle-body');
+    const dtab = document.getElementById('dtab-active');
+    if (list) list.innerHTML = t.list;
+    if (body) { body.style.animation='none'; body.offsetHeight; body.style.animation=''; body.innerHTML = t.body; body.classList.add('anim-content'); }
+    if (dtab) dtab.textContent = t.dtab;
+    current = (current + 1) % tabContents.length;
+  }
+  setInterval(cycleTabs, 2500);
+</script>

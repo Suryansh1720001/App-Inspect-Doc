@@ -1,0 +1,204 @@
+<style>
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 20px; }
+  .card { border: 2px solid #d9e2df; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 200ms, box-shadow 200ms; background: #fff; }
+  .card:hover { border-color: #145f5b; box-shadow: 0 4px 20px rgba(20,95,91,0.13); }
+  .card.selected { border-color: #145f5b; box-shadow: 0 0 0 4px rgba(20,95,91,0.15); }
+  .card-image { background: #f1f5f4; padding: 18px 14px; display: flex; align-items: center; justify-content: center; min-height: 310px; }
+  .card-body { padding: 14px 16px 16px; border-top: 1px solid #eef4f2; }
+  .card-body h3 { margin: 0 0 5px; font-size: 0.95rem; color: #111b22; }
+  .card-body p { margin: 0; font-size: 0.82rem; color: #53636f; line-height: 1.5; }
+
+  /* Shared window chrome */
+  .win { border: 1px solid #26333b; border-radius: 9px; overflow: hidden; box-shadow: 0 10px 28px rgba(17,27,34,0.28); width: 100%; }
+  .win-bar { background: #1b2932; padding: 8px 12px; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid #26333b; }
+  .dots { display:flex; gap:4px; }
+  .dot { width:8px; height:8px; border-radius:50%; }
+  .dr{background:#f07080;} .dy{background:#f0b040;} .dg{background:#4cd9a0;}
+  .win-label { font-size: 8px; font-weight: 700; color: #aebbc4; margin-left: 2px; }
+  .tab-bar { display: flex; background: #111b22; border-bottom: 1px solid #26333b; }
+  .tab { padding: 6px 9px; font-size: 7.5px; font-weight: 700; color: #53636f; }
+  .tab.on { color: #5cd8cc; border-bottom: 2px solid #5cd8cc; }
+
+  /* List column */
+  .col-list { background: #0d1620; }
+  .search-bar { display: flex; align-items: center; gap: 5px; padding: 6px 8px; border-bottom: 1px solid #1a2530; }
+  .search-icon { font-size: 7px; color: #53636f; }
+  .search-text { font-size: 7px; color: #53636f; }
+  .list-row { display: flex; align-items: center; gap: 6px; padding: 7px 8px; border-bottom: 1px solid #161f28; }
+  .list-row.sel { background: #172535; }
+  .badge { font-size: 6.5px; font-weight: 800; padding: 2px 4px; border-radius: 3px; min-width: 24px; text-align: center; }
+  .bg { background:#1a4f3a; color:#4cd9a0; }
+  .bp { background:#3a2a14; color:#f0b040; }
+  .be { background:#3a1520; color:#f07080; }
+  .row-url { font-size: 7px; color: #aebbc4; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row-r { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .row-code { font-size: 7px; font-weight: 700; }
+  .ok { color: #4cd9a0; } .err { color: #f07080; }
+  .row-ms { font-size: 6px; color: #53636f; }
+
+  /* Detail column */
+  .col-detail { background: #111b22; }
+  .detail-tabs { display: flex; background: #0d1620; border-bottom: 1px solid #1a2530; }
+  .dtab { padding: 5px 8px; font-size: 7px; font-weight: 700; color: #53636f; }
+  .dtab.on { color: #5cd8cc; border-bottom: 2px solid #5cd8cc; }
+  .detail-body { padding: 8px 10px; }
+  .sec-label { font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: #53636f; margin: 8px 0 4px; }
+  .sec-label:first-child { margin-top: 0; }
+  .kv { font-size: 7px; margin-bottom: 3px; line-height: 1.4; }
+  .k { color: #7ab8d8; } .v { color: #c8e0ec; }
+  .divider { height: 1px; background: #1a2530; margin: 6px 0; }
+  .json-line { font-size: 6.5px; font-family: monospace; margin: 1px 0; }
+  .jk { color: #7ab8d8; } .js { color: #90d490; } .jn { color: #f0b040; }
+  .tools-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .tool-chip { background: #1a2530; border: 1px solid #26333b; border-radius: 3px; padding: 3px 5px; font-size: 6px; color: #5cd8cc; font-weight: 700; }
+
+  /* Layout variations */
+  .body-40-60 { display: grid; grid-template-columns: 40fr 60fr; }
+  .body-50-50 { display: grid; grid-template-columns: 1fr 1fr; }
+  .body-60-40 { display: grid; grid-template-columns: 60fr 40fr; }
+</style>
+
+<h2>How should the split pane be proportioned?</h2>
+<p class="subtitle">Each variation shows a different balance between the request list and the detail panel.</p>
+
+<div class="cards">
+
+  <!-- Variation 1: 60 list / 40 detail — list-led -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="win">
+        <div class="win-bar">
+          <div class="dots"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div></div>
+          <span class="win-label">AppInspect</span>
+        </div>
+        <div class="tab-bar">
+          <div class="tab on">Network</div><div class="tab">Storage</div><div class="tab">Work</div><div class="tab">Crashes</div><div class="tab">Runtime</div>
+        </div>
+        <div class="body-60-40">
+          <div class="col-list">
+            <div class="search-bar"><span class="search-icon">🔍</span><span class="search-text">Search requests…</span></div>
+            <div class="list-row"><span class="badge bg">GET</span><span class="row-url">/api/v2/user/profile</span><div class="row-r"><span class="row-code ok">200</span><span class="row-ms">124ms</span></div></div>
+            <div class="list-row"><span class="badge bp">POST</span><span class="row-url">/api/v2/auth/refresh</span><div class="row-r"><span class="row-code ok">201</span><span class="row-ms">88ms</span></div></div>
+            <div class="list-row sel"><span class="badge be">GET</span><span class="row-url">/api/v2/upload/avatar</span><div class="row-r"><span class="row-code err">404</span><span class="row-ms">42ms</span></div></div>
+            <div class="list-row"><span class="badge bg">GET</span><span class="row-url">/api/v2/feed/items</span><div class="row-r"><span class="row-code ok">200</span><span class="row-ms">310ms</span></div></div>
+            <div class="list-row"><span class="badge bp">POST</span><span class="row-url">/api/v2/events/track</span><div class="row-r"><span class="row-code ok">200</span><span class="row-ms">56ms</span></div></div>
+          </div>
+          <div class="col-detail">
+            <div class="detail-tabs">
+              <div class="dtab on">Overview</div><div class="dtab">Request</div><div class="dtab">Response</div>
+            </div>
+            <div class="detail-body">
+              <div class="kv"><span class="k">GET </span><span class="v">/api/v2/upload/avatar</span></div>
+              <div class="kv"><span class="k">Status: </span><span class="v err">404 Not Found</span></div>
+              <div class="kv"><span class="k">Host: </span><span class="v">api.myapp.com</span></div>
+              <div class="divider"></div>
+              <div class="kv"><span class="k">Auth: </span><span class="v">Bearer ••••••</span></div>
+              <div class="divider"></div>
+              <div class="tools-row">
+                <span class="tool-chip">cURL</span>
+                <span class="tool-chip">HAR</span>
+                <span class="tool-chip">Share</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — List-led (60/40)</h3>
+      <p>More rows visible in the list. Detail is compact. Emphasises the breadth of captured calls.</p>
+    </div>
+  </div>
+
+  <!-- Variation 2: 50/50 equal split -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="win">
+        <div class="win-bar">
+          <div class="dots"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div></div>
+          <span class="win-label">AppInspect</span>
+        </div>
+        <div class="tab-bar">
+          <div class="tab on">Network</div><div class="tab">Storage</div><div class="tab">Work</div><div class="tab">Crashes</div><div class="tab">Runtime</div>
+        </div>
+        <div class="body-50-50">
+          <div class="col-list">
+            <div class="search-bar"><span class="search-icon">🔍</span><span class="search-text">Search requests…</span></div>
+            <div class="list-row"><span class="badge bg">GET</span><span class="row-url">/api/v2/user/profile</span><div class="row-r"><span class="row-code ok">200</span><span class="row-ms">124ms</span></div></div>
+            <div class="list-row sel"><span class="badge bp">POST</span><span class="row-url">/api/v2/auth/refresh</span><div class="row-r"><span class="row-code ok">201</span><span class="row-ms">88ms</span></div></div>
+            <div class="list-row"><span class="badge bg">GET</span><span class="row-url">/api/v2/feed/items</span><div class="row-r"><span class="row-code ok">200</span><span class="row-ms">310ms</span></div></div>
+            <div class="list-row"><span class="badge bp">POST</span><span class="row-url">/api/v2/events/track</span><div class="row-r"><span class="row-code ok">200</span><span class="row-ms">56ms</span></div></div>
+          </div>
+          <div class="col-detail">
+            <div class="detail-tabs">
+              <div class="dtab">Overview</div><div class="dtab on">Response</div><div class="dtab">Request</div>
+            </div>
+            <div class="detail-body">
+              <div class="sec-label">Response body · 201</div>
+              <div class="json-line"><span class="jk">"access_token"</span><span class="v">: </span><span class="js">"eyJhbGci…"</span></div>
+              <div class="json-line"><span class="jk">"token_type"</span><span class="v">: </span><span class="js">"Bearer"</span></div>
+              <div class="json-line"><span class="jk">"expires_in"</span><span class="v">: </span><span class="jn">3600</span></div>
+              <div class="json-line"><span class="jk">"refresh_token"</span><span class="v">: </span><span class="js">"dGhpc2lz…"</span></div>
+              <div class="divider"></div>
+              <div class="sec-label">Headers</div>
+              <div class="kv"><span class="k">Content-Type: </span><span class="v">application/json</span></div>
+              <div class="kv"><span class="k">Cache-Control: </span><span class="v">no-store</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Equal (50/50)</h3>
+      <p>Balanced view. Detail panel shows JSON response body — demonstrating the inspection depth developers care about most.</p>
+    </div>
+  </div>
+
+  <!-- Variation 3: 40 list / 60 detail — detail-led -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="win">
+        <div class="win-bar">
+          <div class="dots"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div></div>
+          <span class="win-label">AppInspect</span>
+        </div>
+        <div class="tab-bar">
+          <div class="tab on">Network</div><div class="tab">Storage</div><div class="tab">Work</div><div class="tab">Crashes</div><div class="tab">Runtime</div>
+        </div>
+        <div class="body-40-60">
+          <div class="col-list">
+            <div class="list-row"><span class="badge bg">GET</span><span class="row-url">/user/profile</span><div class="row-r"><span class="row-code ok">200</span><span class="row-ms">124ms</span></div></div>
+            <div class="list-row sel"><span class="badge bp">POST</span><span class="row-url">/auth/refresh</span><div class="row-r"><span class="row-code ok">201</span><span class="row-ms">88ms</span></div></div>
+            <div class="list-row"><span class="badge bg">GET</span><span class="row-url">/feed/items</span><div class="row-r"><span class="row-code ok">200</span><span class="row-ms">310ms</span></div></div>
+            <div class="list-row"><span class="badge be">GET</span><span class="row-url">/upload/avatar</span><div class="row-r"><span class="row-code err">404</span><span class="row-ms">42ms</span></div></div>
+          </div>
+          <div class="col-detail">
+            <div class="detail-tabs">
+              <div class="dtab">Overview</div><div class="dtab">Request</div><div class="dtab on">Response</div><div class="dtab">Tools</div>
+            </div>
+            <div class="detail-body">
+              <div class="sec-label">Status · 201 Created · 88ms</div>
+              <div class="divider"></div>
+              <div class="sec-label">Response body</div>
+              <div class="json-line"><span style="color:#53636f;">{</span></div>
+              <div class="json-line">&nbsp;&nbsp;<span class="jk">"access_token"</span>: <span class="js">"eyJhbGciOiJIUzI…"</span>,</div>
+              <div class="json-line">&nbsp;&nbsp;<span class="jk">"token_type"</span>: <span class="js">"Bearer"</span>,</div>
+              <div class="json-line">&nbsp;&nbsp;<span class="jk">"expires_in"</span>: <span class="jn">3600</span>,</div>
+              <div class="json-line">&nbsp;&nbsp;<span class="jk">"scope"</span>: <span class="js">"read write"</span></div>
+              <div class="json-line"><span style="color:#53636f;">}</span></div>
+              <div class="divider"></div>
+              <div class="sec-label">Response headers</div>
+              <div class="kv"><span class="k">Content-Type: </span><span class="v">application/json</span></div>
+              <div class="kv"><span class="k">X-Request-Id: </span><span class="v">a4f9-cc12…</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Detail-led (40/60)</h3>
+      <p>Wider detail panel. Shows full JSON pretty-print and all four inspector tabs (Overview · Request · Response · Tools). Max depth at a glance.</p>
+    </div>
+  </div>
+
+</div>

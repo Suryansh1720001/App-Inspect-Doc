@@ -1,0 +1,237 @@
+<style>
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 20px; }
+  .card { border: 2px solid #d9e2df; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 200ms, box-shadow 200ms; background: #fff; }
+  .card:hover { border-color: #145f5b; box-shadow: 0 4px 20px rgba(20,95,91,0.13); }
+  .card.selected { border-color: #145f5b; box-shadow: 0 0 0 4px rgba(20,95,91,0.15); }
+  .card-image { background: #f6f8f7; padding: 20px; min-height: 280px; display: flex; align-items: center; justify-content: center; }
+  .card-body { padding: 16px 18px 18px; border-top: 1px solid #eef4f2; }
+  .card-body h3 { margin: 0 0 6px; font-size: 1rem; color: #111b22; }
+  .card-body p { margin: 0; font-size: 0.84rem; color: #53636f; line-height: 1.55; }
+
+  /* — Option A: Phone frame — */
+  .phone { width: 160px; border: 4px solid #26333b; border-radius: 28px; background: #111b22; overflow: hidden; box-shadow: 0 12px 32px rgba(17,27,34,0.25); }
+  .phone-top { height: 22px; background: #111b22; display: flex; align-items: center; justify-content: center; }
+  .phone-notch { width: 50px; height: 10px; background: #26333b; border-radius: 6px; }
+  .phone-screen { background: #1b2932; }
+  .phone-tab-bar { display: flex; background: #111b22; border-bottom: 1px solid #26333b; }
+  .phone-tab { flex: 1; padding: 7px 2px; text-align: center; font-size: 7px; font-weight: 700; color: #53636f; }
+  .phone-tab.active { color: #5cd8cc; border-bottom: 2px solid #5cd8cc; }
+  .phone-row { display: flex; align-items: center; gap: 6px; padding: 7px 8px; border-bottom: 1px solid #1f2d36; }
+  .phone-badge { font-size: 6px; font-weight: 800; padding: 2px 4px; border-radius: 3px; }
+  .get { background: #1a4f3a; color: #4cd9a0; }
+  .post { background: #3a2a14; color: #f0b040; }
+  .err { background: #3a1520; color: #f07080; }
+  .phone-url { font-size: 6.5px; color: #aebbc4; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .phone-status { font-size: 6.5px; font-weight: 700; }
+  .status-ok { color: #4cd9a0; }
+  .status-err { color: #f07080; }
+  .phone-time { font-size: 6px; color: #53636f; }
+  .phone-bottom { height: 16px; background: #111b22; display: flex; align-items: center; justify-content: center; }
+  .home-bar { width: 40px; height: 4px; background: #26333b; border-radius: 3px; }
+
+  /* — Option B: Window frame — */
+  .window { width: 100%; max-width: 320px; border: 1px solid #26333b; border-radius: 10px; overflow: hidden; box-shadow: 0 12px 32px rgba(17,27,34,0.2); }
+  .win-title { background: #1b2932; padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #26333b; }
+  .win-dots { display: flex; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f07080; } .dot-y { background: #f0b040; } .dot-g { background: #4cd9a0; }
+  .win-name { font-size: 9px; font-weight: 700; color: #aebbc4; margin-left: 4px; }
+  .win-tabs { display: flex; background: #111b22; border-bottom: 1px solid #26333b; }
+  .win-tab { padding: 7px 10px; font-size: 8px; font-weight: 700; color: #53636f; }
+  .win-tab.active { color: #5cd8cc; border-bottom: 2px solid #5cd8cc; }
+  .win-body { background: #0d1620; }
+  .win-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #1a2530; }
+  .win-badge { font-size: 7px; font-weight: 800; padding: 2px 5px; border-radius: 3px; min-width: 28px; text-align: center; }
+  .win-url { font-size: 7.5px; color: #aebbc4; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .win-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .win-code { font-size: 7.5px; font-weight: 700; }
+  .win-ms { font-size: 6.5px; color: #53636f; }
+
+  /* — Option C: Split pane — */
+  .split-pane { width: 100%; max-width: 340px; border: 1px solid #26333b; border-radius: 10px; overflow: hidden; box-shadow: 0 12px 32px rgba(17,27,34,0.2); display: flex; flex-direction: column; }
+  .sp-header { background: #111b22; padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #26333b; }
+  .sp-body { display: grid; grid-template-columns: 1fr 1fr; }
+  .sp-list { background: #0d1620; border-right: 1px solid #26333b; }
+  .sp-list-row { padding: 8px 10px; border-bottom: 1px solid #1a2530; }
+  .sp-list-row.selected { background: #172535; }
+  .sp-method { font-size: 7px; font-weight: 800; padding: 2px 4px; border-radius: 3px; }
+  .sp-path { font-size: 7px; color: #aebbc4; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+  .sp-row-meta { display: flex; gap: 4px; align-items: center; margin-top: 2px; }
+  .sp-code { font-size: 6.5px; font-weight: 700; }
+  .sp-ms { font-size: 6.5px; color: #53636f; }
+  .sp-detail { background: #111b22; padding: 8px; }
+  .sp-label { font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #53636f; margin-bottom: 4px; }
+  .sp-kv { font-size: 6.5px; margin-bottom: 3px; }
+  .sp-key { color: #7ab8d8; } .sp-val { color: #aebbc4; }
+  .sp-divider { height: 1px; background: #26333b; margin: 6px 0; }
+</style>
+
+<h2>Which showcase direction feels right?</h2>
+<p class="subtitle">Each shows AppInspect in a different visual format. Click to select your preference.</p>
+
+<div class="cards">
+
+  <!-- Option A: Phone frame -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="phone">
+        <div class="phone-top"><div class="phone-notch"></div></div>
+        <div class="phone-screen">
+          <div class="phone-tab-bar">
+            <div class="phone-tab active">Network</div>
+            <div class="phone-tab">Storage</div>
+            <div class="phone-tab">Crashes</div>
+            <div class="phone-tab">Runtime</div>
+          </div>
+          <div class="phone-row">
+            <span class="phone-badge get">GET</span>
+            <span class="phone-url">/api/v2/user/profile</span>
+            <span class="phone-status status-ok">200</span>
+          </div>
+          <div class="phone-row">
+            <span class="phone-badge post">POST</span>
+            <span class="phone-url">/api/v2/auth/refresh</span>
+            <span class="phone-status status-ok">201</span>
+          </div>
+          <div class="phone-row">
+            <span class="phone-badge get">GET</span>
+            <span class="phone-url">/api/v2/feed/items</span>
+            <span class="phone-status status-ok">200</span>
+          </div>
+          <div class="phone-row">
+            <span class="phone-badge err">GET</span>
+            <span class="phone-url">/api/v2/upload/avatar</span>
+            <span class="phone-status status-err">404</span>
+          </div>
+          <div class="phone-row">
+            <span class="phone-badge post">POST</span>
+            <span class="phone-url">/api/v2/events/track</span>
+            <span class="phone-status status-ok">200</span>
+          </div>
+          <div class="phone-row">
+            <span class="phone-badge get">GET</span>
+            <span class="phone-url">/api/v2/config/flags</span>
+            <span class="phone-status status-ok">200</span>
+          </div>
+        </div>
+        <div class="phone-bottom"><div class="home-bar"></div></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Phone frame</h3>
+      <p>Inspector shown inside a realistic Android phone silhouette. Immediately signals "mobile tool." Classic product marketing style.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Desktop window -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="window">
+        <div class="win-title">
+          <div class="win-dots">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+          </div>
+          <span class="win-name">AppInspect — Network</span>
+        </div>
+        <div class="win-tabs">
+          <div class="win-tab active">Network</div>
+          <div class="win-tab">Storage</div>
+          <div class="win-tab">Work</div>
+          <div class="win-tab">Crashes</div>
+          <div class="win-tab">Runtime</div>
+        </div>
+        <div class="win-body">
+          <div class="win-row">
+            <span class="win-badge get">GET</span>
+            <span class="win-url">/api/v2/user/profile</span>
+            <div class="win-meta"><span class="win-code status-ok">200</span><span class="win-ms">124 ms</span></div>
+          </div>
+          <div class="win-row">
+            <span class="win-badge post">POST</span>
+            <span class="win-url">/api/v2/auth/token/refresh</span>
+            <div class="win-meta"><span class="win-code status-ok">201</span><span class="win-ms">88 ms</span></div>
+          </div>
+          <div class="win-row">
+            <span class="win-badge get">GET</span>
+            <span class="win-url">/api/v2/feed/items?page=2</span>
+            <div class="win-meta"><span class="win-code status-ok">200</span><span class="win-ms">310 ms</span></div>
+          </div>
+          <div class="win-row">
+            <span class="win-badge err">GET</span>
+            <span class="win-url">/api/v2/upload/avatar</span>
+            <div class="win-meta"><span class="win-code status-err">404</span><span class="win-ms">42 ms</span></div>
+          </div>
+          <div class="win-row">
+            <span class="win-badge post">POST</span>
+            <span class="win-url">/api/v2/events/track</span>
+            <div class="win-meta"><span class="win-code status-ok">200</span><span class="win-ms">56 ms</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — App window</h3>
+      <p>Inspector shown as a floating dark window with macOS-style chrome. Emphasises the inspector as a full tool. More detail visible at a glance.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Split pane -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="split-pane">
+        <div class="sp-header">
+          <div class="win-dots">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+          </div>
+          <span class="win-name">AppInspect — Request detail</span>
+        </div>
+        <div class="sp-body">
+          <div class="sp-list">
+            <div class="sp-list-row">
+              <span class="sp-method post">POST</span>
+              <div class="sp-path">/api/v2/auth/token</div>
+              <div class="sp-row-meta"><span class="sp-code status-ok">201</span><span class="sp-ms">88 ms</span></div>
+            </div>
+            <div class="sp-list-row selected">
+              <span class="sp-method get">GET</span>
+              <div class="sp-path">/api/v2/user/profile</div>
+              <div class="sp-row-meta"><span class="sp-code status-ok">200</span><span class="sp-ms">124 ms</span></div>
+            </div>
+            <div class="sp-list-row">
+              <span class="sp-method get" style="background:#3a1520;color:#f07080">GET</span>
+              <div class="sp-path">/api/v2/upload/avatar</div>
+              <div class="sp-row-meta"><span class="sp-code status-err">404</span><span class="sp-ms">42 ms</span></div>
+            </div>
+            <div class="sp-list-row">
+              <span class="sp-method get">GET</span>
+              <div class="sp-path">/api/v2/feed/items</div>
+              <div class="sp-row-meta"><span class="sp-code status-ok">200</span><span class="sp-ms">310 ms</span></div>
+            </div>
+          </div>
+          <div class="sp-detail">
+            <div class="sp-label">Request</div>
+            <div class="sp-kv"><span class="sp-key">GET </span><span class="sp-val">/api/v2/user/profile</span></div>
+            <div class="sp-kv"><span class="sp-key">Host: </span><span class="sp-val">api.myapp.com</span></div>
+            <div class="sp-kv"><span class="sp-key">Auth: </span><span class="sp-val">Bearer ••••••</span></div>
+            <div class="sp-divider"></div>
+            <div class="sp-label">Response · 200</div>
+            <div class="sp-kv"><span class="sp-key">type: </span><span class="sp-val">application/json</span></div>
+            <div class="sp-kv"><span class="sp-key">body: </span><span class="sp-val">{ "id": 4812, "name"...</span></div>
+            <div class="sp-divider"></div>
+            <div class="sp-label">Tools</div>
+            <div class="sp-kv" style="color:#5cd8cc; font-size:6.5px;">📋 Copy cURL  ↓ HAR  📤 Share</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Split pane (list + detail)</h3>
+      <p>Shows the list on the left and request detail on the right simultaneously. Demonstrates the inspection depth — headers, body, tools — all at once.</p>
+    </div>
+  </div>
+
+</div>

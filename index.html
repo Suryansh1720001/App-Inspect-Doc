@@ -84,38 +84,86 @@
                         <span class="status-dot"></span>
                         <span>Built for Android development and QA</span>
                     </div>
-                    <div class="preview-window">
-                        <div class="preview-header">
-                            <span>AppInspect</span>
-                            <span>In-app tools</span>
+
+                    <!-- Inspector UI showcase -->
+                    <div class="inspector-window" aria-hidden="true">
+                        <div class="inspector-chrome">
+                            <div class="chrome-dots">
+                                <span class="cdot cdot-r"></span>
+                                <span class="cdot cdot-y"></span>
+                                <span class="cdot cdot-g"></span>
+                            </div>
+                            <span class="chrome-title">AppInspect — Network</span>
                         </div>
-                        <div class="preview-grid">
-                            <div>
-                                <strong>Network</strong>
-                                <span>Headers, bodies, cURL, HAR</span>
+                        <div class="inspector-tabs">
+                            <span class="itab itab-active">Network</span>
+                            <span class="itab">Storage</span>
+                            <span class="itab">Work</span>
+                            <span class="itab">Crashes</span>
+                            <span class="itab">Runtime</span>
+                        </div>
+                        <div class="inspector-split">
+                            <div class="inspector-list">
+                                <div class="irow">
+                                    <span class="imethod imethod-get">GET</span>
+                                    <span class="iurl">/api/v2/user/profile</span>
+                                    <span class="icode icode-ok">200</span>
+                                    <span class="ims">124ms</span>
+                                </div>
+                                <div class="irow irow-sel">
+                                    <span class="imethod imethod-post">POST</span>
+                                    <span class="iurl">/api/v2/auth/refresh</span>
+                                    <span class="icode icode-ok">201</span>
+                                    <span class="ims">88ms</span>
+                                </div>
+                                <div class="irow">
+                                    <span class="imethod imethod-err">GET</span>
+                                    <span class="iurl">/api/v2/upload/avatar</span>
+                                    <span class="icode icode-err">404</span>
+                                    <span class="ims">42ms</span>
+                                </div>
+                                <div class="irow">
+                                    <span class="imethod imethod-get">GET</span>
+                                    <span class="iurl">/api/v2/feed/items</span>
+                                    <span class="icode icode-ok">200</span>
+                                    <span class="ims">310ms</span>
+                                </div>
+                                <div class="irow">
+                                    <span class="imethod imethod-post">POST</span>
+                                    <span class="iurl">/api/v2/events/track</span>
+                                    <span class="icode icode-ok">200</span>
+                                    <span class="ims">56ms</span>
+                                </div>
                             </div>
-                            <div>
-                                <strong>Storage</strong>
-                                <span>Preferences, DataStore, SQLite</span>
-                            </div>
-                            <div>
-                                <strong>WorkManager</strong>
-                                <span>Read-only job visibility</span>
-                            </div>
-                            <div>
-                                <strong>Crashes</strong>
-                                <span>Fatal exception capture</span>
-                            </div>
-                            <div>
-                                <strong>Runtime</strong>
-                                <span>App, device, session metadata</span>
-                            </div>
-                            <div>
-                                <strong>Built-in UI</strong>
-                                <span>Open from app, shortcut, gesture</span>
+                            <div class="inspector-detail">
+                                <div class="idetail-tabs">
+                                    <span class="idtab">Overview</span>
+                                    <span class="idtab">Request</span>
+                                    <span class="idtab idtab-active">Response</span>
+                                    <span class="idtab">Tools</span>
+                                </div>
+                                <div class="idetail-body">
+                                    <p class="idetail-meta">POST /api/v2/auth/refresh &middot; 201 &middot; 88ms</p>
+                                    <div class="idetail-divider"></div>
+                                    <p class="idetail-section">Response body</p>
+                                    <div class="json-block">
+                                        <span class="json-punc">{</span><br>
+                                        &nbsp;&nbsp;<span class="json-key">"access_token"</span><span class="json-punc">: </span><span class="json-str">"eyJhbGci&#8230;"</span><span class="json-punc">,</span><br>
+                                        &nbsp;&nbsp;<span class="json-key">"token_type"</span><span class="json-punc">: </span><span class="json-str">"Bearer"</span><span class="json-punc">,</span><br>
+                                        &nbsp;&nbsp;<span class="json-key">"expires_in"</span><span class="json-punc">: </span><span class="json-num">3600</span><br>
+                                        <span class="json-punc">}</span>
+                                    </div>
+                                    <div class="idetail-divider"></div>
+                                    <div class="idetail-tools">
+                                        <span class="itool">Copy cURL</span>
+                                        <span class="itool">HAR</span>
+                                        <span class="itool">Share</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="trust-row">
                         <span>One Android library</span>
                         <span>Published on Maven Central</span>
@@ -516,15 +564,46 @@
         </main>
 
         <footer class="site-footer">
-            <p>AppInspect documentation landing page by Suryansh Prajapati.</p>
-            <a href="privacy.html">Privacy Policy</a>
-            <a
-                href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                central.sonatype.com
-            </a>
+            <div class="footer-brand">
+                <a class="footer-brand-link" href="#top">
+                    <img src="fevicon/favicon-180.png" alt="" width="32" height="32">
+                    <span>AppInspect</span>
+                </a>
+                <p class="footer-brand-desc">
+                    Android in-app inspector for developers and QA teams. Drop in one library,
+                    inspect network traffic, storage, crashes, and runtime metadata from inside
+                    the running app. No cloud. No telemetry.
+                </p>
+                <p class="footer-copy">&#169; 2025 Suryansh Prajapati</p>
+            </div>
+
+            <nav class="footer-nav" aria-label="Footer">
+                <div class="footer-nav-group">
+                    <span class="footer-nav-label">Docs</span>
+                    <a href="#features">Features</a>
+                    <a href="#install">Integration</a>
+                    <a href="#security">Security</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                </div>
+                <div class="footer-nav-group">
+                    <span class="footer-nav-label">Links</span>
+                    <a
+                        href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >Maven Central</a>
+                    <a
+                        href="https://github.com/Suryansh1720001"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >GitHub</a>
+                    <a
+                        href="https://www.linkedin.com/in/itssuryansh/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >LinkedIn</a>
+                </div>
+            </nav>
         </footer>
     </div>
 
