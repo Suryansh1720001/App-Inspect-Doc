@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | AppInspect</title>
+    <meta
+        name="description"
+        content="AppInspect privacy policy. This website collects no personal data. The AppInspect library runs entirely on-device with no cloud backend and no telemetry."
+    >
+    <meta name="theme-color" content="#145f5b">
+    <script>
+        document.documentElement.classList.add("js");
+    </script>
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="index.html">
+                <img class="brand-logo" src="fevicon/favicon-180.png" alt="" width="44" height="44">
+                <span class="brand-copy">
+                    <strong>AppInspect</strong>
+                    <span>Android in-app inspector</span>
+                </span>
+            </a>
+            <button
+                class="nav-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="site-nav"
+                aria-label="Toggle navigation"
+            >
+                Menu
+            </button>
+            <nav class="site-nav" id="site-nav" aria-label="Primary">
+                <a href="index.html#top">About</a>
+                <a href="index.html#features">Features</a>
+                <a href="index.html#install">Integration</a>
+                <a href="index.html#security">Security</a>
+                <a href="privacy.html" aria-current="page">Privacy</a>
+                <a href="index.html#support">Support</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Page intro -->
+            <section class="section reveal" id="top">
+                <div class="section-heading">
+                    <span class="eyebrow">Privacy Policy</span>
+                    <h1>How AppInspect handles data.</h1>
+                    <p>
+                        AppInspect is a local Android library, not a data service. This page explains
+                        what the documentation website collects (nothing) and what the library itself
+                        does with data on the device.
+                    </p>
+                    <p class="privacy-meta">Last updated: May 2026</p>
+                </div>
+                <div>
+                    <a class="button button-secondary" href="index.html">&#8592; Back to AppInspect</a>
+                </div>
+            </section>
+
+            <!-- Website privacy -->
+            <section class="section reveal" id="website">
+                <div class="section-heading">
+                    <span class="eyebrow">This website</span>
+                    <h2>No tracking. No analytics. No cookies.</h2>
+                    <p>
+                        The AppInspect documentation website does not collect or store any personal
+                        information about visitors.
+                    </p>
+                </div>
+
+                <div class="audience-grid">
+                    <article class="content-panel">
+                        <h3>What this site does not do</h3>
+                        <ul class="check-list">
+                            <li>No analytics scripts (Google Analytics, Mixpanel, Plausible, or similar).</li>
+                            <li>No cookies are set by this site.</li>
+                            <li>No user accounts, sign-up forms, or login flows.</li>
+                            <li>No advertising pixels or third-party tracking.</li>
+                            <li>No session recording or heatmap tools.</li>
+                            <li>No contact forms that submit personal data.</li>
+                        </ul>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Third-party resources loaded</h3>
+                        <ul class="check-list">
+                            <li>
+                                <strong>Google Fonts</strong> — Manrope and JetBrains Mono are loaded
+                                from <code>fonts.googleapis.com</code>. Google may log the request
+                                IP and user-agent per their own privacy policy.
+                            </li>
+                            <li>
+                                <strong>Maven Central links</strong> — Clicking "View Maven Central"
+                                navigates to <code>central.sonatype.com</code>, which has its own
+                                privacy policy and may set cookies on that domain.
+                            </li>
+                            <li>
+                                No other external scripts, images, or iframes are loaded by this
+                                documentation site.
+                            </li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Library privacy -->
+            <section class="section reveal" id="library">
+                <div class="section-heading">
+                    <span class="eyebrow">AppInspect library</span>
+                    <h2>Runs entirely on your device. No cloud. No telemetry.</h2>
+                    <p>
+                        AppInspect is a developer and QA tool that runs inside the host Android
+                        application. It has no cloud backend, requires no account, and never uploads
+                        data to any AppInspect server.
+                    </p>
+                </div>
+
+                <div class="security-grid">
+                    <article class="content-panel">
+                        <h3>What the library never does</h3>
+                        <ul class="check-list">
+                            <li>Does not require an AppInspect account or registration.</li>
+                            <li>Does not upload captured network events, crash reports, or storage data to any remote server.</li>
+                            <li>Does not send usage telemetry, crash telemetry, or analytics about how the inspector is used.</li>
+                            <li>Does not communicate with any AppInspect-operated infrastructure.</li>
+                            <li>Does not include any advertising SDKs or tracking libraries.</li>
+                        </ul>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>What the library stores on-device</h3>
+                        <ul class="check-list">
+                            <li>Captured OkHttp requests and responses are stored in an app-private SQLite database (<code>appinspect_storage.db</code>) on the device.</li>
+                            <li>Uncaught exceptions (crashes) are captured and stored in the same private database, up to 50 recent events.</li>
+                            <li>Storage and WorkManager data is read from the host app on demand and is never persisted by AppInspect.</li>
+                            <li>All on-device data is private to the host app and is not accessible to other apps without device root.</li>
+                            <li>Data is cleared when the user taps "Clear" inside the inspector, or when the host app is uninstalled.</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Exports and sharing -->
+            <section class="section reveal" id="exports">
+                <div class="section-heading">
+                    <span class="eyebrow">Exports and sharing</span>
+                    <h2>Exports leave the device only when a person triggers them.</h2>
+                    <p>
+                        The library provides tools to export network logs as TXT or HAR files and to
+                        share crash details via the Android share sheet. These exports happen only
+                        when someone actively triggers the action inside the inspector.
+                    </p>
+                </div>
+
+                <div class="qa-layout">
+                    <article class="warning-card">
+                        <h3>Exports may contain sensitive data</h3>
+                        <p>
+                            Network log exports (TXT, HAR, cURL) include the full request and response
+                            headers from captured API calls. This may include:
+                        </p>
+                        <ul class="check-list">
+                            <li>Authorization tokens and API keys from request headers.</li>
+                            <li>Session cookies from request and response headers.</li>
+                            <li>Request and response body content, up to the configured capture limit.</li>
+                        </ul>
+                        <p>
+                            These exports are intended for internal debugging only. Treat them as
+                            sensitive internal artifacts and redact credentials before sharing with
+                            external parties or uploading to issue trackers.
+                        </p>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>The library's role in exports</h3>
+                        <ul class="check-list">
+                            <li>The library writes export files to <code>cacheDir/appinspect_exports/</code>, scoped by a <code>FileProvider</code> that cannot grant access to other paths.</li>
+                            <li>Exports are only created when a user explicitly taps the export or share action inside the inspector.</li>
+                            <li>The library does not send exports anywhere automatically.</li>
+                            <li>Export files remain in the app cache until Android clears the cache or the app is uninstalled.</li>
+                            <li>For production builds, use <code>appinspect-no-op</code> to ensure no data is captured or exportable.</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Production builds -->
+            <section class="section reveal" id="production">
+                <div class="section-heading">
+                    <span class="eyebrow">Production builds</span>
+                    <h2>Zero inspection code in release APKs.</h2>
+                    <p>
+                        When you use the <code>appinspect-no-op</code> artifact in your release build,
+                        the production APK contains no inspector UI, no SQLite database, no storage
+                        access, no crash handler, and no network capture code. End users of your
+                        production app are completely unaffected by AppInspect.
+                    </p>
+                </div>
+
+                <div class="audience-grid">
+                    <article class="content-panel">
+                        <h3>No-op artifact guarantees</h3>
+                        <ul class="check-list">
+                            <li>The OkHttp interceptor is a pass-through that calls <code>chain.proceed()</code> immediately without logging anything.</li>
+                            <li>No <code>AppInspectActivity</code> is registered in the release manifest.</li>
+                            <li>No notification channel is created, no crash handler is installed.</li>
+                            <li>No inspector database is opened or created.</li>
+                            <li>No permissions beyond what your app already declares are added.</li>
+                        </ul>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Recommended setup</h3>
+                        <ul class="check-list">
+                            <li>Use <code>debugImplementation</code> and staging-variant dependencies for the full <code>appinspect</code> artifact.</li>
+                            <li>Use <code>releaseImplementation</code> for <code>appinspect-no-op</code> in production builds.</li>
+                            <li>Guard any <code>AppInspect.open()</code> or <code>AppInspect.install()</code> calls by build variant, as these APIs are not present in the no-op.</li>
+                            <li>The OkHttp interceptor extension (<code>.addAppInspectInterceptor()</code>) is safe to call in all variants — it is a no-op in the release artifact.</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Contact -->
+            <section class="section section-compact reveal" id="contact">
+                <div class="developer-card">
+                    <div class="developer-copy">
+                        <span class="eyebrow">Questions</span>
+                        <h2>Questions about this policy?</h2>
+                        <p>
+                            If you have questions about how AppInspect handles data, reach out to
+                            Suryansh Prajapati via GitHub or LinkedIn.
+                        </p>
+                    </div>
+                    <div class="developer-links">
+                        <a
+                            class="button button-secondary"
+                            href="https://github.com/Suryansh1720001"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            GitHub
+                        </a>
+                        <a
+                            class="button button-secondary"
+                            href="https://www.linkedin.com/in/itssuryansh/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            LinkedIn
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <p>AppInspect documentation landing page by Suryansh Prajapati.</p>
+            <a href="privacy.html" aria-current="page">Privacy Policy</a>
+            <a
+                href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                central.sonatype.com
+            </a>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

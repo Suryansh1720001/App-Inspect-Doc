@@ -6,9 +6,9 @@
     <title>AppInspect | Android In-App Inspector</title>
     <meta
         name="description"
-        content="AppInspect is an Android in-app inspector for developers and testers. Learn how to integrate it from Maven Central and enable network, storage, WorkManager, and runtime inspection."
+        content="AppInspect is an Android in-app inspector for developer and QA builds, with network, storage, WorkManager, crash, runtime, redaction, and release-safe no-op support."
     >
-    <meta name="theme-color" content="#176c67">
+    <meta name="theme-color" content="#145f5b">
     <script>
         document.documentElement.classList.add("js");
     </script>
@@ -29,7 +29,7 @@
     <div class="page-shell">
         <header class="site-header">
             <a class="brand" href="#top">
-                <span class="brand-mark">AP</span>
+                <img class="brand-logo" src="fevicon/favicon-180.png" alt="" width="44" height="44">
                 <span class="brand-copy">
                     <strong>AppInspect</strong>
                     <span>Android in-app inspector</span>
@@ -45,24 +45,26 @@
                 Menu
             </button>
             <nav class="site-nav" id="site-nav" aria-label="Primary">
-                <a href="#about">About</a>
-                <a href="#install">Install</a>
-                <a href="#configure">Configure</a>
+                <a href="#top">About</a>
                 <a href="#features">Features</a>
-                <a href="#safety">Safety</a>
+                <a href="#install">Integration</a>
+                <a href="#security">Security</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="#support">Support</a>
             </nav>
         </header>
 
         <main>
+            <!-- About / Hero -->
             <section class="hero reveal" id="top">
                 <div class="hero-copy">
-                    <span class="eyebrow">Published on Maven Central</span>
+                    <span class="eyebrow">Android in-app inspector library</span>
                     <h1>Inspect your Android app from inside the app.</h1>
                     <p class="hero-text">
-                        AppInspect is a clean, built-in debugging surface for Android apps. Add one
-                        dependency, open the inspector inside your app, and review network traffic,
-                        storage, WorkManager state, and runtime details without building your own
-                        internal tools UI.
+                        AppInspect is a drop-in Android library for developers, testers, and
+                        product teams who need real app evidence during development and QA. Open a
+                        built-in inspector inside your app and review network traffic, local storage,
+                        background jobs, crashes, and runtime metadata without building a custom debug panel.
                     </p>
                     <div class="hero-actions">
                         <a
@@ -71,424 +73,372 @@
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            View On Maven Central
+                            View Maven Central
                         </a>
-                        <a class="button button-secondary" href="#install">See Integration Steps</a>
-                    </div>
-
-                    <div class="package-card">
-                        <div class="package-header">
-                            <h2>Package details</h2>
-                            <a
-                                class="tag"
-                                href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >Latest version → Maven Central</a>
-                        </div>
-                        <div class="package-grid">
-                            <div>
-                                <span class="label">Group</span>
-                                <code>io.github.suryansh1720001.appinspect</code>
-                            </div>
-                            <div>
-                                <span class="label">Artifact</span>
-                                <code>appinspect</code>
-                            </div>
-                            <div>
-                                <span class="label">Dependency</span>
-                                <code>implementation("io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;")</code>
-                            </div>
-                        </div>
+                        <a class="button button-secondary" href="#features">Explore Features</a>
                     </div>
                 </div>
 
-                <div class="hero-preview" aria-label="AppInspect interface preview">
+                <div class="hero-panel" aria-label="AppInspect capability summary">
+                    <div class="status-strip">
+                        <span class="status-dot"></span>
+                        <span>Built for Android development and QA</span>
+                    </div>
                     <div class="preview-window">
-                        <div class="preview-topbar">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                        <div class="preview-header">
+                            <span>AppInspect</span>
+                            <span>In-app tools</span>
                         </div>
-                        <div class="preview-body">
-                            <div class="preview-sidebar">
-                                <div class="preview-pill preview-pill-active">Network</div>
-                                <div class="preview-pill">Storage</div>
-                                <div class="preview-pill">WorkManager</div>
-                                <div class="preview-pill">Runtime</div>
+                        <div class="preview-grid">
+                            <div>
+                                <strong>Network</strong>
+                                <span>Headers, bodies, cURL, HAR</span>
                             </div>
-                            <div class="preview-content">
-                                <div class="metric-row">
-                                    <div class="metric-card">
-                                        <span>Captured Calls</span>
-                                        <strong>128</strong>
-                                    </div>
-                                    <div class="metric-card">
-                                        <span>Failed Calls</span>
-                                        <strong>7</strong>
-                                    </div>
-                                </div>
-                                <div class="preview-request">
-                                    <span class="request-method">GET</span>
-                                    <div>
-                                        <strong>/api/v1/profile</strong>
-                                        <p>Headers, body, response, and cURL in one place</p>
-                                    </div>
-                                </div>
-                                <div class="preview-request">
-                                    <span class="request-method request-method-post">POST</span>
-                                    <div>
-                                        <strong>/api/v1/login</strong>
-                                        <p>Persistent history with filter and search support</p>
-                                    </div>
-                                </div>
-                                <div class="preview-footer">
-                                    <span class="mini-chip">Built-in activity</span>
-                                    <span class="mini-chip">AndroidX Startup</span>
-                                    <span class="mini-chip">OkHttp</span>
-                                </div>
+                            <div>
+                                <strong>Storage</strong>
+                                <span>Preferences, DataStore, SQLite</span>
+                            </div>
+                            <div>
+                                <strong>WorkManager</strong>
+                                <span>Read-only job visibility</span>
+                            </div>
+                            <div>
+                                <strong>Crashes</strong>
+                                <span>Fatal exception capture</span>
+                            </div>
+                            <div>
+                                <strong>Runtime</strong>
+                                <span>App, device, session metadata</span>
+                            </div>
+                            <div>
+                                <strong>Built-in UI</strong>
+                                <span>Open from app, shortcut, gesture</span>
                             </div>
                         </div>
+                    </div>
+                    <div class="trust-row">
+                        <span>One Android library</span>
+                        <span>Published on Maven Central</span>
+                        <span>Designed for team debugging</span>
                     </div>
                 </div>
             </section>
 
-            <section class="intro-strip reveal" id="about">
-                <div class="intro-card">
-                    <span class="label">Why AppInspect</span>
-                    <h2>Simple integration, useful data, no extra inspector app required.</h2>
+            <!-- Who it is for -->
+            <section class="section reveal" id="audiences">
+                <div class="section-heading">
+                    <span class="eyebrow">Who it is for</span>
+                    <h2>A practical debugging surface for real Android teams.</h2>
                     <p>
-                        AppInspect is built for developers, QA teams, and internal testing flows.
-                        It opens a full-screen inspector from inside your host app, so you can
-                        inspect live data where issues actually happen.
+                        Use AppInspect when a bug report needs more than screenshots and logs. It
+                        helps developers reproduce faster, helps QA attach better evidence, and helps
+                        companies standardize internal diagnostics across Android apps.
                     </p>
                 </div>
-                <div class="intro-points">
-                    <article>
-                        <strong>One dependency</strong>
-                        <p>Use the umbrella artifact for the default setup path.</p>
+
+                <div class="audience-grid">
+                    <article class="content-panel">
+                        <span class="label">Developers and QA engineers</span>
+                        <h3>Faster debugging from the exact build being tested.</h3>
+                        <ul class="check-list">
+                            <li>Inspect OkHttp calls with filters, search, payload previews, and cURL generation.</li>
+                            <li>Validate SharedPreferences, DataStore, SQLite, WorkManager, crashes, and runtime metadata.</li>
+                            <li>Open through shake, launcher shortcut, long press, notification tap, or <code>AppInspect.open(context)</code>.</li>
+                        </ul>
                     </article>
-                    <article>
-                        <strong>Built-in UI</strong>
-                        <p>No need to create your own debug screen or navigation flow.</p>
-                    </article>
-                    <article>
-                        <strong>Developer-first</strong>
-                        <p>Network, storage, WorkManager, and runtime tools in one place.</p>
+
+                    <article class="content-panel">
+                        <span class="label">Companies and private app teams</span>
+                        <h3>A reusable library instead of a one-off internal screen.</h3>
+                        <ul class="check-list">
+                            <li>Give teams the same inspector experience across apps and environments.</li>
+                            <li>Adopt from Maven Central with normal Gradle dependency management.</li>
+                            <li>Configure entry points, panels, raw-value visibility, editing tools, and retention for your rollout.</li>
+                        </ul>
                     </article>
                 </div>
             </section>
 
+            <!-- Features -->
+            <section class="section reveal" id="features">
+                <div class="section-heading">
+                    <span class="eyebrow">Inspector tools</span>
+                    <h2>Six inspection areas in one Android library.</h2>
+                    <p>
+                        AppInspect is built around the views developers and testers reach for first:
+                        API calls, on-device data, background work, crashes, runtime context, and
+                        simple ways to open the inspector.
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+                    <article class="feature-card">
+                        <span class="feature-icon">N</span>
+                        <h3>Network</h3>
+                        <p>OkHttp request and response capture with headers, payload previews, timing, filters, search, cURL, TXT export, and HAR export.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">S</span>
+                        <h3>Storage</h3>
+                        <p>SharedPreferences inspection and editing, read-only DataStore Preferences, and SQLite or Room database browsing with SQL console.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">W</span>
+                        <h3>WorkManager</h3>
+                        <p>Read-only work-spec visibility for states, tags, unique names, attempts, constraints, input, output, and progress data.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">C</span>
+                        <h3>Crashes</h3>
+                        <p>Fatal exception capture with exception type, message, thread name, timestamp, stack trace, copy, share, and clear actions.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">R</span>
+                        <h3>Runtime</h3>
+                        <p>App metadata, configured environment, build tier, device details, session data, and custom metadata sections.</p>
+                    </article>
+
+                    <article class="feature-card">
+                        <span class="feature-icon">U</span>
+                        <h3>Inspector UI</h3>
+                        <p>Built-in full-screen inspector with open paths for direct calls, shake, launcher shortcut, long press, and notification taps.</p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Integration: Install -->
             <section class="section reveal" id="install">
                 <div class="section-heading">
                     <span class="eyebrow">Integration</span>
-                    <h2>Integrate AppInspect in 3 steps</h2>
+                    <h2>Install by build variant, not as a blanket dependency.</h2>
                     <p>
-                        If your Android project already uses Gradle, the default path is very small.
-                        Add Maven Central, add the dependency, and wire the OkHttp interceptor if you
-                        want automatic network capture.
+                        The recommended setup gives internal builds the full inspector and production
+                        builds only the no-op OkHttp counterpart. That keeps shared OkHttp builder code
+                        simple without pulling inspection code into release APKs.
                     </p>
                 </div>
 
                 <div class="steps-grid">
                     <article class="step-card">
                         <div class="step-meta">
-                            <div class="step-number">1</div>
-                            <h3>Add repositories</h3>
-                            <p>Make sure your project resolves dependencies from Google and Maven Central.</p>
+                            <span class="step-number">1</span>
+                            <h3>Add Maven Central</h3>
+                            <p>Resolve AppInspect from a shared repository so every developer and CI runner uses the same artifact.</p>
                         </div>
-                        <div class="step-code">
-                            <div class="snippet-tabs">
-                                <div class="snippet-card">
-                                    <div class="snippet-head">
-                                        <span>Kotlin DSL</span>
-                                        <button class="copy-button" type="button" data-copy-target="repo-kts">Copy</button>
-                                    </div>
-                                    <pre><code id="repo-kts">dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}</code></pre>
-                                </div>
-                                <div class="snippet-card">
-                                    <div class="snippet-head">
-                                        <span>Groovy</span>
-                                        <button class="copy-button" type="button" data-copy-target="repo-groovy">Copy</button>
-                                    </div>
-                                    <pre><code id="repo-groovy">dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}</code></pre>
-                                </div>
+                        <div class="snippet-card">
+                            <div class="snippet-head">
+                                <span>settings.gradle.kts</span>
+                                <button class="copy-button" type="button" data-copy-target="repo-kts">Copy</button>
                             </div>
+                            <pre><code id="repo-kts">dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}</code></pre>
                         </div>
                     </article>
 
                     <article class="step-card">
                         <div class="step-meta">
-                            <div class="step-number">2</div>
+                            <span class="step-number">2</span>
                             <h3>Add the library</h3>
                             <p>
-                                The umbrella dependency gives you the default AppInspect setup and pulls
-                                the rest of the AppInspect stack transitively.
+                                Use the full inspector in debug builds. Use the no-op artifact in
+                                release builds when you want shared OkHttp setup without inspection behavior.
                             </p>
                         </div>
-                        <div class="step-code">
-                            <div class="snippet-tabs">
-                                <div class="snippet-card">
-                                    <div class="snippet-head">
-                                        <span>build.gradle.kts</span>
-                                        <button class="copy-button" type="button" data-copy-target="dependency-kts">Copy</button>
-                                    </div>
-                                    <pre><code id="dependency-kts">dependencies {
-    implementation("io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;")
-}</code></pre>
-                                </div>
-                                <div class="snippet-card">
-                                    <div class="snippet-head">
-                                        <span>build.gradle</span>
-                                        <button class="copy-button" type="button" data-copy-target="dependency-groovy">Copy</button>
-                                    </div>
-                                    <pre><code id="dependency-groovy">dependencies {
-    implementation 'io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;'
-}</code></pre>
-                                </div>
+                        <div class="snippet-card">
+                            <div class="snippet-head">
+                                <span>build.gradle.kts</span>
+                                <button class="copy-button" type="button" data-copy-target="variant-deps">Copy</button>
                             </div>
-                            <div class="note-card note-card-soft">
-                                <strong>Default behavior after adding the dependency</strong>
-                                <ul>
-                                    <li>Auto-install at app startup through AndroidX Startup</li>
-                                    <li>Built-in full-screen inspector activity</li>
-                                    <li>Launcher shortcut and shake entry point support</li>
-                                    <li>Compose and View long-press trigger helpers</li>
-                                </ul>
-                            </div>
+                            <pre><code id="variant-deps">dependencies {
+    debugImplementation("io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;")
+    releaseImplementation("io.github.suryansh1720001.appinspect:appinspect-no-op:&lt;latest-version&gt;")
+}</code></pre>
                         </div>
+                        <p class="inline-note">
+                            For custom variants like staging or internal QA, add the full
+                            <code>appinspect</code> artifact to that variant only when your team needs it.
+                            Check
+                            <a
+                                href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >Maven Central</a>
+                            for the latest published version.
+                        </p>
                     </article>
 
                     <article class="step-card">
                         <div class="step-meta">
-                            <div class="step-number">3</div>
-                            <h3>Enable network capture</h3>
-                            <p>
-                                AppInspect can open without this step, but automatic network logging needs
-                                the OkHttp interceptor.
-                            </p>
+                            <span class="step-number">3</span>
+                            <h3>Attach OkHttp capture</h3>
+                            <p>The same builder code compiles across variants. In release, the no-op returns the builder unchanged.</p>
                         </div>
-                        <div class="step-code">
-                            <div class="snippet-card">
-                                <div class="snippet-head">
-                                    <span>OkHttp setup</span>
-                                    <button class="copy-button" type="button" data-copy-target="okhttp-setup">Copy</button>
-                                </div>
-                                <pre><code id="okhttp-setup">val client = OkHttpClient.Builder()
+                        <div class="snippet-card">
+                            <div class="snippet-head">
+                                <span>OkHttpClient</span>
+                                <button class="copy-button" type="button" data-copy-target="okhttp-setup">Copy</button>
+                            </div>
+                            <pre><code id="okhttp-setup">val client = OkHttpClient.Builder()
     .addAppInspectInterceptor()
     .build()</code></pre>
-                            </div>
-                            <div class="snippet-card">
-                                <div class="snippet-head">
-                                    <span>Open the inspector</span>
-                                    <button class="copy-button" type="button" data-copy-target="open-setup">Copy</button>
-                                </div>
-                                <pre><code id="open-setup">AppInspect.open(context)</code></pre>
-                            </div>
                         </div>
+                        <p class="inline-note">
+                            Guard direct <code>AppInspect.open()</code> or <code>AppInspect.install()</code> calls by build variant,
+                            because the no-op artifact only mirrors the OkHttp API surface.
+                        </p>
                     </article>
                 </div>
             </section>
 
+            <!-- Integration: Configure -->
             <section class="section reveal" id="configure">
                 <div class="section-heading">
                     <span class="eyebrow">Configuration</span>
-                    <h2>Use the defaults or install with your own settings</h2>
+                    <h2>Customize AppInspect for your team workflow.</h2>
                     <p>
-                        For most apps, the Maven Central dependency is enough. If you want custom
-                        build-tier gating, entry points, or power tools, you can install AppInspect
-                        manually with a configuration object.
+                        The default setup is developer-friendly. When the build is shared with a
+                        wider QA or business audience, you can hide raw values, disable editing tools,
+                        turn off request notifications, or remove panels that are not needed.
                     </p>
                 </div>
 
                 <div class="configure-layout">
-                    <div class="content-panel">
-                        <h3>Manual install example</h3>
+                    <article class="content-panel">
+                        <h3>Controlled QA profile</h3>
                         <div class="snippet-card">
                             <div class="snippet-head">
-                                <span>Custom configuration</span>
-                                <button class="copy-button" type="button" data-copy-target="manual-config">Copy</button>
+                                <span>AppInspectConfiguration</span>
+                                <button class="copy-button" type="button" data-copy-target="qa-config">Copy</button>
                             </div>
-                            <pre><code id="manual-config">AppInspect.install(
+                            <pre><code id="qa-config">AppInspect.install(
     application = application,
     configuration = AppInspectConfiguration(
-        enablement = AppInspectEnablement(
-            allowedBuildTiers = linkedSetOf(AppInspectBuildTier.DEBUG),
-        ),
         entryPoints = AppInspectEntryPoints(
-            shakeToOpenEnabled = true,
-            launcherShortcutEnabled = true,
-            autoOpenOnLongPressTrigger = true,
+            networkNotificationsEnabled = false,
         ),
         powerTools = AppInspectPowerTools(
-            showRawSensitiveValues = true,
-            allowSharedPreferencesEditing = true,
-            allowDatabaseEditing = true,
-            allowSqlConsole = true,
+            showRawSensitiveValues = false,
+            allowSharedPreferencesEditing = false,
+            allowDatabaseEditing = false,
+            allowSqlConsole = false,
         ),
     ),
 )</code></pre>
                         </div>
-                    </div>
+                    </article>
 
                     <aside class="content-panel side-panel">
-                        <h3>When manual setup helps</h3>
-                        <ul>
-                            <li>Only enable AppInspect for selected build tiers</li>
-                            <li>Turn shake, shortcut, or auto-open trigger behavior on or off</li>
-                            <li>Control database editing, SQL console access, and raw value visibility</li>
-                            <li>Use the built-in screen but keep tighter host-level control</li>
-                        </ul>
-
-                        <h3>Open paths</h3>
-                        <ul>
-                            <li><code>AppInspect.open(context)</code></li>
-                            <li><code>AppInspect.attachLongPressTrigger(view)</code></li>
-                            <li><code>Modifier.appInspectLongPressTrigger(...)</code></li>
-                            <li>Shake gesture and launcher shortcut</li>
-                        </ul>
+                        <h3>Configuration levers</h3>
+                        <dl class="definition-list">
+                            <div>
+                                <dt><code>showRawSensitiveValues</code></dt>
+                                <dd>When false, configured headers, query parameters, body fields, cookies, and metadata keys are masked or removed before storage.</dd>
+                            </div>
+                            <div>
+                                <dt><code>allowDatabaseEditing</code> and <code>allowSqlConsole</code></dt>
+                                <dd>Keep database inspection read-focused for QA builds that do not need mutation tools.</dd>
+                            </div>
+                            <div>
+                                <dt><code>networkNotificationsEnabled</code></dt>
+                                <dd>Disable request notifications when device lock-screen visibility or shared testers are a concern.</dd>
+                            </div>
+                        </dl>
                     </aside>
                 </div>
             </section>
 
-            <section class="section reveal" id="features">
+            <!-- Security -->
+            <section class="section reveal" id="security">
                 <div class="section-heading">
-                    <span class="eyebrow">Built-in tools</span>
-                    <h2>Everything your team needs in one inspector</h2>
+                    <span class="eyebrow">Security and data handling</span>
+                    <h2>A local library, not an external data service.</h2>
                     <p>
-                        AppInspect is network-first, but it also gives you storage, WorkManager, and
-                        runtime visibility so you can debug the full app state in one place.
+                        AppInspect runs inside your Android application. It does not require an
+                        AppInspect cloud account, does not upload captured app data to an AppInspect
+                        backend, and does not send telemetry from your users. Data stays on the device
+                        by default unless someone copies or shares an export from the app.
                     </p>
                 </div>
 
-                <div class="feature-grid">
-                    <article class="feature-card">
-                        <span class="feature-icon feature-icon-teal">N</span>
-                        <h3>Network</h3>
-                        <p>Capture OkHttp requests, responses, and failures with search, filtering, and cURL generation.</p>
-                        <ul>
-                            <li>Headers and bodies with formatted JSON and XML</li>
-                            <li>Persistent history across app restarts</li>
-                            <li>Copy and share tools for request and response data</li>
-                        </ul>
-                    </article>
-
-                    <article class="feature-card">
-                        <span class="feature-icon feature-icon-slate">S</span>
-                        <h3>Storage</h3>
-                        <p>Inspect SharedPreferences and host databases directly inside the running app.</p>
-                        <ul>
-                            <li>Add, edit, delete, and search preference values</li>
-                            <li>Browse schemas, rows, and table data</li>
-                            <li>Use SQL console support when your configuration allows it</li>
-                        </ul>
-                    </article>
-
-                    <article class="feature-card">
-                        <span class="feature-icon feature-icon-sand">W</span>
-                        <h3>WorkManager</h3>
-                        <p>Review work specs, tags, attempts, payloads, and scheduling metadata.</p>
-                        <ul>
-                            <li>Read-only inspection for safer debugging</li>
-                            <li>Status-focused summaries for faster scanning</li>
-                            <li>Useful for background task validation and QA flows</li>
-                        </ul>
-                    </article>
-
-                    <article class="feature-card">
-                        <span class="feature-icon feature-icon-rose">R</span>
-                        <h3>Runtime</h3>
-                        <p>See app, device, environment, and session details from one searchable surface.</p>
-                        <ul>
-                            <li>Session and environment metadata</li>
-                            <li>Searchable runtime keys and values</li>
-                            <li>Helpful for build verification and internal support checks</li>
-                        </ul>
-                    </article>
-                </div>
-            </section>
-
-            <section class="section reveal">
-                <div class="section-heading">
-                    <span class="eyebrow">What the host app gets</span>
-                    <h2>The default setup is intentionally small</h2>
-                </div>
-                <div class="benefit-grid">
-                    <article class="benefit-card">
-                        <h3>No custom inspector screen required</h3>
-                        <p>The built-in AppInspect activity is ready to use after integration.</p>
-                    </article>
-                    <article class="benefit-card">
-                        <h3>Friendly for Compose and View apps</h3>
-                        <p>Use long-press triggers in both UI stacks without building custom plumbing.</p>
-                    </article>
-                    <article class="benefit-card">
-                        <h3>Useful for debugging and QA</h3>
-                        <p>Inspect real app state from inside the same build your team is testing.</p>
-                    </article>
-                    <article class="benefit-card">
-                        <h3>Power tools when you need them</h3>
-                        <p>Keep advanced editing and raw visibility behind explicit configuration flags.</p>
-                    </article>
-                </div>
-            </section>
-
-            <section class="section reveal" id="safety">
-                <div class="section-heading">
-                    <span class="eyebrow">Safety note</span>
-                    <h2>Important default behavior for sensitive data</h2>
-                    <p>
-                        AppInspect is designed as developer tooling. When it is enabled, raw sensitive
-                        values are visible by default unless you turn masking back on.
-                    </p>
-                </div>
-
-                <div class="safety-layout">
-                    <article class="warning-card">
-                        <h3>What to know</h3>
-                        <ul>
-                            <li>Authorization headers, cookies, tokens, and payload values may be visible</li>
-                            <li>Production remains disabled by default unless the host app opts in</li>
-                            <li>Staging or non-debug rollouts should review these defaults carefully</li>
+                <div class="security-grid">
+                    <article class="content-panel">
+                        <h3>What the library does by default</h3>
+                        <ul class="check-list">
+                            <li>Captured network and crash data stay on device by default in app-private SQLite.</li>
+                            <li>Storage and WorkManager information is read from the host app on demand for the inspector UI.</li>
+                            <li>Network log export happens only when a user triggers TXT, HAR, copy, or Android share-sheet actions.</li>
+                            <li>The export <code>FileProvider</code> is scoped only to <code>cacheDir/appinspect_exports/</code>.</li>
+                            <li><code>AppInspectActivity</code> is declared with <code>android:exported="false"</code>.</li>
+                            <li>Host SQLite operations use parameterized queries; the SQL console is the explicit developer power tool.</li>
+                            <li>DataStore inspection is read-only and never writes to <code>.preferences_pb</code> files.</li>
                         </ul>
                     </article>
 
                     <article class="content-panel">
-                        <h3>Turn masking back on</h3>
-                        <div class="snippet-card">
-                            <div class="snippet-head">
-                                <span>Safer visibility setup</span>
-                                <button class="copy-button" type="button" data-copy-target="safety-config">Copy</button>
-                            </div>
-                            <pre><code id="safety-config">AppInspectConfiguration(
-    powerTools = AppInspectPowerTools(
-        showRawSensitiveValues = false,
-    ),
-)</code></pre>
-                        </div>
+                        <h3>Production and company controls</h3>
+                        <ul class="check-list">
+                            <li>Use <code>releaseImplementation</code> with <code>appinspect-no-op</code> when release builds should have no inspector UI, no storage access, and no captured data.</li>
+                            <li>The no-op OkHttp surface is pass-through, so shared client-builder code can stay clean across debug and release variants.</li>
+                            <li>Mask sensitive values with <code>showRawSensitiveValues = false</code> and custom redaction rules.</li>
+                            <li>Disable SharedPreferences editing, database editing, SQL console, network notifications, or crash capture when a team does not need them.</li>
+                            <li>Keep enabled builds limited to trusted development, QA, internal test, or controlled company distribution paths.</li>
+                        </ul>
                     </article>
                 </div>
             </section>
 
+            <!-- QA checklist -->
+            <section class="section reveal" id="qa">
+                <div class="section-heading">
+                    <span class="eyebrow">QA checklist</span>
+                    <h2>Share evidence carefully. Exports can carry real credentials.</h2>
+                    <p>
+                        Network exports are valuable for bug reports, but they include the same headers
+                        and tokens the original requests used. Treat them as internal security artifacts.
+                    </p>
+                </div>
+
+                <div class="qa-layout">
+                    <article class="warning-card">
+                        <h3>Before sharing TXT, HAR, or cURL output</h3>
+                        <ol class="number-list">
+                            <li>Search for <code>Authorization</code>, <code>Cookie</code>, <code>Set-Cookie</code>, <code>X-API-Key</code>, and app-specific credential headers.</li>
+                            <li>Replace token values with <code>[REDACTED]</code> before uploading to Jira, Slack, email, shared drives, or bug trackers.</li>
+                            <li>Remove <code>-H "Authorization: ..."</code> flags from cURL commands copied into tickets or messages.</li>
+                            <li>If an unredacted export was already shared, rotate the exposed token and ask the backend team to invalidate the session.</li>
+                        </ol>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Distribution guidance</h3>
+                        <ul class="check-list">
+                            <li>Give debug, internal, or QA builds only to trusted users who are allowed to see internal app data.</li>
+                            <li>Turn raw visibility off for wider QA audiences with <code>showRawSensitiveValues = false</code>.</li>
+                            <li>Disable storage editing and SQL console unless the tester genuinely needs mutation access.</li>
+                            <li>Remember that crash stack traces reveal package names, class names, methods, and line numbers.</li>
+                            <li>Exports persist in app cache until Android clears cache or the app is uninstalled.</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- CTA -->
             <section class="section section-compact reveal">
                 <div class="cta-card">
                     <div>
-                        <span class="eyebrow">Ready to use</span>
-                        <h2>Start with Maven Central, then tailor the setup only if your app needs it.</h2>
+                        <span class="eyebrow">Ready to try</span>
+                        <h2>Add AppInspect to your Android app from Maven Central.</h2>
                         <p>
-                            AppInspect is easiest to adopt through the published umbrella dependency.
-                            That gives your team a clean built-in inspector with room for deeper
-                            configuration later.
+                            Start with the debug dependency, wire the OkHttp interceptor if you want
+                            network capture, and tune the panels and power tools for your team's workflow.
                         </p>
                     </div>
                     <div class="cta-actions">
@@ -500,19 +450,20 @@
                         >
                             Open Maven Central
                         </a>
-                        <a class="button button-secondary" href="#top">Back To Top</a>
+                        <a class="button button-secondary" href="#install">Copy Install Steps</a>
                     </div>
                 </div>
             </section>
 
+            <!-- Developer / Maintainer -->
             <section class="section section-compact reveal" id="developer">
                 <div class="developer-card">
                     <div class="developer-copy">
-                        <span class="eyebrow">Developer</span>
-                        <h2>Built and maintained by Suryansh Prajapati</h2>
+                        <span class="eyebrow">Maintainer</span>
+                        <h2>Built and maintained by Suryansh Prajapati.</h2>
                         <p>
-                            AppInspect is published on Maven Central and maintained by Suryansh
-                            Prajapati. You can connect through GitHub or LinkedIn below.
+                            AppInspect is published for Android teams that want practical internal
+                            debugging without building their own inspector surface from scratch.
                         </p>
                     </div>
                     <div class="developer-links">
@@ -535,10 +486,38 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Support -->
+            <section class="section section-compact reveal" id="support">
+                <div class="coffee-card">
+                    <div class="coffee-layout">
+                        <div class="coffee-text">
+                            <span class="eyebrow eyebrow-dark">Support the developer</span>
+                            <h2>Enjoyed AppInspect? Buy Suryansh a coffee.</h2>
+                            <p>
+                                AppInspect is free to use. Contributions help keep the project maintained,
+                                documented, and improving for Android developers and QA teams.
+                            </p>
+                            <ul class="check-list check-list-dark">
+                                <li>Free library with no subscription gate</li>
+                                <li>Focused updates, docs, and release quality work</li>
+                            </ul>
+                        </div>
+                        <div class="coffee-qr-wrap">
+                            <p class="coffee-scan-label">Scan to support</p>
+                            <div class="coffee-qr-frame">
+                                <img src="Qr_code.jpeg" alt="Google Pay QR code for Suryansh Prajapati">
+                            </div>
+                            <p class="coffee-upi-label">UPI - Any UPI payment</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <footer class="site-footer">
             <p>AppInspect documentation landing page by Suryansh Prajapati.</p>
+            <a href="privacy.html">Privacy Policy</a>
             <a
                 href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
                 target="_blank"
