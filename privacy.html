@@ -65,7 +65,7 @@
                         what the documentation website collects (nothing) and what the library itself
                         does with data on the device.
                     </p>
-                    <p class="privacy-meta">Last updated: May 2026</p>
+                    <p class="privacy-meta">Last updated: June 2026</p>
                 </div>
                 <div>
                     <a class="button button-secondary" href="index.html">&#8592; Back to AppInspect</a>
@@ -146,7 +146,7 @@
                         <h3>What the library stores on-device</h3>
                         <ul class="check-list">
                             <li>Captured OkHttp requests and responses are stored in an app-private SQLite database (<code>appinspect_storage.db</code>) on the device.</li>
-                            <li>Uncaught exceptions (crashes) are captured and stored in the same private database, up to 50 recent events.</li>
+                            <li>Uncaught exceptions, and on Android 11+ ANR and native crash records, are captured and stored in the same private database, up to 50 recent events.</li>
                             <li>Storage and WorkManager data is read from the host app on demand and is never persisted by AppInspect.</li>
                             <li>All on-device data is private to the host app and is not accessible to other apps without device root.</li>
                             <li>Data is cleared when the user taps "Clear" inside the inspector, or when the host app is uninstalled.</li>
@@ -207,8 +207,11 @@
                     <p>
                         When you use the <code>appinspect-no-op</code> artifact in your release build,
                         the production APK contains no inspector UI, no SQLite database, no storage
-                        access, no crash handler, and no network capture code. End users of your
-                        production app are completely unaffected by AppInspect.
+                        access, no crash handler, and no network capture code. As a second independent
+                        layer, even if the full library accidentally ships in a release build, it
+                        detects the non-debuggable build and disables itself completely — it never
+                        creates its database, never captures data, and refuses to open. End users of
+                        your production app are completely unaffected by AppInspect.
                     </p>
                 </div>
 
@@ -277,8 +280,8 @@
                 </a>
                 <p class="footer-brand-desc">
                     Android in-app inspector for developers and QA teams. Drop in one library,
-                    inspect network traffic, storage, crashes, and runtime metadata from inside
-                    the running app. No cloud. No telemetry.
+                    inspect network traffic, storage, background work, crashes and ANRs, and
+                    runtime metadata from inside the running app. No cloud. No telemetry.
                 </p>
                 <p class="footer-copy">&#169; 2025 Suryansh Prajapati</p>
             </div>

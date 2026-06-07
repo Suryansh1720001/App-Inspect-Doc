@@ -6,7 +6,7 @@
     <title>AppInspect | Android In-App Inspector</title>
     <meta
         name="description"
-        content="AppInspect is an Android in-app inspector for developer and QA builds, with network, storage, WorkManager, crash, runtime, redaction, and release-safe no-op support."
+        content="AppInspect is an Android in-app inspector for developer and QA builds: network, storage, WorkManager, crash and ANR capture, runtime metadata — 100% on-device, with a no-op artifact that keeps inspection code out of release APKs."
     >
     <meta name="theme-color" content="#145f5b">
     <script>
@@ -61,10 +61,11 @@
                     <span class="eyebrow">Android in-app inspector library</span>
                     <h1>Inspect your Android app from inside the app.</h1>
                     <p class="hero-text">
-                        AppInspect is a drop-in Android library for developers, testers, and
-                        product teams who need real app evidence during development and QA. Open a
-                        built-in inspector inside your app and review network traffic, local storage,
-                        background jobs, crashes, and runtime metadata without building a custom debug panel.
+                        AppInspect is a drop-in Android library that opens a full-screen inspector
+                        inside your app. Review network traffic, local storage, background jobs,
+                        crashes and ANRs, and runtime metadata from the exact build being tested —
+                        while the no-op artifact keeps inspection code completely out of your
+                        production APK.
                     </p>
                     <div class="hero-actions">
                         <a
@@ -165,9 +166,9 @@
                     </div>
 
                     <div class="trust-row">
-                        <span>One Android library</span>
                         <span>Published on Maven Central</span>
-                        <span>Designed for team debugging</span>
+                        <span>100% on-device, zero telemetry</span>
+                        <span>No-op safe for release builds</span>
                     </div>
                 </div>
             </section>
@@ -178,9 +179,9 @@
                     <span class="eyebrow">Who it is for</span>
                     <h2>A practical debugging surface for real Android teams.</h2>
                     <p>
-                        Use AppInspect when a bug report needs more than screenshots and logs. It
-                        helps developers reproduce faster, helps QA attach better evidence, and helps
-                        companies standardize internal diagnostics across Android apps.
+                        Use AppInspect when a bug report needs more than screenshots and logs.
+                        Developers reproduce faster, QA attaches real evidence, and companies
+                        standardize internal diagnostics across Android apps.
                     </p>
                 </div>
 
@@ -189,8 +190,9 @@
                         <span class="label">Developers and QA engineers</span>
                         <h3>Faster debugging from the exact build being tested.</h3>
                         <ul class="check-list">
-                            <li>Inspect OkHttp calls with filters, search, payload previews, and cURL generation.</li>
-                            <li>Validate SharedPreferences, DataStore, SQLite, WorkManager, crashes, and runtime metadata.</li>
+                            <li>Inspect OkHttp calls with filters, content search, payload previews, and one-tap cURL or HAR export.</li>
+                            <li>Attach crash, ANR, and native-crash evidence captured automatically — persisted across app restarts.</li>
+                            <li>Validate SharedPreferences, DataStore, SQLite, and WorkManager state with search across every panel.</li>
                             <li>Open through shake, launcher shortcut, long press, notification tap, or <code>AppInspect.open(context)</code>.</li>
                         </ul>
                     </article>
@@ -201,7 +203,8 @@
                         <ul class="check-list">
                             <li>Give teams the same inspector experience across apps and environments.</li>
                             <li>Adopt from Maven Central with normal Gradle dependency management.</li>
-                            <li>Configure entry points, panels, raw-value visibility, editing tools, and retention for your rollout.</li>
+                            <li>Configure entry points, panels, raw-value visibility, and editing tools per rollout.</li>
+                            <li>Ship release builds with confidence: compile-time no-op plus a runtime gate that self-disables the library in production.</li>
                         </ul>
                     </article>
                 </div>
@@ -214,8 +217,8 @@
                     <h2>Six inspection areas in one Android library.</h2>
                     <p>
                         AppInspect is built around the views developers and testers reach for first:
-                        API calls, on-device data, background work, crashes, runtime context, and
-                        simple ways to open the inspector.
+                        API calls, on-device data, background work, crashes and ANRs, runtime
+                        context, and simple ways to open the inspector.
                     </p>
                 </div>
 
@@ -223,37 +226,37 @@
                     <article class="feature-card">
                         <span class="feature-icon">N</span>
                         <h3>Network</h3>
-                        <p>OkHttp request and response capture with headers, payload previews, timing, filters, search, cURL, TXT export, and HAR export.</p>
+                        <p>OkHttp capture with filters, find-in-body and full-screen content search, swipeable detail tabs, long-press quick actions, and one-tap cURL, TXT, or HAR 1.2 export.</p>
                     </article>
 
                     <article class="feature-card">
                         <span class="feature-icon">S</span>
                         <h3>Storage</h3>
-                        <p>SharedPreferences inspection and editing, read-only DataStore Preferences, and SQLite or Room database browsing with SQL console.</p>
+                        <p>Edit SharedPreferences, browse SQLite or Room with a SQL console, and read DataStore Preferences via a built-in protobuf parser — with search across files, keys, and values.</p>
                     </article>
 
                     <article class="feature-card">
                         <span class="feature-icon">W</span>
                         <h3>WorkManager</h3>
-                        <p>Read-only work-spec visibility for states, tags, unique names, attempts, constraints, input, output, and progress data.</p>
+                        <p>Every persisted work spec with status badges, constraints, attempts, payloads, last stop reason, and periodic or expedited indicators — searchable by class, ID, state, or tag.</p>
                     </article>
 
                     <article class="feature-card">
                         <span class="feature-icon">C</span>
-                        <h3>Crashes</h3>
-                        <p>Fatal exception capture with exception type, message, thread name, timestamp, stack trace, copy, share, and clear actions.</p>
+                        <h3>Crashes &amp; ANRs</h3>
+                        <p>Automatic uncaught-exception capture plus ANR and native crash detection on Android 11+. The 50 most recent reports persist across restarts, with copy, share, and TXT export.</p>
                     </article>
 
                     <article class="feature-card">
                         <span class="feature-icon">R</span>
                         <h3>Runtime</h3>
-                        <p>App metadata, configured environment, build tier, device details, session data, and custom metadata sections.</p>
+                        <p>App, environment, device, and session metadata with custom data sections — tap any row to copy its value, or share the full runtime summary.</p>
                     </article>
 
                     <article class="feature-card">
                         <span class="feature-icon">U</span>
                         <h3>Inspector UI</h3>
-                        <p>Built-in full-screen inspector with open paths for direct calls, shake, launcher shortcut, long press, and notification taps.</p>
+                        <p>Built-in full-screen inspector opened by direct call, shake, launcher shortcut, long press, or tapping a live network notification to jump straight to that request.</p>
                     </article>
                 </div>
             </section>
@@ -265,8 +268,9 @@
                     <h2>Install by build variant, not as a blanket dependency.</h2>
                     <p>
                         The recommended setup gives internal builds the full inspector and production
-                        builds only the no-op OkHttp counterpart. That keeps shared OkHttp builder code
-                        simple without pulling inspection code into release APKs.
+                        builds only the no-op OkHttp counterpart. AppInspect auto-initializes via
+                        AndroidX Startup — add the dependency and the inspector is ready, with
+                        <code>AppInspect.install()</code> available when you want host-controlled setup.
                     </p>
                 </div>
 
@@ -311,15 +315,17 @@
 }</code></pre>
                         </div>
                         <p class="inline-note">
-                            For custom variants like staging or internal QA, add the full
-                            <code>appinspect</code> artifact to that variant only when your team needs it.
-                            Check
+                            For custom variants, add the full <code>appinspect</code> artifact per
+                            variant — e.g. <code>add("stagingImplementation", ...)</code> or
+                            <code>add("internalTestImplementation", ...)</code>. Check
                             <a
                                 href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >Maven Central</a>
-                            for the latest published version.
+                            for the latest published version. See
+                            <a href="#security">Security</a> for why the no-op artifact keeps release
+                            builds clean.
                         </p>
                     </article>
 
@@ -369,8 +375,15 @@
                             <pre><code id="qa-config">AppInspect.install(
     application = application,
     configuration = AppInspectConfiguration(
+        enablement = AppInspectEnablement(
+            allowedBuildTiers = linkedSetOf(AppInspectBuildTier.DEBUG),
+        ),
         entryPoints = AppInspectEntryPoints(
+            shakeToOpenEnabled = true,
             networkNotificationsEnabled = false,
+        ),
+        panels = AppInspectPanels(
+            crashesEnabled = true,
         ),
         powerTools = AppInspectPowerTools(
             showRawSensitiveValues = false,
@@ -387,16 +400,24 @@
                         <h3>Configuration levers</h3>
                         <dl class="definition-list">
                             <div>
+                                <dt><code>enablement.allowedBuildTiers</code></dt>
+                                <dd>Decide which build tiers can run the inspector at all. Production stays off unless the host explicitly opts in twice.</dd>
+                            </div>
+                            <div>
                                 <dt><code>showRawSensitiveValues</code></dt>
                                 <dd>When false, configured headers, query parameters, body fields, cookies, and metadata keys are masked or removed before storage.</dd>
                             </div>
                             <div>
-                                <dt><code>allowDatabaseEditing</code> and <code>allowSqlConsole</code></dt>
-                                <dd>Keep database inspection read-focused for QA builds that do not need mutation tools.</dd>
+                                <dt><code>allowDatabaseEditing</code>, <code>allowSqlConsole</code>, <code>allowSharedPreferencesEditing</code></dt>
+                                <dd>Keep storage inspection read-only for QA builds that do not need mutation tools.</dd>
+                            </div>
+                            <div>
+                                <dt><code>panels.crashesEnabled</code></dt>
+                                <dd>Hide the Crashes tab for audiences that should not see stack traces.</dd>
                             </div>
                             <div>
                                 <dt><code>networkNotificationsEnabled</code></dt>
-                                <dd>Disable request notifications when device lock-screen visibility or shared testers are a concern.</dd>
+                                <dd>Disable per-request notifications when lock-screen visibility or shared testers are a concern.</dd>
                             </div>
                         </dl>
                     </aside>
@@ -407,37 +428,53 @@
             <section class="section reveal" id="security">
                 <div class="section-heading">
                     <span class="eyebrow">Security and data handling</span>
-                    <h2>A local library, not an external data service.</h2>
+                    <h2>Release builds are safe — two independent layers of protection.</h2>
                     <p>
-                        AppInspect runs inside your Android application. It does not require an
-                        AppInspect cloud account, does not upload captured app data to an AppInspect
-                        backend, and does not send telemetry from your users. Data stays on the device
-                        by default unless someone copies or shares an export from the app.
+                        AppInspect is a local library, not an external data service. It never uploads
+                        captured app data, sends zero telemetry, and writes nothing to Logcat. For
+                        production, two separate layers each guarantee on their own that no inspection
+                        happens in users' hands.
                     </p>
                 </div>
 
                 <div class="security-grid">
                     <article class="content-panel">
-                        <h3>What the library does by default</h3>
+                        <h3>Layer 1 — Compile-time no-op</h3>
                         <ul class="check-list">
-                            <li>Captured network and crash data stay on device by default in app-private SQLite.</li>
-                            <li>Storage and WorkManager information is read from the host app on demand for the inspector UI.</li>
-                            <li>Network log export happens only when a user triggers TXT, HAR, copy, or Android share-sheet actions.</li>
-                            <li>The export <code>FileProvider</code> is scoped only to <code>cacheDir/appinspect_exports/</code>.</li>
-                            <li><code>AppInspectActivity</code> is declared with <code>android:exported="false"</code>.</li>
-                            <li>Host SQLite operations use parameterized queries; the SQL console is the explicit developer power tool.</li>
-                            <li>DataStore inspection is read-only and never writes to <code>.preferences_pb</code> files.</li>
+                            <li><code>releaseImplementation("...appinspect-no-op")</code> ships only a pass-through OkHttp interceptor.</li>
+                            <li>No inspector UI, no storage, no network capture, no crash handler, no manifest entries — inspection code is absent from the release APK.</li>
+                            <li>Shared OkHttp builder code compiles unchanged across debug and release variants.</li>
                         </ul>
                     </article>
 
                     <article class="content-panel">
-                        <h3>Production and company controls</h3>
+                        <h3>Layer 2 — Runtime self-disable</h3>
                         <ul class="check-list">
-                            <li>Use <code>releaseImplementation</code> with <code>appinspect-no-op</code> when release builds should have no inspector UI, no storage access, and no captured data.</li>
-                            <li>The no-op OkHttp surface is pass-through, so shared client-builder code can stay clean across debug and release variants.</li>
-                            <li>Mask sensitive values with <code>showRawSensitiveValues = false</code> and custom redaction rules.</li>
-                            <li>Disable SharedPreferences editing, database editing, SQL console, network notifications, or crash capture when a team does not need them.</li>
-                            <li>Keep enabled builds limited to trusted development, QA, internal test, or controlled company distribution paths.</li>
+                            <li>Even if the full module accidentally ships in a release build, it detects the non-debuggable build and disables itself completely.</li>
+                            <li>Never creates <code>appinspect_storage.db</code> on disk, never installs the crash handler or ANR collector, never registers sensors, notifications, or shortcuts.</li>
+                            <li>The interceptor becomes a pure pass-through and all <code>open()</code> calls are refused.</li>
+                            <li>Cannot be re-enabled at runtime — production requires the host to explicitly ship <strong>both</strong> <code>allowInNonDebugBuilds = true</code> and <code>allowInProductionBuilds = true</code> in the APK.</li>
+                        </ul>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Hardening in every build type</h3>
+                        <ul class="check-list">
+                            <li>No exported components — the inspector activity, startup initializer, and file provider are all <code>exported="false"</code>; nothing is reachable from other apps.</li>
+                            <li>No network calls of its own — the library only observes the host's OkHttp traffic and never sends data anywhere.</li>
+                            <li>No logging — captured payloads, headers, and crash traces are never written to Logcat.</li>
+                            <li>Notifications show only method, status code, host, and path — never headers, bodies, or tokens.</li>
+                            <li>Export sharing goes through a non-exported <code>FileProvider</code> scoped exclusively to <code>cacheDir/appinspect_exports/</code> with per-URI grants.</li>
+                        </ul>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Debug and staging builds are intentionally open</h3>
+                        <ul class="check-list">
+                            <li>Auth headers, tokens, cookies, database contents, DataStore values, and crash stack traces are visible inside the inspector — by design, for developer tooling.</li>
+                            <li>Captured data stays on device in app-private SQLite with retention caps (200 network events, 50 crashes by default).</li>
+                            <li>Distribute enabled builds only to trusted development, QA, and internal-test audiences.</li>
+                            <li>Tune visibility for wider audiences with the levers in <a href="#configure">Configuration</a>.</li>
                         </ul>
                     </article>
                 </div>
@@ -466,13 +503,12 @@
                     </article>
 
                     <article class="content-panel">
-                        <h3>Distribution guidance</h3>
+                        <h3>Good habits for enabled builds</h3>
                         <ul class="check-list">
-                            <li>Give debug, internal, or QA builds only to trusted users who are allowed to see internal app data.</li>
-                            <li>Turn raw visibility off for wider QA audiences with <code>showRawSensitiveValues = false</code>.</li>
-                            <li>Disable storage editing and SQL console unless the tester genuinely needs mutation access.</li>
-                            <li>Remember that crash stack traces reveal package names, class names, methods, and line numbers.</li>
-                            <li>Exports persist in app cache until Android clears cache or the app is uninstalled.</li>
+                            <li>Exports persist in app cache until Android clears the cache or the app is uninstalled.</li>
+                            <li>Crash and ANR reports reveal package names, class names, methods, and line numbers — treat shared reports like source-adjacent artifacts.</li>
+                            <li>If your debug build enables Android auto-backup, exclude <code>appinspect_storage.db</code> in your backup rules — it can contain captured auth headers. Production builds have nothing to back up.</li>
+                            <li>For wider QA audiences, reduce what testers can see and change with the levers in <a href="#configure">Configuration</a>.</li>
                         </ul>
                     </article>
                 </div>
@@ -571,8 +607,8 @@
                 </a>
                 <p class="footer-brand-desc">
                     Android in-app inspector for developers and QA teams. Drop in one library,
-                    inspect network traffic, storage, crashes, and runtime metadata from inside
-                    the running app. No cloud. No telemetry.
+                    inspect network traffic, storage, background work, crashes and ANRs, and
+                    runtime metadata from inside the running app. No cloud. No telemetry.
                 </p>
                 <p class="footer-copy">&#169; 2025 Suryansh Prajapati</p>
             </div>
