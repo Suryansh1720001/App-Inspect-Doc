@@ -66,7 +66,7 @@
                         what the documentation website collects (nothing) and what the library itself
                         does with data on the device.
                     </p>
-                    <p class="privacy-meta">Last updated: June 2026</p>
+                    <p class="privacy-meta">Last updated: 21 June 2026</p>
                 </div>
                 <div>
                     <a class="button button-secondary" href="index.html">&#8592; Back to AppInspect</a>
@@ -77,10 +77,12 @@
             <section class="section reveal" id="website">
                 <div class="section-heading">
                     <span class="eyebrow">This website</span>
-                    <h2>No tracking. No analytics. No cookies.</h2>
+                    <h2>No cookies. No personal data collected.</h2>
                     <p>
-                        The AppInspect documentation website does not collect or store any personal
-                        information about visitors.
+                        This documentation website uses cookie-free, privacy-respecting analytics
+                        (Cloudflare Web Analytics) to count page visits. No personal information
+                        about visitors is collected or stored. The AppInspect library itself
+                        contains no analytics — see the section below.
                     </p>
                 </div>
 
@@ -88,7 +90,6 @@
                     <article class="content-panel">
                         <h3>What this site does not do</h3>
                         <ul class="check-list">
-                            <li>No analytics scripts (Google Analytics, Mixpanel, Plausible, or similar).</li>
                             <li>No cookies are set by this site.</li>
                             <li>No user accounts, sign-up forms, or login flows.</li>
                             <li>No advertising pixels or third-party tracking.</li>
@@ -101,6 +102,14 @@
                         <h3>Third-party resources loaded</h3>
                         <ul class="check-list">
                             <li>
+                                <strong>Cloudflare Web Analytics</strong> — a lightweight, cookie-free
+                                analytics beacon (<code>static.cloudflareinsights.com/beacon.min.js</code>)
+                                is loaded to count page visits and measure performance. It does not set
+                                cookies, does not track individuals across sites, and does not fingerprint
+                                visitors. Aggregated data (page views, countries, referrers) is visible
+                                only to the site owner. See Cloudflare's privacy policy for details.
+                            </li>
+                            <li>
                                 <strong>Google Fonts</strong> — Manrope and JetBrains Mono are loaded
                                 from <code>fonts.googleapis.com</code>. Google may log the request
                                 IP and user-agent per their own privacy policy.
@@ -109,10 +118,6 @@
                                 <strong>Maven Central links</strong> — Clicking "View Maven Central"
                                 navigates to <code>central.sonatype.com</code>, which has its own
                                 privacy policy and may set cookies on that domain.
-                            </li>
-                            <li>
-                                No other external scripts, images, or iframes are loaded by this
-                                documentation site.
                             </li>
                         </ul>
                     </article>
@@ -318,5 +323,7 @@
     </div>
 
     <script src="script.js"></script>
+    <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
 </body>
 </html>
