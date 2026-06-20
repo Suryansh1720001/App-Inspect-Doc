@@ -419,6 +419,14 @@
                                 <dt><code>networkNotificationsEnabled</code></dt>
                                 <dd>Disable per-request notifications when lock-screen visibility or shared testers are a concern.</dd>
                             </div>
+                            <div>
+                                <dt><code>launcherShortcutEnabled</code></dt>
+                                <dd>Show or hide the launcher shortcut that opens the inspector directly from the device home screen.</dd>
+                            </div>
+                            <div>
+                                <dt><code>autoOpenOnLongPressTrigger</code></dt>
+                                <dd>Enable the long-press trigger on views and Compose modifiers (<code>AppInspect.attachLongPressTrigger</code> / <code>Modifier.appInspectLongPressTrigger</code>) that opens the inspector.</dd>
+                            </div>
                         </dl>
                     </aside>
                 </div>
@@ -587,12 +595,27 @@
                                 <li>Focused updates, docs, and release quality work</li>
                             </ul>
                         </div>
-                        <div class="coffee-qr-wrap">
-                            <p class="coffee-scan-label">Scan to support</p>
-                            <div class="coffee-qr-frame">
-                                <img src="Qr_code.jpeg" alt="Google Pay QR code for Suryansh Prajapati">
-                            </div>
-                            <p class="coffee-upi-label">UPI - Any UPI payment</p>
+                        <div class="support-tiers">
+                            <button class="tier-card" data-tier="Coffee" data-amount="240" data-icon="&#9749;" type="button">
+                                <span class="tier-icon" aria-hidden="true">&#9749;</span>
+                                <span class="tier-name">Coffee</span>
+                                <span class="tier-amount">&#8377;240</span>
+                            </button>
+                            <button class="tier-card" data-tier="Sandwich" data-amount="420" data-icon="&#129386;" type="button">
+                                <span class="tier-icon" aria-hidden="true">&#129386;</span>
+                                <span class="tier-name">Sandwich</span>
+                                <span class="tier-amount">&#8377;420</span>
+                            </button>
+                            <button class="tier-card" data-tier="Lunch" data-amount="950" data-icon="&#127857;" type="button">
+                                <span class="tier-icon" aria-hidden="true">&#127857;</span>
+                                <span class="tier-name">Lunch</span>
+                                <span class="tier-amount">&#8377;950</span>
+                            </button>
+                            <button class="tier-card" data-tier="Huge" data-amount="2150" data-icon="&#128640;" type="button">
+                                <span class="tier-icon" aria-hidden="true">&#128640;</span>
+                                <span class="tier-name">Huge</span>
+                                <span class="tier-amount">&#8377;2150</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -610,7 +633,7 @@
                     inspect network traffic, storage, background work, crashes and ANRs, and
                     runtime metadata from inside the running app. No cloud. No telemetry.
                 </p>
-                <p class="footer-copy">&#169; 2025 Suryansh Prajapati</p>
+                <p class="footer-copy">&#169; 2026 Suryansh Prajapati</p>
             </div>
 
             <nav class="footer-nav" aria-label="Footer">
@@ -641,6 +664,25 @@
                 </div>
             </nav>
         </footer>
+    </div>
+
+    <!-- QR payment modal -->
+    <div class="support-modal" id="support-modal" role="dialog" aria-modal="true" aria-labelledby="modal-tier-name" hidden>
+        <div class="modal-backdrop"></div>
+        <div class="modal-box">
+            <button class="modal-close" type="button" aria-label="Close">&#x2715;</button>
+            <div class="modal-tier-info">
+                <span class="modal-tier-icon" id="modal-tier-icon" aria-hidden="true"></span>
+                <div>
+                    <p class="modal-tier-name" id="modal-tier-name"></p>
+                    <p class="modal-tier-amount" id="modal-tier-amount"></p>
+                </div>
+            </div>
+            <div class="modal-qr-frame">
+                <img src="Qr_code.jpeg" alt="UPI payment QR code for Suryansh Prajapati">
+            </div>
+            <p class="modal-scan-label">Scan with any UPI app to pay</p>
+        </div>
     </div>
 
     <script src="script.js"></script>

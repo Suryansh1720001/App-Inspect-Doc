@@ -3,6 +3,59 @@ const siteHeader = document.querySelector(".site-header");
 const navToggle = document.querySelector(".nav-toggle");
 const siteNavLinks = document.querySelectorAll(".site-nav a");
 
+// Support tier modal
+const supportModal = document.getElementById("support-modal");
+const modalBackdrop = supportModal && supportModal.querySelector(".modal-backdrop");
+const modalClose = supportModal && supportModal.querySelector(".modal-close");
+const modalTierIcon = document.getElementById("modal-tier-icon");
+const modalTierName = document.getElementById("modal-tier-name");
+const modalTierAmount = document.getElementById("modal-tier-amount");
+const tierCards = document.querySelectorAll(".tier-card");
+
+let modalLastFocused = null;
+
+function openSupportModal(tier, amount, icon, triggerEl) {
+    modalTierIcon.textContent = icon;
+    modalTierName.textContent = tier;
+    modalTierAmount.textContent = "₹" + amount;
+    modalLastFocused = triggerEl;
+    supportModal.removeAttribute("hidden");
+    document.body.style.overflow = "hidden";
+    if (modalClose) {
+        modalClose.focus();
+    }
+}
+
+function closeSupportModal() {
+    supportModal.setAttribute("hidden", "");
+    document.body.style.overflow = "";
+    if (modalLastFocused) {
+        modalLastFocused.focus();
+        modalLastFocused = null;
+    }
+}
+
+if (supportModal) {
+    tierCards.forEach((card) => {
+        card.addEventListener("click", () => {
+            openSupportModal(
+                card.getAttribute("data-tier"),
+                card.getAttribute("data-amount"),
+                card.getAttribute("data-icon"),
+                card
+            );
+        });
+    });
+
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener("click", closeSupportModal);
+    }
+
+    if (modalClose) {
+        modalClose.addEventListener("click", closeSupportModal);
+    }
+}
+
 copyButtons.forEach((button) => {
     button.addEventListener("click", async () => {
         const targetId = button.getAttribute("data-copy-target");
@@ -63,6 +116,9 @@ if (siteHeader && navToggle) {
             siteHeader.classList.remove("is-open");
             navToggle.setAttribute("aria-expanded", "false");
             navToggle.textContent = "Menu";
+            if (supportModal && !supportModal.hasAttribute("hidden")) {
+                closeSupportModal();
+            }
         }
     });
 }

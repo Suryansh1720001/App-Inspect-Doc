@@ -98,6 +98,7 @@ No build, no dependencies. Edit HTML/CSS/JS directly.
 
 ## Changelog
 
+- **2026-06-20** — Reworked Support section: QR code now hidden behind tier cards (Coffee ₹240, Sandwich ₹420, Lunch ₹950, Huge ₹2150); clicking a tier opens a modal with the QR. Corrected footer copyright year to 2026; added `launcherShortcutEnabled` and `autoOpenOnLongPressTrigger` to Configure section.
 - **2026-06-07** — Synced with library 0.3.1 README: Crashes card now covers ANR +
   native crash detection and persistence; Security rewritten as the two-layer model
   (compile-time no-op + runtime self-disable) with hardening list; search features
