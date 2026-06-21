@@ -9,15 +9,13 @@ const modalBackdrop = supportModal && supportModal.querySelector(".modal-backdro
 const modalClose = supportModal && supportModal.querySelector(".modal-close");
 const modalTierIcon = document.getElementById("modal-tier-icon");
 const modalTierName = document.getElementById("modal-tier-name");
-const modalTierAmount = document.getElementById("modal-tier-amount");
 const tierCards = document.querySelectorAll(".tier-card");
 
 let modalLastFocused = null;
 
-function openSupportModal(tier, amount, icon, triggerEl) {
+function openSupportModal(tier, icon, triggerEl) {
     modalTierIcon.textContent = icon;
     modalTierName.textContent = tier;
-    modalTierAmount.textContent = "₹" + amount;
     modalLastFocused = triggerEl;
     supportModal.removeAttribute("hidden");
     document.body.style.overflow = "hidden";
@@ -40,7 +38,6 @@ if (supportModal) {
         card.addEventListener("click", () => {
             openSupportModal(
                 card.getAttribute("data-tier"),
-                card.getAttribute("data-amount"),
                 card.getAttribute("data-icon"),
                 card
             );
