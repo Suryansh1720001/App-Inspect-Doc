@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security | AppInspect</title>
+    <meta
+        name="description"
+        content="AppInspect uses two independent layers to keep release builds safe: a compile-time no-op artifact and a runtime self-disable gate. Zero telemetry, no exported components, no network calls."
+    >
+    <meta name="theme-color" content="#145f5b">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/security.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="https://app-inspect-doc.vercel.app/security.html">
+    <meta property="og:title"       content="Security — AppInspect">
+    <meta property="og:description" content="Two independent layers keep release builds safe: compile-time no-op artifact and runtime self-disable. Zero telemetry, no exported components.">
+    <meta property="og:image"       content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="Security — AppInspect">
+    <meta name="twitter:description" content="AppInspect never runs in production. Compile-time no-op + runtime self-disable. Zero telemetry.">
+    <meta name="twitter:image"       content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <script>
+        document.documentElement.classList.add("js");
+    </script>
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="index.html">
+                <img class="brand-logo" src="fevicon/favicon-180.png" alt="AppInspect logo" width="44" height="44">
+                <span class="brand-copy">
+                    <strong>AppInspect</strong>
+                    <span>Android in-app inspector</span>
+                </span>
+            </a>
+            <button
+                class="nav-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="site-nav"
+                aria-label="Toggle navigation"
+            >
+                Menu
+            </button>
+            <nav class="site-nav" id="site-nav" aria-label="Primary">
+                <a href="index.html#top">About</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html">Docs</a>
+                <a href="security.html" aria-current="page">Security</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="index.html#support">Support</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Hero -->
+            <section class="hero hero-page reveal" id="top">
+                <div class="hero-copy hero-copy-full">
+                    <span class="eyebrow">Security and data handling</span>
+                    <h1>Release builds are safe — two independent layers of protection.</h1>
+                    <p class="hero-text">
+                        AppInspect is a local library, not an external data service. It never uploads
+                        captured app data, sends zero telemetry, and writes nothing to Logcat. For
+                        production, two separate layers each guarantee on their own that no inspection
+                        happens in users' hands.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="docs.html">Integration guide</a>
+                        <a
+                            class="button button-secondary"
+                            href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >Maven Central</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Security model -->
+            <section class="section reveal" id="security">
+                <div class="section-heading">
+                    <span class="eyebrow">Release safety</span>
+                    <h2>Two layers, either one sufficient on its own.</h2>
+                </div>
+
+                <div class="security-grid">
+                    <article class="content-panel">
+                        <h3>Layer 1 — Compile-time no-op</h3>
+                        <ul class="check-list">
+                            <li><code>releaseImplementation("...appinspect-no-op")</code> ships only a pass-through OkHttp interceptor.</li>
+                            <li>No inspector UI, no storage, no network capture, no crash handler, no manifest entries — inspection code is absent from the release APK.</li>
+                            <li>Shared OkHttp builder code compiles unchanged across debug and release variants.</li>
+                        </ul>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Layer 2 — Runtime self-disable</h3>
+                        <ul class="check-list">
+                            <li>Even if the full module accidentally ships in a release build, it detects the non-debuggable build and disables itself completely.</li>
+                            <li>Never creates <code>appinspect_storage.db</code> on disk, never installs the crash handler or ANR collector, never registers sensors, notifications, or shortcuts.</li>
+                            <li>The interceptor becomes a pure pass-through and all <code>open()</code> calls are refused.</li>
+                            <li>Cannot be re-enabled at runtime — production requires the host to explicitly ship <strong>both</strong> <code>allowInNonDebugBuilds = true</code> and <code>allowInProductionBuilds = true</code> in the APK.</li>
+                        </ul>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Hardening in every build type</h3>
+                        <ul class="check-list">
+                            <li>No exported components — the inspector activity, startup initializer, and file provider are all <code>exported="false"</code>; nothing is reachable from other apps.</li>
+                            <li>No network calls of its own — the library only observes the host's OkHttp traffic and never sends data anywhere.</li>
+                            <li>No logging — captured payloads, headers, and crash traces are never written to Logcat.</li>
+                            <li>Notifications show only method, status code, host, and path — never headers, bodies, or tokens.</li>
+                            <li>Export sharing goes through a non-exported <code>FileProvider</code> scoped exclusively to <code>cacheDir/appinspect_exports/</code> with per-URI grants.</li>
+                        </ul>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Debug and staging builds are intentionally open</h3>
+                        <ul class="check-list">
+                            <li>Auth headers, tokens, cookies, database contents, DataStore values, and crash stack traces are visible inside the inspector — by design, for developer tooling.</li>
+                            <li>Captured data stays on device in app-private SQLite with retention caps (200 network events, 50 crashes by default).</li>
+                            <li>Distribute enabled builds only to trusted development, QA, and internal-test audiences.</li>
+                            <li>Tune visibility for wider audiences with the levers in <a href="docs.html#configure">Configuration</a>.</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- QA checklist -->
+            <section class="section reveal" id="qa">
+                <div class="section-heading">
+                    <span class="eyebrow">QA checklist</span>
+                    <h2>Share evidence carefully. Exports can carry real credentials.</h2>
+                    <p>
+                        Network exports are valuable for bug reports, but they include the same headers
+                        and tokens the original requests used. Treat them as internal security artifacts.
+                    </p>
+                </div>
+
+                <div class="qa-layout">
+                    <article class="warning-card">
+                        <h3>Before sharing TXT, HAR, or cURL output</h3>
+                        <ol class="number-list">
+                            <li>Search for <code>Authorization</code>, <code>Cookie</code>, <code>Set-Cookie</code>, <code>X-API-Key</code>, and app-specific credential headers.</li>
+                            <li>Replace token values with <code>[REDACTED]</code> before uploading to Jira, Slack, email, shared drives, or bug trackers.</li>
+                            <li>Remove <code>-H "Authorization: ..."</code> flags from cURL commands copied into tickets or messages.</li>
+                            <li>If an unredacted export was already shared, rotate the exposed token and ask the backend team to invalidate the session.</li>
+                        </ol>
+                    </article>
+
+                    <article class="content-panel">
+                        <h3>Good habits for enabled builds</h3>
+                        <ul class="check-list">
+                            <li>Exports persist in app cache until Android clears the cache or the app is uninstalled.</li>
+                            <li>Crash and ANR reports reveal package names, class names, methods, and line numbers — treat shared reports like source-adjacent artifacts.</li>
+                            <li>If your debug build enables Android auto-backup, exclude <code>appinspect_storage.db</code> in your backup rules — it can contain captured auth headers. Production builds have nothing to back up.</li>
+                            <li>For wider QA audiences, reduce what testers can see and change with the levers in <a href="docs.html#configure">Configuration</a>.</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Bottom CTA -->
+            <section class="section section-compact reveal">
+                <div class="cta-card">
+                    <div>
+                        <span class="eyebrow">Ready to integrate</span>
+                        <h2>Add AppInspect to your Android app in three steps.</h2>
+                        <p>Follow the integration guide to add the Gradle dependency, wire the OkHttp interceptor, and configure panels for your team.</p>
+                    </div>
+                    <div class="cta-actions">
+                        <a class="button button-primary" href="docs.html">Integration guide</a>
+                        <a
+                            class="button button-secondary"
+                            href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >Maven Central</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-brand">
+                <a class="footer-brand-link" href="index.html">
+                    <img src="fevicon/favicon-180.png" alt="AppInspect logo" width="32" height="32">
+                    <span>AppInspect</span>
+                </a>
+                <p class="footer-brand-desc">
+                    Android in-app inspector for developers and QA teams. Drop in one library,
+                    inspect network traffic, storage, background work, crashes and ANRs, and
+                    runtime metadata from inside the running app. No cloud. No telemetry.
+                </p>
+                <p class="footer-copy">&#169; 2026 Suryansh Prajapati</p>
+            </div>
+
+            <nav class="footer-nav" aria-label="Footer">
+                <div class="footer-nav-group">
+                    <span class="footer-nav-label">Docs</span>
+                    <a href="index.html#features">Features</a>
+                    <a href="docs.html">Integration</a>
+                    <a href="security.html">Security</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                </div>
+                <div class="footer-nav-group">
+                    <span class="footer-nav-label">Links</span>
+                    <a
+                        href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >Maven Central</a>
+                    <a
+                        href="https://github.com/Suryansh1720001"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >GitHub</a>
+                    <a
+                        href="https://www.linkedin.com/in/itssuryansh/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >LinkedIn</a>
+                </div>
+            </nav>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
+</body>
+</html>
