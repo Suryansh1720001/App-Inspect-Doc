@@ -206,7 +206,7 @@ code {
 }
 
 .hero-copy-full {
-    max-width: 760px;
+    max-width: none;
 }
 
 .hero.hero-page h1 {
@@ -942,7 +942,6 @@ p {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    max-width: 640px;
 }
 
 .quickstart-actions {
