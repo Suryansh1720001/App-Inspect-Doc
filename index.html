@@ -10,6 +10,22 @@
     >
     <meta name="theme-color" content="#145f5b">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="keywords" content="android debugging library, android in-app inspector, network inspector android, in-app debugger android, appinspect, android developer tools, android crash inspector, workmanager inspector, android qa tools">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/">
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="https://app-inspect-doc.vercel.app/">
+    <meta property="og:title"       content="AppInspect — Android In-App Inspector">
+    <meta property="og:description" content="Network, storage, WorkManager, crash & ANR capture inside your Android app. Zero-overhead no-op for release builds. Free and open source.">
+    <meta property="og:image"       content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="AppInspect — Android In-App Inspector">
+    <meta name="twitter:description" content="On-device inspector for Android debug builds. Network, storage, crashes, ANRs — no proxy, no USB. Free and open source.">
+    <meta name="twitter:image"       content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
     <script>
         document.documentElement.classList.add("js");
     </script>
@@ -30,7 +46,7 @@
     <div class="page-shell">
         <header class="site-header">
             <a class="brand" href="#top">
-                <img class="brand-logo" src="fevicon/favicon-180.png" alt="" width="44" height="44">
+                <img class="brand-logo" src="fevicon/favicon-180.png" alt="AppInspect logo" width="44" height="44">
                 <span class="brand-copy">
                     <strong>AppInspect</strong>
                     <span>Android in-app inspector</span>
@@ -622,7 +638,7 @@
         <footer class="site-footer">
             <div class="footer-brand">
                 <a class="footer-brand-link" href="#top">
-                    <img src="fevicon/favicon-180.png" alt="" width="32" height="32">
+                    <img src="fevicon/favicon-180.png" alt="AppInspect logo" width="32" height="32">
                     <span>AppInspect</span>
                 </a>
                 <p class="footer-brand-desc">
@@ -680,6 +696,125 @@
     </div>
 
     <script src="script.js"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "AppInspect",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Android",
+      "description": "AppInspect is a free Android in-app inspector for developer and QA builds. Inspect network requests, storage, WorkManager jobs, crashes, ANRs, and runtime metadata — all on-device with no proxy or USB cable required.",
+      "url": "https://app-inspect-doc.vercel.app/",
+      "downloadUrl": "https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview",
+      "softwareVersion": "0.3.1",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Suryansh Prajapati",
+        "url": "https://github.com/Suryansh1720001"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is AppInspect free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. AppInspect is completely free. It is published on Maven Central at no cost. There is no paid tier, no license fee, and no usage limits."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does AppInspect add any code to my release APK?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. You use the appinspect-no-op artifact for release builds. It is a pass-through stub with no UI, no storage, no network capture, and no crash handler. Inspection code is completely absent from the release APK."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What can AppInspect inspect?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AppInspect inspects: network requests and responses captured via OkHttp (exportable as .har or .txt with cURL commands), SharedPreferences, DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs, native crashes (Android 11+), and full runtime and device metadata."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does AppInspect require root access?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. AppInspect works on any unrooted Android device running API 24 (Android 7.0) or higher. No special device permissions or developer mode are required beyond what a normal debug build needs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my app's data safe when using AppInspect in release builds?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, through two independent layers. Layer 1 (compile-time): the no-op artifact contains no inspection code, so nothing is added to the release APK. Layer 2 (runtime): even if the full SDK accidentally ships in a release build, it detects that the build is non-debuggable and self-disables completely — no database is created, no crash handler is installed, no lifecycle callbacks are registered, and all open() calls are refused."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does AppInspect collect or send any data outside the device?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. AppInspect never makes network calls of its own. It has zero telemetry. All captured data — network logs, storage values, crash traces — stays entirely on-device. Nothing is sent to any server."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is AppInspect different from Charles Proxy or Flipper?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AppInspect runs entirely on-device inside the app — no desktop proxy, no SSL certificate installation, no Wi-Fi MITM configuration, and no USB cable needed. QA testers can open the inspector on their device at any time via shake gesture, a launcher shortcut, or a long-press trigger without involving a developer or any external tool."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What Android versions does AppInspect support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AppInspect supports Android API 24 (Android 7.0) and above. ANR detection and native crash detection require Android API 30 (Android 11+)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can QA testers use AppInspect without developer help after initial setup?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Once the library is integrated into the app by a developer, testers can open the inspector on their own device at any time — via a shake gesture, a launcher shortcut, or a long-press trigger. No Android Studio, adb, USB cable, or developer involvement is needed during testing."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I integrate AppInspect into my Android project?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Add two lines to your Gradle dependencies: debugImplementation for the full SDK and releaseImplementation for the no-op stub. AppInspect auto-initializes via AndroidX Startup — no changes to your Application class are needed for basic usage. For OkHttp network capture, add .addAppInspectInterceptor() to your OkHttpClient builder."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I export data captured by AppInspect?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Network logs can be exported as .txt files (including cURL commands for every request) or as .har files in HAR 1.2 format, which is compatible with browser DevTools and tools like Proxyman. Storage contents and runtime summaries can also be shared via the Android share sheet."
+          }
+        }
+      ]
+    }
+    </script>
     <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
 </body>

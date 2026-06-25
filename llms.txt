@@ -1,0 +1,55 @@
+# AppInspect
+
+AppInspect is a free, open-source Android in-app inspector library for developer and QA builds.
+It opens a full-screen diagnostics surface inside the host app — no proxy, no USB cable, no desktop tool required.
+All captured data stays on-device. Zero telemetry. Safe for debug and staging builds.
+
+## What it inspects
+
+- Network — captures OkHttp requests/responses; export as .har or .txt with cURL
+- Storage — SharedPreferences, DataStore, SQLite/Room databases (with optional editing)
+- WorkManager — running, enqueued, and completed job specs
+- Crashes & ANRs — uncaught exceptions, ANRs (Android 11+), native crash detection (Android 11+)
+- Runtime — app version, build type, device model, OS, session metadata
+
+## Release safety
+
+Two independent layers ensure inspection code never runs in production:
+1. Compile-time: the `appinspect-no-op` artifact is a pass-through stub with no UI, storage, or capture logic.
+2. Runtime: even if the full SDK ships accidentally, it detects non-debuggable builds and self-disables completely.
+
+## Integration (Gradle)
+
+```kotlin
+dependencies {
+    debugImplementation("io.github.suryansh1720001.appinspect:appinspect:<latest-version>")
+    releaseImplementation("io.github.suryansh1720001.appinspect:appinspect-no-op:<latest-version>")
+}
+```
+
+AppInspect auto-initializes via AndroidX Startup. No Application class changes needed for basic usage.
+
+## Requirements
+
+- Minimum: Android API 24 (Android 7.0)
+- ANR + native crash detection: Android API 30 (Android 11+)
+- Network capture: requires OkHttp
+
+## Pricing
+
+Free. No license fee. No paid tier. Published on Maven Central at no cost.
+
+## Links
+
+- Documentation: https://app-inspect-doc.vercel.app/
+- Maven Central: https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview
+- GitHub: https://github.com/Suryansh1720001
+- Privacy policy: https://app-inspect-doc.vercel.app/privacy.html
+
+## Author
+
+Suryansh Prajapati — https://github.com/Suryansh1720001 — https://www.linkedin.com/in/itssuryansh/
+
+## License
+
+Free to use. Published on Maven Central.
