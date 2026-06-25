@@ -98,6 +98,7 @@ No build, no dependencies. Edit HTML/CSS/JS directly.
 
 ## Changelog
 
+- **2026-06-25** — Reduced section heading h2 from 2.6rem → 2rem (scales: 1.8rem at 900px, 1.6rem at 640px) for a more document-appropriate scale. Trimmed `privacy.html` "Production builds" section to a short summary linking to `security.html`, removing the duplicate two-layer model detail.
 - **2026-06-25** — Fixed full-row layout on inner-page hero (removed `max-width: 760px` from `.hero-copy-full`) and Quick Start snippet (removed `max-width: 640px` from `.quickstart-layout`) so both span the full content width.
 - **2026-06-25** — Multi-page restructure (Approach B): created `docs.html` (integration + configuration) and `security.html` (security model + QA checklist). Homepage shortened — install/configure/security/qa sections moved to dedicated pages, replaced by a compact Quick Start teaser. Nav updated to 6 items on all pages. `sitemap.xml` updated with new pages. `llms.txt` updated with new URLs.
 - **2026-06-25** — SEO & discoverability pass: added `sitemap.xml`, `robots.txt` (allows all crawlers including GPTBot/PerplexityBot/ClaudeBot), `llms.txt` (AI crawler plain-text summary). Added to `index.html`: canonical link, Open Graph tags, Twitter Card tags, meta keywords, JSON-LD `SoftwareApplication` schema, JSON-LD `FAQPage` schema (11 questions). Added canonical to `privacy.html`. Fixed blank `alt` attributes on logo images.

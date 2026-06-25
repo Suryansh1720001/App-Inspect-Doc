@@ -207,42 +207,18 @@
             </section>
 
             <!-- Production builds -->
-            <section class="section reveal" id="production">
+            <section class="section section-compact reveal" id="production">
                 <div class="section-heading">
                     <span class="eyebrow">Production builds</span>
                     <h2>Zero inspection code in release APKs.</h2>
                     <p>
-                        When you use the <code>appinspect-no-op</code> artifact in your release build,
-                        the production APK contains no inspector UI, no SQLite database, no storage
-                        access, no crash handler, and no network capture code. As a second independent
-                        layer, even if the full library accidentally ships in a release build, it
-                        detects the non-debuggable build and disables itself completely — it never
-                        creates its database, never captures data, and refuses to open. End users of
-                        your production app are completely unaffected by AppInspect.
+                        Use <code>releaseImplementation("...appinspect-no-op")</code> to ship only a
+                        pass-through OkHttp stub in production — no UI, no database, no capture code,
+                        no manifest entries. As a second independent layer, even if the full SDK
+                        accidentally ships, it detects a non-debuggable build and self-disables
+                        completely. End users are completely unaffected.
+                        <a href="security.html">See the full security model →</a>
                     </p>
-                </div>
-
-                <div class="audience-grid">
-                    <article class="content-panel">
-                        <h3>No-op artifact guarantees</h3>
-                        <ul class="check-list">
-                            <li>The OkHttp interceptor is a pass-through that calls <code>chain.proceed()</code> immediately without logging anything.</li>
-                            <li>No <code>AppInspectActivity</code> is registered in the release manifest.</li>
-                            <li>No notification channel is created, no crash handler is installed.</li>
-                            <li>No inspector database is opened or created.</li>
-                            <li>No permissions beyond what your app already declares are added.</li>
-                        </ul>
-                    </article>
-
-                    <article class="content-panel">
-                        <h3>Recommended setup</h3>
-                        <ul class="check-list">
-                            <li>Use <code>debugImplementation</code> and staging-variant dependencies for the full <code>appinspect</code> artifact.</li>
-                            <li>Use <code>releaseImplementation</code> for <code>appinspect-no-op</code> in production builds.</li>
-                            <li>Guard any <code>AppInspect.open()</code> or <code>AppInspect.install()</code> calls by build variant, as these APIs are not present in the no-op.</li>
-                            <li>The OkHttp interceptor extension (<code>.addAppInspectInterceptor()</code>) is safe to call in all variants — it is a no-op in the release artifact.</li>
-                        </ul>
-                    </article>
                 </div>
             </section>
 
