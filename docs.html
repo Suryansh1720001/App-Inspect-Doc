@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docs | AppInspect</title>
+    <meta
+        name="description"
+        content="Step-by-step integration guide for AppInspect — add Maven Central, configure Gradle build variants, attach the OkHttp interceptor, and customize panels for your team."
+    >
+    <meta name="theme-color" content="#145f5b">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/docs.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="https://app-inspect-doc.vercel.app/docs.html">
+    <meta property="og:title"       content="Docs — AppInspect Integration Guide">
+    <meta property="og:description" content="Step-by-step: add Maven Central, configure Gradle build variants, attach the OkHttp interceptor, and customize AppInspect for your team.">
+    <meta property="og:image"       content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="Docs — AppInspect Integration Guide">
+    <meta name="twitter:description" content="Integrate AppInspect in 3 steps: Maven Central, Gradle build variants, OkHttp interceptor.">
+    <meta name="twitter:image"       content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <script>
+        document.documentElement.classList.add("js");
+    </script>
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="index.html">
+                <img class="brand-logo" src="fevicon/favicon-180.png" alt="AppInspect logo" width="44" height="44">
+                <span class="brand-copy">
+                    <strong>AppInspect</strong>
+                    <span>Android in-app inspector</span>
+                </span>
+            </a>
+            <button
+                class="nav-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="site-nav"
+                aria-label="Toggle navigation"
+            >
+                Menu
+            </button>
+            <nav class="site-nav" id="site-nav" aria-label="Primary">
+                <a href="index.html#top">About</a>
+                <a href="index.html#features">Features</a>
+                <a href="docs.html" aria-current="page">Docs</a>
+                <a href="security.html">Security</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="index.html#support">Support</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Hero -->
+            <section class="hero hero-page reveal" id="top">
+                <div class="hero-copy hero-copy-full">
+                    <span class="eyebrow">Integration guide</span>
+                    <h1>Integrate AppInspect in three steps.</h1>
+                    <p class="hero-text">
+                        Add the library by build variant, attach the OkHttp interceptor once,
+                        and tune the inspector for your team. AppInspect auto-initializes via
+                        AndroidX Startup — no <code>Application</code> class changes needed for basic usage.
+                    </p>
+                    <div class="hero-actions">
+                        <a
+                            class="button button-primary"
+                            href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            View on Maven Central
+                        </a>
+                        <a class="button button-secondary" href="security.html">Security model</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Install -->
+            <section class="section reveal" id="install">
+                <div class="section-heading">
+                    <span class="eyebrow">Installation</span>
+                    <h2>Install by build variant, not as a blanket dependency.</h2>
+                    <p>
+                        The recommended setup gives internal builds the full inspector and production
+                        builds only the no-op OkHttp counterpart. AppInspect auto-initializes via
+                        AndroidX Startup — add the dependency and the inspector is ready, with
+                        <code>AppInspect.install()</code> available when you want host-controlled setup.
+                    </p>
+                </div>
+
+                <div class="steps-grid">
+                    <article class="step-card">
+                        <div class="step-meta">
+                            <span class="step-number">1</span>
+                            <h3>Add Maven Central</h3>
+                            <p>Resolve AppInspect from a shared repository so every developer and CI runner uses the same artifact.</p>
+                        </div>
+                        <div class="snippet-card">
+                            <div class="snippet-head">
+                                <span>settings.gradle.kts</span>
+                                <button class="copy-button" type="button" data-copy-target="repo-kts">Copy</button>
+                            </div>
+                            <pre><code id="repo-kts">dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}</code></pre>
+                        </div>
+                    </article>
+
+                    <article class="step-card">
+                        <div class="step-meta">
+                            <span class="step-number">2</span>
+                            <h3>Add the library</h3>
+                            <p>
+                                Use the full inspector in debug builds. Use the no-op artifact in
+                                release builds when you want shared OkHttp setup without inspection behavior.
+                            </p>
+                        </div>
+                        <div class="snippet-card">
+                            <div class="snippet-head">
+                                <span>build.gradle.kts</span>
+                                <button class="copy-button" type="button" data-copy-target="variant-deps">Copy</button>
+                            </div>
+                            <pre><code id="variant-deps">dependencies {
+    debugImplementation("io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;")
+    releaseImplementation("io.github.suryansh1720001.appinspect:appinspect-no-op:&lt;latest-version&gt;")
+}</code></pre>
+                        </div>
+                        <p class="inline-note">
+                            For custom variants, add the full <code>appinspect</code> artifact per
+                            variant — e.g. <code>add("stagingImplementation", ...)</code> or
+                            <code>add("internalTestImplementation", ...)</code>. Check
+                            <a
+                                href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >Maven Central</a>
+                            for the latest published version. See
+                            <a href="security.html">Security</a> for why the no-op artifact keeps release
+                            builds clean.
+                        </p>
+                    </article>
+
+                    <article class="step-card">
+                        <div class="step-meta">
+                            <span class="step-number">3</span>
+                            <h3>Attach OkHttp capture</h3>
+                            <p>The same builder code compiles across variants. In release, the no-op returns the builder unchanged.</p>
+                        </div>
+                        <div class="snippet-card">
+                            <div class="snippet-head">
+                                <span>OkHttpClient</span>
+                                <button class="copy-button" type="button" data-copy-target="okhttp-setup">Copy</button>
+                            </div>
+                            <pre><code id="okhttp-setup">val client = OkHttpClient.Builder()
+    .addAppInspectInterceptor()
+    .build()</code></pre>
+                        </div>
+                        <p class="inline-note">
+                            Guard direct <code>AppInspect.open()</code> or <code>AppInspect.install()</code> calls by build variant,
+                            because the no-op artifact only mirrors the OkHttp API surface.
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Configure -->
+            <section class="section reveal" id="configure">
+                <div class="section-heading">
+                    <span class="eyebrow">Configuration</span>
+                    <h2>Customize AppInspect for your team workflow.</h2>
+                    <p>
+                        The default setup is developer-friendly. When the build is shared with a
+                        wider QA or business audience, you can hide raw values, disable editing tools,
+                        turn off request notifications, or remove panels that are not needed.
+                    </p>
+                </div>
+
+                <div class="configure-layout">
+                    <article class="content-panel">
+                        <h3>Controlled QA profile</h3>
+                        <div class="snippet-card">
+                            <div class="snippet-head">
+                                <span>AppInspectConfiguration</span>
+                                <button class="copy-button" type="button" data-copy-target="qa-config">Copy</button>
+                            </div>
+                            <pre><code id="qa-config">AppInspect.install(
+    application = application,
+    configuration = AppInspectConfiguration(
+        enablement = AppInspectEnablement(
+            allowedBuildTiers = linkedSetOf(AppInspectBuildTier.DEBUG),
+        ),
+        entryPoints = AppInspectEntryPoints(
+            shakeToOpenEnabled = true,
+            networkNotificationsEnabled = false,
+        ),
+        panels = AppInspectPanels(
+            crashesEnabled = true,
+        ),
+        powerTools = AppInspectPowerTools(
+            showRawSensitiveValues = false,
+            allowSharedPreferencesEditing = false,
+            allowDatabaseEditing = false,
+            allowSqlConsole = false,
+        ),
+    ),
+)</code></pre>
+                        </div>
+                    </article>
+
+                    <aside class="content-panel side-panel">
+                        <h3>Configuration levers</h3>
+                        <dl class="definition-list">
+                            <div>
+                                <dt><code>enablement.allowedBuildTiers</code></dt>
+                                <dd>Decide which build tiers can run the inspector at all. Production stays off unless the host explicitly opts in twice.</dd>
+                            </div>
+                            <div>
+                                <dt><code>showRawSensitiveValues</code></dt>
+                                <dd>When false, configured headers, query parameters, body fields, cookies, and metadata keys are masked or removed before storage.</dd>
+                            </div>
+                            <div>
+                                <dt><code>allowDatabaseEditing</code>, <code>allowSqlConsole</code>, <code>allowSharedPreferencesEditing</code></dt>
+                                <dd>Keep storage inspection read-only for QA builds that do not need mutation tools.</dd>
+                            </div>
+                            <div>
+                                <dt><code>panels.crashesEnabled</code></dt>
+                                <dd>Hide the Crashes tab for audiences that should not see stack traces.</dd>
+                            </div>
+                            <div>
+                                <dt><code>networkNotificationsEnabled</code></dt>
+                                <dd>Disable per-request notifications when lock-screen visibility or shared testers are a concern.</dd>
+                            </div>
+                            <div>
+                                <dt><code>launcherShortcutEnabled</code></dt>
+                                <dd>Show or hide the launcher shortcut that opens the inspector directly from the device home screen.</dd>
+                            </div>
+                            <div>
+                                <dt><code>autoOpenOnLongPressTrigger</code></dt>
+                                <dd>Enable the long-press trigger on views and Compose modifiers (<code>AppInspect.attachLongPressTrigger</code> / <code>Modifier.appInspectLongPressTrigger</code>) that opens the inspector.</dd>
+                            </div>
+                        </dl>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- Bottom CTA -->
+            <section class="section section-compact reveal">
+                <div class="cta-card">
+                    <div>
+                        <span class="eyebrow">Ready to add it</span>
+                        <h2>Add AppInspect to your Android app from Maven Central.</h2>
+                        <p>Copy the two Gradle lines above, wire the OkHttp interceptor, and the inspector is live in your next debug build.</p>
+                    </div>
+                    <div class="cta-actions">
+                        <a
+                            class="button button-primary"
+                            href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Open Maven Central
+                        </a>
+                        <a class="button button-secondary" href="security.html">Security model</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-brand">
+                <a class="footer-brand-link" href="index.html">
+                    <img src="fevicon/favicon-180.png" alt="AppInspect logo" width="32" height="32">
+                    <span>AppInspect</span>
+                </a>
+                <p class="footer-brand-desc">
+                    Android in-app inspector for developers and QA teams. Drop in one library,
+                    inspect network traffic, storage, background work, crashes and ANRs, and
+                    runtime metadata from inside the running app. No cloud. No telemetry.
+                </p>
+                <p class="footer-copy">&#169; 2026 Suryansh Prajapati</p>
+            </div>
+
+            <nav class="footer-nav" aria-label="Footer">
+                <div class="footer-nav-group">
+                    <span class="footer-nav-label">Docs</span>
+                    <a href="index.html#features">Features</a>
+                    <a href="docs.html">Integration</a>
+                    <a href="security.html">Security</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                </div>
+                <div class="footer-nav-group">
+                    <span class="footer-nav-label">Links</span>
+                    <a
+                        href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >Maven Central</a>
+                    <a
+                        href="https://github.com/Suryansh1720001"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >GitHub</a>
+                    <a
+                        href="https://www.linkedin.com/in/itssuryansh/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >LinkedIn</a>
+                </div>
+            </nav>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
+</body>
+</html>
