@@ -42,6 +42,8 @@ Free. No license fee. No paid tier. Published on Maven Central at no cost.
 ## Links
 
 - Documentation: https://app-inspect-doc.vercel.app/
+- Docs / Integration guide: https://app-inspect-doc.vercel.app/docs.html
+- Security model: https://app-inspect-doc.vercel.app/security.html
 - Maven Central: https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview
 - GitHub: https://github.com/Suryansh1720001
 - Privacy policy: https://app-inspect-doc.vercel.app/privacy.html

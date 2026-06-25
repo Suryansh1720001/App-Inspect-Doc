@@ -98,6 +98,7 @@ No build, no dependencies. Edit HTML/CSS/JS directly.
 
 ## Changelog
 
+- **2026-06-25** — Multi-page restructure (Approach B): created `docs.html` (integration + configuration) and `security.html` (security model + QA checklist). Homepage shortened — install/configure/security/qa sections moved to dedicated pages, replaced by a compact Quick Start teaser. Nav updated to 6 items on all pages. `sitemap.xml` updated with new pages. `llms.txt` updated with new URLs.
 - **2026-06-25** — SEO & discoverability pass: added `sitemap.xml`, `robots.txt` (allows all crawlers including GPTBot/PerplexityBot/ClaudeBot), `llms.txt` (AI crawler plain-text summary). Added to `index.html`: canonical link, Open Graph tags, Twitter Card tags, meta keywords, JSON-LD `SoftwareApplication` schema, JSON-LD `FAQPage` schema (11 questions). Added canonical to `privacy.html`. Fixed blank `alt` attributes on logo images.
 - **2026-06-21** — Added Cloudflare Web Analytics beacon to index.html and privacy.html (cookie-free, free tier). Updated privacy.html to document the beacon as a third-party resource.
 - **2026-06-20** — Reworked Support section: QR code now hidden behind tier cards (Coffee ₹240, Sandwich ₹420, Lunch ₹950, Huge ₹2150); clicking a tier opens a modal with the QR. Corrected footer copyright year to 2026; added `launcherShortcutEnabled` and `autoOpenOnLongPressTrigger` to Configure section.
