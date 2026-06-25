@@ -539,6 +539,71 @@
                 </div>
             </section>
 
+            <!-- FAQ -->
+            <section class="section reveal" id="faq">
+                <div class="section-heading">
+                    <span class="eyebrow">FAQ</span>
+                    <h2>Common questions about AppInspect.</h2>
+                </div>
+
+                <div class="faq-list">
+                    <details class="faq-item">
+                        <summary>Is AppInspect free?</summary>
+                        <p>Yes. AppInspect is completely free — no paid tier, no license fee, no usage limits. It is published on Maven Central at no cost.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Does AppInspect add any code to my release APK?</summary>
+                        <p>No. You use the <code>appinspect-no-op</code> artifact for release builds. It is a pass-through stub with no UI, no storage, no network capture, and no crash handler — inspection code is completely absent from the release APK.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>What can AppInspect inspect?</summary>
+                        <p>Network requests and responses via OkHttp (exportable as <code>.har</code> or <code>.txt</code> with cURL commands), SharedPreferences, DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs, native crashes (Android 11+), and full runtime and device metadata.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Does AppInspect require root access?</summary>
+                        <p>No. AppInspect works on any unrooted Android device running API 24 (Android 7.0) or higher. No special permissions or developer mode are needed beyond what a normal debug build already has.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Is my app's data safe in release builds?</summary>
+                        <p>Yes — two independent layers protect you. <strong>Layer 1 (compile-time):</strong> the no-op artifact contains no inspection code, so nothing is added to the release APK. <strong>Layer 2 (runtime):</strong> even if the full SDK accidentally ships in a release build, it detects the non-debuggable flag and self-disables completely — no database, no crash handler, no callbacks, all <code>open()</code> calls refused.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Does AppInspect collect or send any data outside the device?</summary>
+                        <p>No. AppInspect never makes network calls of its own. Zero telemetry. All captured data — network logs, storage values, crash traces — stays entirely on-device. Nothing is sent to any server.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>How is AppInspect different from Charles Proxy or Flipper?</summary>
+                        <p>AppInspect runs entirely on-device inside the app — no desktop proxy, no SSL certificate installation, no Wi-Fi MITM setup, no USB cable. QA testers can open the inspector directly on their device via shake, launcher shortcut, or long-press, without involving a developer or any external tool.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>What Android versions does AppInspect support?</summary>
+                        <p>Android API 24 (Android 7.0) and above. ANR detection and native crash detection require Android API 30 (Android 11+).</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Can QA testers use AppInspect without developer help?</summary>
+                        <p>Yes. Once the library is integrated, testers open the inspector on their own device at any time — via shake gesture, launcher shortcut, or long-press trigger. No Android Studio, adb, or USB cable needed during testing.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>How do I integrate AppInspect into my Android project?</summary>
+                        <p>Add two Gradle lines: <code>debugImplementation</code> for the full SDK and <code>releaseImplementation</code> for the no-op stub. AppInspect auto-initializes via AndroidX Startup — no <code>Application</code> class changes needed for basic usage. For network capture, add <code>.addAppInspectInterceptor()</code> to your <code>OkHttpClient</code> builder.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Can I export data captured by AppInspect?</summary>
+                        <p>Yes. Network logs export as <code>.txt</code> (with cURL commands) or <code>.har</code> in HAR 1.2 format, compatible with browser DevTools and Proxyman. Storage contents and runtime summaries can be shared via the Android share sheet.</p>
+                    </details>
+                </div>
+            </section>
+
             <!-- CTA -->
             <section class="section section-compact reveal">
                 <div class="cta-card">
