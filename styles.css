@@ -199,6 +199,23 @@ code {
     min-height: 640px;
 }
 
+/* Inner-page hero — single column, no side panel */
+.hero.hero-page {
+    grid-template-columns: 1fr;
+    min-height: 0;
+}
+
+.hero-copy-full {
+    max-width: 760px;
+}
+
+.hero.hero-page h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    max-width: 36ch;
+    line-height: 1.15;
+}
+
 .hero-copy,
 .hero-panel,
 .section,
