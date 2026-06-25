@@ -920,6 +920,20 @@ p {
     color: var(--warning);
 }
 
+/* Quick Start teaser */
+.quickstart-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 640px;
+}
+
+.quickstart-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 /* FAQ accordion */
 .faq-list {
     display: flex;
