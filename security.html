@@ -135,8 +135,8 @@
                     <article class="content-panel">
                         <h3>Debug and staging builds are intentionally open</h3>
                         <ul class="check-list">
-                            <li>Auth headers, tokens, cookies, database contents, DataStore values, and crash stack traces are visible inside the inspector — by design, for developer tooling.</li>
-                            <li>Captured data stays on device in app-private SQLite with retention caps (200 network events, 50 crashes by default).</li>
+                            <li>Auth headers, tokens, cookies, database contents, DataStore values, decrypted EncryptedSharedPreferences, and crash stack traces are visible inside the inspector — by design, for developer tooling.</li>
+                            <li>Captured data stays on device in app-private SQLite with retention caps (300 network events, 50 crashes by default).</li>
                             <li>Distribute enabled builds only to trusted development, QA, and internal-test audiences.</li>
                             <li>Tune visibility for wider audiences with the levers in <a href="docs.html#configure">Configuration</a>.</li>
                         </ul>
