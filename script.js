@@ -246,6 +246,42 @@
                 next.focus();
             });
         });
+
+        /* Swipe between panels, which is how the real inspector works too.
+           Listeners are passive, so vertical page scrolling is never blocked —
+           a gesture only counts when it is clearly horizontal. */
+        var swipeFrom = null;
+        var screen = mock.querySelector(".phone-screen");
+
+        screen.addEventListener("touchstart", function (event) {
+            var touch = event.touches[0];
+            swipeFrom = { x: touch.clientX, y: touch.clientY };
+        }, { passive: true });
+
+        screen.addEventListener("touchend", function (event) {
+            if (!swipeFrom) {
+                return;
+            }
+
+            var touch = event.changedTouches[0];
+            var dx = touch.clientX - swipeFrom.x;
+            var dy = touch.clientY - swipeFrom.y;
+            swipeFrom = null;
+
+            if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.5) {
+                return;
+            }
+
+            var current = 0;
+            bottomTabs.forEach(function (tab, i) {
+                if (tab.classList.contains("is-on")) {
+                    current = i;
+                }
+            });
+
+            var step = dx < 0 ? 1 : bottomTabs.length - 1;
+            showPanel(bottomTabs[(current + step) % bottomTabs.length]);
+        }, { passive: true });
     }
 
     /* ---------------------------------------------------- live capture feed */

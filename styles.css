@@ -178,6 +178,11 @@ body {
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Safety net for long identifiers outside <code> — an artifact coordinate
+       or a file path is wider than a 320px column. Only breaks a word that
+       would otherwise overflow, so ordinary text is untouched, and it does
+       nothing inside <pre>, which scrolls instead. */
+    overflow-wrap: break-word;
 }
 
 h1, h2, h3, h4 {
@@ -1693,7 +1698,7 @@ pre.snippet-bare code {
 
 .feature-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(272px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(272px, 100%), 1fr));
     gap: 18px;
     margin-top: 44px;
 }
@@ -2287,5 +2292,122 @@ a.feature-card:hover {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   12. Touch and small screens
+
+   Two problems this solves. First, `:hover` sticks after a tap on a
+   touchscreen, so a lifted card stays lifted until you tap elsewhere — the
+   lift is now gated behind a real pointer, and touch gets a press response
+   instead. Second, the top bar had roughly 500px of content, which does not
+   fit a 320px phone; it sheds the parts that are reachable elsewhere as the
+   viewport narrows.
+   -------------------------------------------------------------------------- */
+
+@media (hover: none) {
+    .button:hover,
+    a.feature-card:hover,
+    .tier-card:hover {
+        transform: none;
+    }
+
+    /* Press feedback, which is what a touch device actually needs. */
+    .button:active,
+    a.feature-card:active,
+    .tier-card:active,
+    .phone-tab:active,
+    .search-results a:active {
+        transform: scale(0.985);
+    }
+}
+
+/* No blue flash on tap; the :active states above do the job. */
+@media (pointer: coarse) {
+    body {
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    /* Comfortable targets on a fingertip. */
+    .icon-button,
+    .topbar-menu {
+        width: 40px;
+        height: 40px;
+    }
+
+    .copy-button {
+        padding: 7px 12px;
+    }
+
+    .faq-item summary {
+        padding: 20px 0;
+    }
+}
+
+/* 560px and below — the Maven Central link lives in the footer and the docs
+   sidebar, so it is the first thing to go. */
+@media (max-width: 560px) {
+    .topbar-tools a[aria-label*="Maven"] {
+        display: none;
+    }
+
+    .topbar-nav a[href*="support"] {
+        display: none;
+    }
+
+    .site-footer-inner {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 28px;
+        padding: 44px 20px 36px;
+    }
+
+    .footer-about p {
+        max-width: none;
+    }
+}
+
+/* 420px and below — a small phone. The top bar keeps only the brand, search
+   and the theme toggle: docs navigation is in the drawer, and the landing page
+   leads with its own buttons. */
+@media (max-width: 420px) {
+    .topbar {
+        gap: 8px;
+        padding: 0 12px;
+    }
+
+    .topbar-nav,
+    .topbar-tools a[aria-label*="GitHub"] {
+        display: none;
+    }
+
+    .topbar-tools {
+        padding-left: 0;
+        margin-left: 0;
+        border-left: 0;
+    }
+
+    .brand-name {
+        font-size: 1rem;
+    }
+
+    /* A 46px radius reads as a pebble once the frame is only ~280px wide. */
+    .phone {
+        --f-bezel: 6px;
+        --f-radius: 38px;
+    }
+
+    .phone-screen {
+        height: 560px;
+    }
+
+    .hero h1 {
+        font-size: 2.05rem;
+    }
+
+    .band-head h2,
+    .support-card h2,
+    .cta h2 {
+        font-size: 1.5rem;
     }
 }

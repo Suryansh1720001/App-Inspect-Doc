@@ -369,6 +369,44 @@ is a one-line summary with a link.
   horizontally.
 - No CSS framework, no build step, plain static files.
 
+## Responsive and touch behaviour
+
+The site is one layout that adapts, not a desktop layout with a mobile patch. Five
+breakpoints, each shedding what is reachable elsewhere:
+
+| Width | What changes |
+|---|---|
+| 1180px | Docs "On this page" rail collapses into a `<details>` above the article |
+| 1100px | Landing hero stacks; quick start and support cards go single-column |
+| 940px | Docs sidebar becomes a drawer behind the hamburger; secondary top-bar links hide; search collapses to an icon |
+| 640px | Type scales down; grids single-column; footer to two columns |
+| 560px | Maven Central icon and the Support link leave the top bar (both are in the footer) |
+| 420px | Top bar keeps only brand, search and theme toggle; phone frame radius shrinks |
+
+Rules worth keeping:
+
+- **The top bar is a width budget.** At full size it holds ~860px of content. It must
+  still fit 320px, which is why it sheds items rather than wrapping — a wrapped top bar
+  changes the page's sticky offset and breaks `scroll-padding-top`. If you add something
+  to it, re-check the narrow end.
+- **Never give a grid track a fixed px minimum.** `minmax(272px, 1fr)` cannot shrink
+  below 272px and overflows a narrow phone; use `minmax(min(272px, 100%), 1fr)`. A check
+  asserts none remain.
+- **`100vh` is wrong on mobile** — browser chrome overlaps it, so a sidebar sized that way
+  is taller than the visible area. Every use is paired: `100vh` first as a fallback, then
+  `100dvh`.
+- **Hover lift needs `@media (hover: none)` counterpart.** On a touchscreen `:hover`
+  sticks after a tap, leaving cards raised until you tap elsewhere. Touch gets a
+  `:active` scale instead. The docs-page override lives in `docs.css`, because that file
+  loads later and would otherwise win the cascade.
+- **Wide content scrolls in its own container**, never the page: `.table-scroll`, `pre`,
+  `.snippet-file`. `body` also carries `overflow-wrap: break-word` for long identifiers
+  outside `<code>` — an artifact coordinate is wider than a 320px column.
+- **Touch targets** reach 40px under `@media (pointer: coarse)`.
+- **The mockup is swipeable** — horizontal swipes move between panels, matching the real
+  inspector. Listeners are passive and a gesture only counts when clearly horizontal, so
+  vertical page scrolling is never blocked.
+
 ## Working locally
 
 ```bash
@@ -395,6 +433,25 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 - LinkedIn: <https://www.linkedin.com/in/itssuryansh/>
 
 ## Changelog
+
+- **2026-08-21 (responsive + touch pass)** — Audited the site at phone, tablet and
+  desktop widths and fixed what was actually broken rather than adding breakpoints on
+  spec. **The top bar overflowed on phones**: it held roughly 500px of content in a 320px
+  bar, so items were being squeezed. It now sheds the Maven Central icon and Support link
+  at 560px and the nav and GitHub icon at 420px, leaving ~259px of content with 61px of
+  slack at 320px. **Two grid tracks could not shrink** — `minmax(272px, 1fr)` and
+  `minmax(228px, 1fr)` overflow any container narrower than their minimum; both are now
+  `minmax(min(…, 100%), 1fr)`. **Three `100vh` values** became `100dvh` with a `100vh`
+  fallback, since mobile browser chrome overlaps `vh`. **Five hover-lift rules stuck
+  after a tap** on touchscreens; they are gated behind `@media (hover: none)` with an
+  `:active` press response instead. Added 40px touch targets under
+  `@media (pointer: coarse)`, a global `overflow-wrap: break-word` net for long
+  identifiers outside `<code>`, a single-column footer below 560px, and a smaller phone
+  frame radius below 420px where 46px read as a pebble. **New interaction: the mockup is
+  swipeable** — horizontal swipes change panels, matching the real inspector's own swipe
+  navigation; listeners are passive so page scrolling is never blocked. Checks were added
+  for hover gating, grid minimums and vh/dvh pairing. Details under "Responsive and touch
+  behaviour" above.
 
 - **2026-08-21 (frame polish + live-dot fix)** — Three fixes from close inspection of the
   mockup. **The side buttons now read as buttons**: they were drawn with the same

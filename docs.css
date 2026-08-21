@@ -20,6 +20,7 @@
     position: sticky;
     top: var(--topbar-h);
     height: calc(100vh - var(--topbar-h));
+    height: calc(100dvh - var(--topbar-h));
     padding: 26px 16px 60px 24px;
     border-right: 1px solid var(--border);
     overflow-y: auto;
@@ -120,6 +121,7 @@
     position: sticky;
     top: var(--topbar-h);
     max-height: calc(100vh - var(--topbar-h));
+    max-height: calc(100dvh - var(--topbar-h));
     padding: 30px 24px 60px 8px;
     overflow-y: auto;
     scrollbar-width: thin;
@@ -441,7 +443,7 @@
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(228px, 100%), 1fr));
     gap: 14px;
     margin: 26px 0;
 }
@@ -601,6 +603,7 @@
         z-index: 50;
         width: min(310px, 82vw);
         height: calc(100vh - var(--topbar-h));
+        height: calc(100dvh - var(--topbar-h));
         background: var(--bg);
         transform: translateX(-102%);
         transition: transform 0.2s ease;
@@ -660,4 +663,17 @@
 .doc-card,
 .page-nav a {
     transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+/* Hover lift needs a real pointer — see the note in styles.css. Kept here
+   because docs.css loads later and would otherwise win the cascade. */
+@media (hover: none) {
+    .doc-card:hover,
+    .page-nav a:hover {
+        transform: none;
+    }
+
+    .doc-card:active {
+        transform: scale(0.985);
+    }
 }
