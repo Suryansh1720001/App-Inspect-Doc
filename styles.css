@@ -340,18 +340,6 @@ button {
     font-size: 1.06rem;
 }
 
-.brand-version {
-    padding: 2px 7px;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--bg-soft);
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 0;
-}
-
 .topbar-spacer {
     flex: 1;
 }
@@ -890,49 +878,267 @@ pre.snippet-bare code {
 /* --- Phone mockup ---------------------------------------------------------
    An interactive preview of the real inspector: the bottom bar and the Runtime
    pill switch panels, and the caption under the phone links into that panel's
-   docs page. Colours are fixed dark on purpose — it is a device screen, not
-   part of the page, so it does not follow the site theme.
+   docs page. The Network list also cycles like a live capture (see the feed
+   ticker in script.js).
+
+   The screen has its own local palette rather than using the site tokens,
+   because it is a device screen with its own semantics — badge tints, status
+   colours, a nav bar. It still follows the site theme: the real library has a
+   light mode, so showing a dark phone on a light page would misrepresent it.
+   Light values are the defaults below; dark overrides follow.
    -------------------------------------------------------------------------- */
 
+/* The frame. Three things keep it from looking like a 2015 handset: a thin
+   bezel, corner radii that are actually concentric (outer = inner + bezel),
+   and a gradient rail instead of a flat fill so the edge catches light. */
 .phone {
+    --f-bezel: 7px;
+    --f-radius: 46px;
+    --f-rail-1: #ffffff;
+    --f-rail-2: #d5cfc3;
+    --f-line: rgba(24, 18, 8, 0.16);
+    /* Soft: against a white app bar a strong ring reads as a stray border. */
+    --f-ring: rgba(24, 18, 8, 0.14);
+    --f-cam: #1a1f26;
+    --f-btn-1: #c2bbac;
+    --f-btn-2: #9c9486;
+    --f-btn-top: rgba(255, 255, 255, 0.55);
+    --f-btn-shadow: rgba(24, 18, 8, 0.28);
+
     position: relative;
     width: 344px;
     margin: 0 auto;
-    padding: 10px;
-    border: 1px solid var(--border-strong);
-    border-radius: 34px;
-    background: var(--surface-raised);
-    box-shadow: var(--shadow-lg);
+    padding: var(--f-bezel);
+    border-radius: var(--f-radius);
+    background: linear-gradient(155deg, var(--f-rail-1), var(--f-rail-2));
+    box-shadow:
+        inset 0 0 0 1px var(--f-line),
+        0 1px 1px rgba(255, 255, 255, 0.5),
+        0 3px 8px rgba(24, 18, 8, 0.10),
+        0 26px 50px -22px rgba(24, 18, 8, 0.34);
+}
+
+:root[data-theme="dark"] .phone {
+    --f-rail-1: #4a5553;
+    --f-rail-2: #141b1a;
+    --f-line: rgba(255, 255, 255, 0.13);
+    --f-ring: rgba(0, 0, 0, 0.65);
+    --f-cam: #05090a;
+    --f-btn-1: #626e6b;
+    --f-btn-2: #2c3534;
+    --f-btn-top: rgba(255, 255, 255, 0.22);
+    --f-btn-shadow: rgba(0, 0, 0, 0.55);
+
+    box-shadow:
+        inset 0 0 0 1px var(--f-line),
+        0 1px 1px rgba(255, 255, 255, 0.06),
+        0 3px 10px rgba(0, 0, 0, 0.5),
+        0 26px 54px -22px rgba(0, 0, 0, 0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .phone {
+        --f-rail-1: #4a5553;
+        --f-rail-2: #141b1a;
+        --f-line: rgba(255, 255, 255, 0.13);
+        --f-ring: rgba(0, 0, 0, 0.65);
+        --f-cam: #05090a;
+        --f-btn-1: #626e6b;
+        --f-btn-2: #2c3534;
+        --f-btn-top: rgba(255, 255, 255, 0.22);
+        --f-btn-shadow: rgba(0, 0, 0, 0.55);
+
+        box-shadow:
+            inset 0 0 0 1px var(--f-line),
+            0 1px 1px rgba(255, 255, 255, 0.06),
+            0 3px 10px rgba(0, 0, 0, 0.5),
+            0 26px 54px -22px rgba(0, 0, 0, 0.7);
+    }
+}
+
+/* Volume rocker on the left, power on the right. Pseudo-elements, so no extra
+   markup. They need their own tone — reusing the rail gradient made them
+   disappear into the frame instead of reading as hardware. */
+.phone::before,
+.phone::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    border-radius: 1px 3px 3px 1px;
+    background: linear-gradient(180deg, var(--f-btn-1), var(--f-btn-2));
+    box-shadow:
+        inset 0 1px 0 var(--f-btn-top),
+        1px 1px 2px var(--f-btn-shadow);
+}
+
+.phone::before {
+    left: -3px;
+    top: 118px;
+    height: 76px;
+    border-radius: 3px 1px 1px 3px;
+    box-shadow:
+        inset 0 1px 0 var(--f-btn-top),
+        -1px 1px 2px var(--f-btn-shadow);
+}
+
+.phone::after {
+    right: -3px;
+    top: 152px;
+    height: 50px;
 }
 
 .phone-screen {
+    /* Surfaces */
+    --p-bg: #f1f3f8;
+    --p-card: #ffffff;
+    --p-navbar: #ffffff;
+    --p-field: #e9edf8;
+    --p-line: #e0e4ee;
+    --p-line-soft: #edf0f6;
+
+    /* Ink */
+    --p-text: #16202e;
+    --p-muted: #566072;
+    --p-dim: #646f80;
+
+    /* Semantic */
+    --p-teal: #0d6b63;
+    --p-accent: #128b80;
+    --p-green: #1b7a4d;
+    --p-red: #b3392f;
+    --p-amber: #9a5a08;
+    --p-blue: #3450ad;
+
+    /* Badge fills */
+    --p-ok-bg: #e2f3e9;
+    --p-err-bg: #fbe3e0;
+    --p-warn-bg: #fbeed0;
+    --p-info-bg: #e6ebfa;
+    --p-teal-bg: #ddeeec;
+    --p-quiet-bg: #eceef4;
+
+    /* Components */
+    --p-bad-bg: #fdf4f2;
+    --p-bad-line: #f2d3ce;
+    --p-pill-bg: #e2f0ee;
+    --p-pill-line: #b9d8d4;
+    --p-master-bg: #edf7ea;
+    --p-master-line: #bdd9b5;
+    --p-knob: #ffffff;
+    --p-badge-fg: #ffffff;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 604px;
+    /* Concentric with the frame: outer radius minus the bezel. */
+    border-radius: calc(var(--f-radius) - var(--f-bezel));
+    background: var(--p-bg);
+    color: var(--p-text);
+    font-size: 0.72rem;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px var(--f-ring);
+}
+
+/* Punch-hole camera. Absolute, so it never becomes a flex item. */
+.phone-screen::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    z-index: 2;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--f-cam);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    transform: translateX(-50%);
+}
+
+:root[data-theme="dark"] .phone-screen {
     --p-bg: #0b1211;
     --p-card: #111c1a;
+    --p-navbar: #080f0e;
+    --p-field: #0f1a18;
     --p-line: #1b2927;
+    --p-line-soft: #141f1e;
+
     --p-text: #e0ebe9;
     --p-muted: #7d938f;
     --p-dim: #61756f;
+
     --p-teal: #6fded3;
+    --p-accent: #4fd1c5;
     --p-green: #7fd7a4;
     --p-red: #e88b81;
     --p-amber: #e0a95c;
     --p-blue: #9fb8f0;
 
-    display: flex;
-    flex-direction: column;
-    height: 604px;
-    border-radius: 26px;
-    background: var(--p-bg);
-    color: var(--p-text);
-    font-size: 0.72rem;
-    overflow: hidden;
+    --p-ok-bg: #12301f;
+    --p-err-bg: #3a1714;
+    --p-warn-bg: #33260e;
+    --p-info-bg: #16233d;
+    --p-teal-bg: #10302c;
+    --p-quiet-bg: #1b2725;
+
+    --p-bad-bg: #17100f;
+    --p-bad-line: #4a2723;
+    --p-pill-bg: #10241f;
+    --p-pill-line: #26433f;
+    --p-master-bg: #121f14;
+    --p-master-line: #3c5a2f;
+    --p-knob: #08201e;
+    --p-badge-fg: #2a0d0a;
 }
 
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .phone-screen {
+        --p-bg: #0b1211;
+        --p-card: #111c1a;
+        --p-navbar: #080f0e;
+        --p-field: #0f1a18;
+        --p-line: #1b2927;
+        --p-line-soft: #141f1e;
+
+        --p-text: #e0ebe9;
+        --p-muted: #7d938f;
+        --p-dim: #61756f;
+
+        --p-teal: #6fded3;
+        --p-accent: #4fd1c5;
+        --p-green: #7fd7a4;
+        --p-red: #e88b81;
+        --p-amber: #e0a95c;
+        --p-blue: #9fb8f0;
+
+        --p-ok-bg: #12301f;
+        --p-err-bg: #3a1714;
+        --p-warn-bg: #33260e;
+        --p-info-bg: #16233d;
+        --p-teal-bg: #10302c;
+        --p-quiet-bg: #1b2725;
+
+        --p-bad-bg: #17100f;
+        --p-bad-line: #4a2723;
+        --p-pill-bg: #10241f;
+        --p-pill-line: #26433f;
+        --p-master-bg: #121f14;
+        --p-master-line: #3c5a2f;
+        --p-knob: #08201e;
+        --p-badge-fg: #2a0d0a;
+    }
+}
+
+/* Shares the app bar's surface, the way a real app tints the status bar. With
+   two different surfaces the screen's rounded top corners read as one colour
+   and the bar below as another, which looked like the bar was escaping the
+   frame. */
 .phone-status {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 9px 16px 2px;
+    padding: 9px 16px 4px;
+    background: var(--p-navbar);
     color: var(--p-dim);
     font-family: var(--font-mono);
     font-size: 0.58rem;
@@ -947,6 +1153,7 @@ pre.snippet-bare code {
     gap: 8px;
     padding: 8px 12px 10px;
     border-bottom: 1px solid var(--p-line);
+    background: var(--p-navbar);
 }
 
 .phone-bar-copy {
@@ -973,9 +1180,9 @@ pre.snippet-bare code {
     position: relative;
     flex: none;
     padding: 4px 9px;
-    border: 1px solid #26433f;
+    border: 1px solid var(--p-pill-line);
     border-radius: 999px;
-    background: #10241f;
+    background: var(--p-pill-bg);
     color: var(--p-teal);
     font-size: 0.58rem;
     font-weight: 700;
@@ -984,8 +1191,7 @@ pre.snippet-bare code {
 
 .phone-pill:hover,
 .phone-pill.is-on {
-    border-color: #3c6e68;
-    background: #143530;
+    border-color: var(--p-accent);
 }
 
 .phone-pill .phone-dot {
@@ -996,7 +1202,7 @@ pre.snippet-bare code {
     padding: 0 3px;
     border-radius: 999px;
     background: var(--p-red);
-    color: #2a0d0a;
+    color: var(--p-badge-fg);
     font-size: 0.52rem;
     font-weight: 700;
     line-height: 14px;
@@ -1022,7 +1228,7 @@ pre.snippet-bare code {
     padding: 7px 9px;
     border: 1px solid var(--p-line);
     border-radius: 9px;
-    background: #0f1a18;
+    background: var(--p-field);
     color: var(--p-dim);
     font-size: 0.65rem;
 }
@@ -1040,30 +1246,6 @@ pre.snippet-bare code {
     text-overflow: ellipsis;
 }
 
-/* Filter chips */
-
-.phone-chips {
-    display: flex;
-    gap: 5px;
-    padding: 9px 10px 2px;
-    overflow: hidden;
-}
-
-.phone-chip {
-    flex: none;
-    padding: 3px 8px;
-    border: 1px solid var(--p-line);
-    border-radius: 999px;
-    color: var(--p-muted);
-    font-size: 0.58rem;
-}
-
-.phone-chip.is-on {
-    border-color: #2d5a55;
-    background: #12312d;
-    color: var(--p-teal);
-}
-
 /* Section heading inside a panel */
 
 .phone-meta {
@@ -1076,7 +1258,10 @@ pre.snippet-bare code {
     letter-spacing: -0.01em;
 }
 
-.phone-meta span {
+/* Child selector on purpose: the live dot is a <span> nested inside the
+   <strong>, and a descendant selector here would out-specify it and knock it
+   onto its own line. */
+.phone-meta > span {
     display: block;
     margin-top: 1px;
     color: var(--p-dim);
@@ -1125,8 +1310,8 @@ pre.snippet-bare code {
 }
 
 .phone-card.is-bad {
-    border-color: #4a2723;
-    background: #17100f;
+    border-color: var(--p-bad-line);
+    background: var(--p-bad-bg);
 }
 
 .phone-card-top {
@@ -1173,7 +1358,7 @@ pre.snippet-bare code {
 .phone-tag {
     padding: 2px 6px;
     border-radius: 5px;
-    background: #172422;
+    background: var(--p-quiet-bg);
     color: var(--p-muted);
     font-family: var(--font-mono);
     font-size: 0.55rem;
@@ -1190,12 +1375,33 @@ pre.snippet-bare code {
     letter-spacing: 0.02em;
 }
 
-.b-ok     { background: #12301f; color: var(--p-green); }
-.b-err    { background: #3a1714; color: var(--p-red); }
-.b-warn   { background: #33260e; color: var(--p-amber); }
-.b-info   { background: #16233d; color: var(--p-blue); }
-.b-teal   { background: #10302c; color: var(--p-teal); }
-.b-quiet  { background: #1b2725; color: var(--p-muted); }
+.b-ok    { background: var(--p-ok-bg);    color: var(--p-green); }
+.b-err   { background: var(--p-err-bg);   color: var(--p-red); }
+.b-warn  { background: var(--p-warn-bg);  color: var(--p-amber); }
+.b-info  { background: var(--p-info-bg);  color: var(--p-blue); }
+.b-teal  { background: var(--p-teal-bg);  color: var(--p-teal); }
+.b-quiet { background: var(--p-quiet-bg); color: var(--p-muted); }
+
+/* The live capture feed — the Network list cycles like a real one filling up.
+   Only the wrapper is transformed, so no layout runs per tick. */
+
+/* Both durations must stay comfortably under the ticker's TICK_MS in
+   script.js, or a tick lands mid-slide and the list jumps. 0.38s leaves
+   headroom at 1000ms and still works if the cadence drops to 750ms. */
+.phone-feed {
+    transition: transform 0.38s cubic-bezier(0.16, 0.8, 0.3, 1);
+    will-change: transform;
+}
+
+.phone-feed > .is-new {
+    animation: feed-in 0.32s ease-out both;
+}
+
+@keyframes feed-in {
+    from {
+        opacity: 0;
+    }
+}
 
 /* Segmented control (Storage sub-tabs) */
 
@@ -1205,7 +1411,7 @@ pre.snippet-bare code {
     margin: 10px 0 8px;
     padding: 3px;
     border-radius: 9px;
-    background: #0f1a18;
+    background: var(--p-field);
 }
 
 .phone-seg span {
@@ -1218,7 +1424,7 @@ pre.snippet-bare code {
 }
 
 .phone-seg span.is-on {
-    background: #16302c;
+    background: var(--p-card);
     color: var(--p-teal);
     font-weight: 700;
 }
@@ -1239,7 +1445,7 @@ pre.snippet-bare code {
     align-items: baseline;
     gap: 10px;
     padding: 5px 2px;
-    border-bottom: 1px solid #141f1e;
+    border-bottom: 1px solid var(--p-line-soft);
 }
 
 .phone-kv dt {
@@ -1265,9 +1471,9 @@ pre.snippet-bare code {
     gap: 8px;
     margin-top: 10px;
     padding: 9px 10px;
-    border: 1px solid #3c5a2f;
+    border: 1px solid var(--p-master-line);
     border-radius: 10px;
-    background: #121f14;
+    background: var(--p-master-bg);
 }
 
 .phone-master-copy {
@@ -1290,7 +1496,7 @@ pre.snippet-bare code {
     width: 26px;
     height: 15px;
     border-radius: 999px;
-    background: #4fd1c5;
+    background: var(--p-accent);
     position: relative;
 }
 
@@ -1302,7 +1508,7 @@ pre.snippet-bare code {
     width: 11px;
     height: 11px;
     border-radius: 50%;
-    background: #08201e;
+    background: var(--p-knob);
 }
 
 /* Bottom navigation */
@@ -1311,7 +1517,7 @@ pre.snippet-bare code {
     display: flex;
     padding: 4px 2px 8px;
     border-top: 1px solid var(--p-line);
-    background: #080f0e;
+    background: var(--p-navbar);
 }
 
 .phone-tab {
@@ -1352,7 +1558,7 @@ pre.snippet-bare code {
     width: 22px;
     height: 2px;
     border-radius: 2px;
-    background: #4fd1c5;
+    background: var(--p-accent);
     transform: translateX(-50%);
 }
 
@@ -1364,7 +1570,7 @@ pre.snippet-bare code {
     padding: 0 3px;
     border-radius: 999px;
     background: var(--p-red);
-    color: #2a0d0a;
+    color: var(--p-badge-fg);
     font-size: 0.5rem;
     font-weight: 700;
     line-height: 15px;
@@ -1373,7 +1579,7 @@ pre.snippet-bare code {
 
 .phone-tab-badge.is-amber {
     background: var(--p-amber);
-    color: #2b1c05;
+    color: var(--p-badge-fg);
 }
 
 /* Caption under the phone — updates with the selected panel */
@@ -1911,10 +2117,6 @@ a.feature-card:hover {
         gap: 10px;
     }
 
-    .brand-version {
-        display: none;
-    }
-
     .wrap {
         padding: 0 20px;
     }
@@ -1941,5 +2143,149 @@ a.feature-card:hover {
     .hero-actions .button,
     .cta-actions .button {
         flex: 1 1 100%;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   11. Motion
+
+   Deliberately small. Only transform and opacity are animated, so everything
+   stays on the compositor and nothing reflows. Two rules of thumb:
+
+   - Motion must explain something. The phone stages its rows because the real
+     inspector fills up as calls arrive; panels fade because an instant swap
+     reads as a glitch. Decoration is not a reason.
+   - Documentation prose is never animated and never scroll-revealed. It has to
+     be readable and searchable the instant it renders.
+
+   The reduced-motion block at the end switches all of it off.
+   -------------------------------------------------------------------------- */
+
+@keyframes ai-rise {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+@keyframes ai-rise-sm {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+}
+
+@keyframes ai-fade {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes ai-pop {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.985);
+    }
+}
+
+@keyframes ai-pulse {
+    50% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+}
+
+/* Hero entrance — landing page only, runs once, ~450ms end to end. */
+
+.hero .eyebrow,
+.hero h1,
+.hero-lede,
+.hero-actions,
+.hero-meta,
+.hero-inner > div:last-child {
+    animation: ai-rise 0.45s cubic-bezier(0.16, 0.8, 0.3, 1) both;
+}
+
+.hero h1                      { animation-delay: 0.06s; }
+.hero-inner > div:last-child  { animation-delay: 0.10s; }
+.hero-lede                    { animation-delay: 0.12s; }
+.hero-actions                 { animation-delay: 0.18s; }
+.hero-meta                    { animation-delay: 0.24s; }
+
+/* Phone panels — also re-runs when you switch panels, which is the point:
+   the list restocks itself the way the real one does. */
+
+.phone-view.is-on {
+    animation: ai-fade 0.18s ease-out both;
+}
+
+.phone-view.is-on .phone-feed {
+    animation: ai-fade 0.3s ease-out both;
+}
+
+.phone-view.is-on .phone-scroll > *:not(.phone-feed),
+.phone-view.is-on .phone-master,
+.phone-view.is-on .phone-seg {
+    animation: ai-rise-sm 0.3s ease-out both;
+    animation-delay: 0.2s;
+}
+
+.phone-view.is-on .phone-scroll > *:nth-child(1):not(.phone-feed) { animation-delay: 0.04s; }
+.phone-view.is-on .phone-scroll > *:nth-child(2):not(.phone-feed) { animation-delay: 0.08s; }
+.phone-view.is-on .phone-scroll > *:nth-child(3):not(.phone-feed) { animation-delay: 0.12s; }
+.phone-view.is-on .phone-scroll > *:nth-child(4):not(.phone-feed) { animation-delay: 0.16s; }
+
+/* The only looping animation on the site: a live-capture dot, 6px, in the
+   phone. Nothing in the reading area ever moves on its own. */
+
+.phone-live {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 7px;
+    border-radius: 50%;
+    background: var(--p-green);
+    vertical-align: middle;
+    animation: ai-pulse 2.4s ease-in-out infinite;
+}
+
+/* Interaction polish */
+
+.search-scrim {
+    animation: ai-fade 0.16s ease-out both;
+}
+
+.search-box {
+    animation: ai-pop 0.18s cubic-bezier(0.16, 0.8, 0.3, 1) both;
+}
+
+.modal-scrim {
+    animation: ai-fade 0.16s ease-out both;
+}
+
+.modal-box {
+    animation: ai-pop 0.2s cubic-bezier(0.16, 0.8, 0.3, 1) both;
+}
+
+.copy-button,
+.phone-tab,
+.phone-pill {
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.search-results a {
+    transition: background-color 0.12s ease;
+}
+
+/* One switch to turn the whole lot off. */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

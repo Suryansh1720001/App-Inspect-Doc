@@ -56,7 +56,6 @@
         <a class="brand" href="index.html">
             <span class="brand-mark" aria-hidden="true"></span>
             <span class="brand-name">AppInspect</span>
-            <span class="brand-version">0.7.0</span>
         </a>
         <span class="topbar-spacer"></span>
         <button class="search-trigger" type="button" data-search-open>
@@ -138,10 +137,11 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
                                     </div>
                                     <div class="phone-meta">
-                                        <strong>API log</strong>
+                                        <strong>API log <span class="phone-live" aria-hidden="true"></span></strong>
                                         <span>198 calls captured &middot; 52 with issues</span>
                                     </div>
                                     <div class="phone-scroll">
+                                        <div class="phone-feed" data-feed>
                                         <div class="phone-card is-bad">
                                             <div class="phone-card-top">
                                                 <span class="phone-badge b-err">500</span>
@@ -194,6 +194,33 @@
                                                 <span class="phone-tag">11:55:02</span>
                                                 <span class="phone-tag">842 B</span>
                                             </div>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-err">422</span>
+                                                <span class="phone-badge b-info">PUT</span>
+                                                <span class="phone-card-time">142 ms</span>
+                                            </div>
+                                            <span class="phone-card-path">/api/v1/cart/items/8812</span>
+                                            <span class="phone-card-host">api-qa.example.co</span>
+                                            <div class="phone-card-foot">
+                                                <span class="phone-tag">11:54:58</span>
+                                                <span class="phone-tag">311 B</span>
+                                            </div>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-ok">304</span>
+                                                <span class="phone-badge b-info">GET</span>
+                                                <span class="phone-card-time is-fast">18 ms</span>
+                                            </div>
+                                            <span class="phone-card-path">/api/v1/config/flags</span>
+                                            <span class="phone-card-host">api-qa.example.co</span>
+                                            <div class="phone-card-foot">
+                                                <span class="phone-tag">11:54:55</span>
+                                                <span class="phone-tag">cached</span>
+                                            </div>
+                                        </div>
                                         </div>
                                     </div>
                                 </div>
@@ -914,7 +941,6 @@
       "description": "AppInspect is a free Android in-app inspector for developer and QA builds. Inspect OkHttp network traffic, mock API responses, and review storage, WorkManager jobs, crashes, ANRs and runtime metadata — all on-device, with no proxy or USB cable required.",
       "url": "https://app-inspect-doc.vercel.app/",
       "downloadUrl": "https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview",
-      "softwareVersion": "0.7.0",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "author": {
         "@type": "Person",

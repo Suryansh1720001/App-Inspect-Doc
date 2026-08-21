@@ -29,8 +29,11 @@ rules, content policies, the design system, and the changelog.
    `<url>` to `sitemap.xml`. Do not hand-write navigation into a page.
 4. **One canonical home per topic.** The de-duplication table in `README.md` says
    where each topic lives. Elsewhere, summarise in a line and link — never re-explain.
-5. **Use the `<latest-version>` placeholder** in dependency snippets — never pin a
-   version.
+5. **Never put a version number on the site** — not in snippets, headers, prose,
+   JSON-LD `softwareVersion`, or `llms.txt`. Dependency snippets use the
+   `<latest-version>` placeholder; anything else links to the Maven Central versions
+   page. The only version recorded anywhere is `README.md`'s "Last synced with library"
+   line, which is a maintenance record.
 6. **Both themes matter.** Light and dark are both first-class; check any visual
    change in both. Never hard-code a colour — use the tokens in `styles.css`.
 7. Keep `privacy.html` consistent with actual library behaviour and bump its

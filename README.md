@@ -144,15 +144,68 @@ so it is the main path from the landing page into the panel docs.
 
 - **Adding a panel** means adding one `[data-mock-view]` block and one tab button with
   those five attributes. No JS change.
-- **The phone has its own colour scale** (`--p-bg`, `--p-card`, `--p-teal`, …) declared
-  locally on `.phone-screen`. It is a device screen, so it stays dark in both site
-  themes — do not wire it to the site tokens.
+- **The phone has its own colour scale** (`--p-bg`, `--p-card`, `--p-ok-bg`, …) declared
+  locally on `.phone-screen`, because a device screen has its own semantics: badge
+  tints, status colours, a nav bar. **It follows the site theme** — light values are the
+  defaults, dark overrides sit under `:root[data-theme="dark"] .phone-screen` plus the
+  `prefers-color-scheme` fallback. The real library has a light mode, so a dark phone on
+  a light page would misrepresent it. Every colour inside the phone must be a `--p-*`
+  token; there are no hardcoded hexes in the component rules, and a check asserts it.
+- **The Network list cycles** — see "The live capture feed" below.
+- **The frame is its own small system**, keyed off `--f-*` tokens on `.phone`. Three
+  things stop it reading as an old handset, and all three are easy to undo by accident:
+  a **7px bezel** (not 10), **concentric corners** — the screen radius is
+  `calc(var(--f-radius) - var(--f-bezel))`, so changing one keeps the other in step —
+  and a **gradient rail** rather than a flat fill, so the edge catches light. Side
+  buttons and the punch-hole camera are pseudo-elements (`.phone::before/::after`,
+  `.phone-screen::after`), so they cost no markup — don't claim those pseudos for
+  anything else.
+- **The side buttons need their own `--f-btn-*` tones.** Reusing the rail gradient makes
+  them vanish into the frame — they stop reading as hardware, which is the whole point of
+  having them. Each carries an inset top highlight and an outward shadow so it looks
+  raised.
+- **`.phone-status` shares `--p-navbar` with `.phone-bar`**, the way a real app tints the
+  status bar. Give them different surfaces and the screen's rounded top corners end up
+  one colour with the bar below another, which reads as the bar escaping the frame.
 - **Content must stay plausible and consistent.** The counts in a panel's `.phone-meta`
   line should match the rows shown, badges should use real vocabulary
   (`SHORT_CIRCUIT`, `OVERRIDDEN`, `ENQUEUED`, `ANR`), and nothing should claim a
   capability the library does not have. Hosts are `example.co`, never a real one.
 - `.phone-scroll` clips overflow, so a view that grows past roughly 470px silently
   loses its last row. Check each panel after editing.
+
+### The live capture feed
+
+The Network list cycles: the oldest card moves to the top every second, so the hero
+shows what the panel actually does rather than a frozen screenshot. Implemented by the
+`[data-feed]` block in `script.js`, and it is the only JavaScript-driven animation on
+the site.
+
+**Cadence is one constant** — `TICK_MS` in that block. The slide (`.phone-feed`
+transition, 0.38s), the arrival fade (`feed-in`, 0.32s) and the `is-new` cleanup (450ms)
+must all stay comfortably below it, or a tick lands mid-slide and the list jumps. The
+current values hold at both 1000ms and 750ms.
+
+How it stays cheap:
+
+- **One DOM move per tick.** The last card is inserted before the first — no rebuilding,
+  no cloning.
+- **Only a transform is animated.** The wrapper jumps up by exactly one card height, then
+  eases back to `translateY(0)`, so the new row appears to slide in from behind the
+  section header. Nothing reflows mid-animation.
+- **All six cards must stay structurally identical** (top / path / host / foot). The slide
+  distance is `offsetHeight + 6`, so a card of a different height would make the list
+  visibly jump. There is a check for this.
+- **The arriving card is re-stamped** from a rolling clock, because cards recycle: left
+  alone, a re-used row keeps its original time and after one rotation the list reads
+  oldest-first. The ticker rewrites the card's **first** `.phone-tag` — keep the time tag
+  first in `.phone-card-foot`.
+- **It stops whenever it would be wasted work**: `prefers-reduced-motion`, the phone
+  scrolled out of view (`IntersectionObserver`), another panel selected, or a
+  backgrounded tab. `sync()` is the single place that decides.
+
+Six cards exist but only about four are visible, which is deliberate — the rotation
+window changes each tick instead of looping four identical rows.
 
 ### Documentation sidebar order
 
@@ -210,10 +263,15 @@ is a one-line summary with a link.
 
 ## Content policies
 
-- **Version in snippets:** use the `<latest-version>` placeholder, never a pinned
-  version. Deliberate: the site never goes stale. The current version appears once as
-  the `brand-version` pill, in the Introduction note, and in the JSON-LD
-  `softwareVersion`.
+- **No version number anywhere on the site.** Not in snippets, not in the header, not
+  in prose, not in JSON-LD `softwareVersion`, not in `llms.txt`. Dependency snippets use
+  the `<latest-version>` placeholder and link to Maven Central; anything else that wants
+  to name a version links to the
+  [versions page](https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions)
+  instead — the docs sidebar already carries it as "Released versions". The reason: the
+  library releases far more often than this site is edited, so any number here turns
+  into a lie. **The only place a version is written down is this README's "Last synced
+  with library" line** — that is a maintenance record, not a user-facing claim.
 - **Write for three readers at once** — a developer integrating it, a tester using it,
   and someone deciding whether it is safe to adopt. Lead each page with what the thing
   is for in plain language, then the specifics.
@@ -239,6 +297,21 @@ is a one-line summary with a link.
   is a deeper amber than it needs to be on white, because a pale amber fill disappears
   against cream. Two things deliberately stay pure white: `--accent-on` (label on a
   teal button) and `.modal-qr` (a QR needs maximum camera contrast).
+- **Motion is rationed.** It lives in one section at the end of `styles.css` plus a few
+  transitions at the end of `docs.css`. Four rules:
+  1. **Only `opacity` and `transform`** are ever animated, so everything stays on the
+     compositor and nothing reflows. There is an assertion for this in the checks below.
+  2. **Motion must explain something.** The phone stages its rows because the real
+     inspector fills up as calls arrive; panels fade because an instant swap reads as a
+     glitch. "It looks nice" is not a reason.
+  3. **Documentation prose is never animated and never scroll-revealed.** It must be
+     readable and `Ctrl+F`-able the instant it renders. Docs pages get transitions only —
+     no entrance animation, because you navigate between them constantly.
+  4. **Looping animation exists only inside the phone mockup**: the 6px `.phone-live`
+     dot and the capture feed. Nothing in the reading area moves on its own.
+
+  The `prefers-reduced-motion` block at the end of `styles.css` switches all of it off
+  with `!important`, which beats `docs.css` regardless of load order. Keep it last.
 - **Contrast is a constraint, not a preference.** Every text token must clear WCAG AA
   (4.5:1) against **all three** light surfaces — page, band and card. `--text-faint` is
   the tight one: it sits at 4.82:1 on `--bg-soft`, so lightening it any further breaks
@@ -323,6 +396,73 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 
 ## Changelog
 
+- **2026-08-21 (frame polish + live-dot fix)** — Three fixes from close inspection of the
+  mockup. **The side buttons now read as buttons**: they were drawn with the same
+  gradient as the rail, so they had 1.00 contrast against it and looked like scratches.
+  They get their own `--f-btn-*` tones (1.49 separation in light, 2.03 in dark), an inset
+  top highlight, an outward shadow, and 1px more width. **The status bar now shares the
+  app bar's surface** — previously the status strip used `--p-bg` and the bar below used
+  `--p-navbar`, so in light mode the screen's rounded top corners were lavender with a
+  square white slab underneath, which read as the white bar escaping the frame. Also
+  softened the light screen ring from `0.28` to `0.14` alpha, since a strong ring against
+  a white app bar looks like a stray border, and lifted the dark rail and hairline
+  slightly for separation against the near-black page. **Bug fix:** the live-capture dot
+  was rendering on its own line below "API log". `.phone-meta span` (0,1,1) was
+  out-specifying `.phone-live` (0,1,0) and forcing `display: block` onto it; the selector
+  is now `.phone-meta > span`, which cannot reach the dot nested inside the `<strong>`.
+
+- **2026-08-21 (phone frame)** — Modernised the mockup's frame, which read as a
+  mid-2010s handset. The bezel went from 10px to 7px; corner radii are now genuinely
+  concentric (outer 46px, screen `calc(46px - 7px)`) instead of 34/26, which was the main
+  reason the corners looked wrong; the flat `--surface-raised` fill became a gradient
+  rail so the edge catches light; and the single flat shadow became a four-layer stack
+  (hairline, top-edge catch, contact shadow, soft drop). Added volume and power buttons
+  plus a punch-hole camera, all as pseudo-elements, so no markup changed. The frame has
+  its own `--f-*` tokens with light and dark variants — silver-warm on the cream page,
+  graphite in dark — and the screen now carries an inset ring so the display sits *in*
+  the frame rather than on it. Net effect on the screen: 8px wider, since the bezel and
+  border shrank.
+
+- **2026-08-21 (live feed + themed phone)** — Two changes to the hero mockup. **The
+  Network list now cycles**: every second the oldest card moves to the top and the list
+  slides down, so the hero demonstrates a live capture instead of showing a frozen
+  screenshot. The cadence started at 2.6s and was tightened to 1s; the slide was
+  shortened to 0.38s to keep clear separation between cycles, and the arriving card is
+  re-stamped from a rolling clock — without that, recycled cards kept their original
+  timestamps and the list visibly read oldest-first after one rotation, which is obvious
+  at a fast cadence. Two more calls were added (six total, ~four visible) so the rotation window
+  changes rather than looping the same four rows. It is the only JS-driven animation on
+  the site and is heavily gated — see "The live capture feed" above. **The phone screen
+  now follows the site theme.** It was hardcoded dark in both themes, which
+  misrepresented the library, since the real inspector has a light mode. Its whole
+  palette was tokenised — 27 `--p-*` variables including badge fills, card and nav-bar
+  surfaces, and the error-card tint — with light as the default and dark overrides under
+  the theme selectors. No hardcoded colours remain inside the phone rules. Contrast was
+  measured for both themes: every badge clears WCAG AA, and light `--p-dim` was darkened
+  from `#7b8595` to `#646f80` to bring secondary text from 3.7:1 up to 5.1:1. This
+  reverses the "stays dark in both themes" note from the 2026-08-21 mockup entry.
+- **2026-08-21 (restrained motion)** — Added animation, deliberately little: a staggered
+  hero entrance on the landing page only (~450ms, runs once), a 180ms fade on phone
+  panel switches, staggered rows inside each phone panel — which re-run on every switch,
+  so the list restocks the way the real inspector does — a 6px pulsing live-capture dot
+  on the API log, pop-in for the search and support dialogs, and cross-fades on the
+  sidebar/TOC active states, which used to snap. **Cost: 140 lines of CSS, zero new
+  JavaScript, zero new files** (+~1.3 KB gzipped total). Only `opacity` and `transform`
+  are animated. Explicitly rejected: scroll-triggered reveals on prose (the pre-2026-08-21
+  site had these and they hide content, hurt scanning, and blank the page if JS fails),
+  parallax, animated gradients, and a typewriter headline. Documentation pages get
+  transitions only. The `prefers-reduced-motion` block at the end of `styles.css` disables
+  everything with `!important`. Policy recorded under "Motion is rationed" above.
+- **2026-08-21 (no pinned versions)** — Removed every hardcoded version number from
+  the site; it had crept in during the docs restructure and contradicted the site's own
+  policy. Gone: the `0.7.0` pill next to the wordmark on all 17 pages (and its CSS,
+  including a mobile override), `"softwareVersion"` in the homepage JSON-LD, "These
+  pages describe 0.7.0" in the Introduction note, and the version line in `llms.txt`.
+  Nothing was added to replace the pill — the docs sidebar already links to "Released
+  versions" on Maven Central, which is the honest answer. Snippets keep using
+  `<latest-version>`. The policy in `README.md` and `CLAUDE.md` was broadened from
+  "no pinned version *in snippets*" to no version number anywhere on the site, since the
+  narrow wording is what let the pill through.
 - **2026-08-21 (privacy / data-handling split)** — `privacy.html` was covering two
   unrelated things, and an audit showed its library section duplicated `security.html`
   on every single topic (`appinspect_storage.db`, the mirror file, retention,

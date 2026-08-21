@@ -9,7 +9,7 @@
 
 - Artifact group: `io.github.suryansh1720001.appinspect`
 - Published on: Maven Central
-- Current version documented here: 0.7.0
+- Version: this documentation tracks the latest published release; check Maven Central for the current version number
 - Minimum Android version: 7.0 (API 24). ANR and native crash reporting need Android 11 (API 30).
 - License cost: free
 - Website: https://app-inspect-doc.vercel.app/

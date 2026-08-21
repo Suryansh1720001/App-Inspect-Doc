@@ -640,3 +640,24 @@
         text-align: left;
     }
 }
+
+/* --------------------------------------------------------------------------
+   Motion — transitions only. Documentation pages get no entrance animation:
+   you navigate between them constantly, and a fade on every click wears out
+   fast. The global reduced-motion switch lives in styles.css.
+   -------------------------------------------------------------------------- */
+
+.nav-list a,
+.nav-sub a,
+.nav-aside a {
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.toc-list a {
+    transition: color 0.15s ease, border-left-color 0.15s ease;
+}
+
+.doc-card,
+.page-nav a {
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}

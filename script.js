@@ -248,6 +248,100 @@
         });
     }
 
+    /* ---------------------------------------------------- live capture feed */
+
+    /* The Network list cycles so the hero shows what the panel actually does:
+       calls arriving at the top, older ones pushed down. Deliberately cheap —
+       one card is moved in the DOM per tick and only the wrapper's transform is
+       animated, so nothing reflows mid-animation.
+
+       It stops running whenever it would be wasted work: reduced motion, the
+       phone scrolled out of view, another panel selected, or a hidden tab. */
+
+    var feed = document.querySelector("[data-feed]");
+
+    if (feed && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        var TICK_MS = 1000;
+        var timer = null;
+        var onScreen = false;
+
+        /* Cards recycle, so a re-used row would carry a stale time and the list
+           would read newest-last. Stamp each arrival from a rolling clock that
+           starts where the markup's newest card left off. */
+        var clock = 11 * 3600 + 55 * 60 + 13;
+
+        var pad = function (n) {
+            return n < 10 ? "0" + n : String(n);
+        };
+
+        var nextStamp = function () {
+            clock += 1 + Math.floor(Math.random() * 4);
+            return pad(Math.floor(clock / 3600) % 24) +
+                ":" + pad(Math.floor(clock / 60) % 60) +
+                ":" + pad(clock % 60);
+        };
+
+        var tick = function () {
+            var oldest = feed.lastElementChild;
+            if (!oldest) {
+                return;
+            }
+
+            var shift = oldest.offsetHeight + 6; /* card height + the 6px gap */
+            var stamp = oldest.querySelector(".phone-tag");
+            if (stamp) {
+                stamp.textContent = nextStamp();
+            }
+
+            feed.insertBefore(oldest, feed.firstElementChild);
+
+            /* Jump the list up by exactly one card, then ease it back to rest:
+               the new row appears to slide in from behind the section header. */
+            feed.style.transition = "none";
+            feed.style.transform = "translateY(" + -shift + "px)";
+            void feed.offsetHeight; /* flush, so the transition below animates */
+            feed.style.transition = "";
+            feed.style.transform = "translateY(0)";
+
+            oldest.classList.add("is-new");
+            window.setTimeout(function () {
+                oldest.classList.remove("is-new");
+            }, 450);
+        };
+
+        var sync = function () {
+            var view = feed.closest("[data-mock-view]");
+            var live = onScreen &&
+                document.visibilityState === "visible" &&
+                view && view.classList.contains("is-on");
+
+            if (live && !timer) {
+                timer = window.setInterval(tick, TICK_MS);
+            } else if (!live && timer) {
+                window.clearInterval(timer);
+                timer = null;
+            }
+        };
+
+        if ("IntersectionObserver" in window) {
+            new IntersectionObserver(function (entries) {
+                onScreen = entries[0].isIntersecting;
+                sync();
+            }, { threshold: 0.25 }).observe(feed.closest(".phone"));
+        } else {
+            onScreen = true;
+        }
+
+        document.addEventListener("visibilitychange", sync);
+        document.querySelectorAll("[data-mock-tab]").forEach(function (tab) {
+            tab.addEventListener("click", function () {
+                window.setTimeout(sync, 0);
+            });
+        });
+
+        sync();
+    }
+
     /* --------------------------------------------------------- mobile drawer */
 
     var drawerToggle = document.querySelector(".topbar-menu");
