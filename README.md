@@ -278,6 +278,12 @@ is a one-line summary with a link.
 - **Prose over bullet dumps.** Explain *why* a behaviour exists, not just that it
   exists. Tables are for genuine matrices (gates, actions, field references), not for
   hiding sentences.
+- **Explain the behaviour, not the design decision.** "Why" is worth writing when it
+  changes what a reader does — why the interceptor goes last, why a mock body still has
+  to parse, why exports need redacting. It is not worth writing to justify a UI choice:
+  a reader needs to know *where* the Runtime button is, not why it isn't a bottom-bar
+  tab. Product rationale reads as defensive and takes up the space the actual answer
+  should occupy.
 - **Security claims** must mirror the library README's "Security Model": Layer 1 =
   compile-time no-op, Layer 2 = runtime self-disable. Never overstate.
 - **`privacy.html`** covers the website only; bump its "Last updated" date when its
@@ -433,6 +439,14 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 - LinkedIn: <https://www.linkedin.com/in/itssuryansh/>
 
 ## Changelog
+
+- **2026-08-21 (cut design rationale)** — Removed the explanation of *why* Runtime is not
+  a bottom-bar tab. It appeared in three user-facing places — a whole `<h2>` section on
+  `runtime.html`, a paragraph on `open-inspector.html`, and the mockup's Runtime caption —
+  and none of them answered a question a reader has. All three now state only where the
+  button is, which is the useful part. `runtime.html` drops from three sections to two and
+  gets to "What it collects" immediately. Added a content policy above:
+  explain the behaviour, not the design decision.
 
 - **2026-08-21 (responsive + touch pass)** — Audited the site at phone, tablet and
   desktop widths and fixed what was actually broken rather than adding breakpoints on
