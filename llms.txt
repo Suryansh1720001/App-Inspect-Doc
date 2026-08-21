@@ -30,8 +30,9 @@
 - Configuration reference: https://app-inspect-doc.vercel.app/configuration.html
 - Network notifications: https://app-inspect-doc.vercel.app/notifications.html
 - Security model: https://app-inspect-doc.vercel.app/security.html
+- Data handling: https://app-inspect-doc.vercel.app/data-handling.html
 - QA checklist: https://app-inspect-doc.vercel.app/qa-checklist.html
-- Privacy policy: https://app-inspect-doc.vercel.app/privacy.html
+- Privacy policy (the website only): https://app-inspect-doc.vercel.app/privacy.html
 
 ## Installation
 
@@ -156,16 +157,35 @@ traces. Mock rules are developer-authored configuration and are never redacted, 
 real credentials must not go into a mock body. A committed `mocks.json` belongs in
 `src/debug/assets/`, because assets are not stripped per variant.
 
-## Data handling
+## Data handling (the library)
 
-The library has no cloud backend and sends nothing anywhere. Captured data lives in
-app-private SQLite on the device and is deleted on clear or uninstall. Export files
-(`.txt`, `.har`, `.json`) are created only when a person taps share, and can contain
-real credentials — including ones attached downstream of AppInspect — so they should be
-redacted before being attached to a ticket.
+The library has no cloud backend, no account and no telemetry, and it never originates
+a network request — so nothing is ever sent to the maintainer. Captured requests and
+crashes live in `appinspect_storage.db`, AppInspect's own app-private SQLite database,
+capped at 300 network events and 50 crashes by default. Storage and WorkManager
+contents are read on demand and never persisted. Mock rules are stored in the same
+database plus an app-scoped external mirror file for `adb pull`, written only on builds
+where mocking is allowed. `EncryptedSharedPreferences` is decrypted in-process for
+read-only viewing and the plaintext is never written anywhere.
 
-The documentation website sets no cookies and uses cookie-free Cloudflare Web
-Analytics. Google Fonts is loaded from `fonts.googleapis.com`.
+Data leaves the device only when a person taps share: `.txt` / `.har` network exports,
+`.json` mock rules, crash reports and runtime summaries. Exports go to
+`cacheDir/appinspect_exports/` through a non-exported `FileProvider` scoped to that
+directory, and they can contain real credentials — including ones attached downstream of
+AppInspect — so they should be redacted before being attached to a ticket. Everything is
+removed on clear or uninstall.
+
+For a Google Play Data Safety declaration: in the recommended setup the library is not
+in the production APK at all (release builds get `appinspect-no-op`), it collects
+nothing because it never transmits, and the host app remains the sole data controller.
+
+## Privacy (the documentation website)
+
+Separate from the above, and covering only this site: no cookies, no accounts, no forms,
+no advertising or cross-site tracking. Hosted on Vercel, which processes request
+metadata like any web host. Page views are counted by cookie-free Cloudflare Web
+Analytics. Google Fonts is loaded from `fonts.googleapis.com`. The visitor's light/dark
+theme choice is kept in `localStorage` and never sent anywhere.
 
 ## Comparison
 

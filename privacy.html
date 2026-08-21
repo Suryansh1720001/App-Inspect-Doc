@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy policy | AppInspect docs</title>
-    <meta name="description" content="AppInspect privacy policy: what this website collects, and what the library stores on the device. No cloud backend, no telemetry.">
+    <meta name="description" content="Privacy policy for the AppInspect documentation website: no cookies, cookie-free analytics, and the third parties involved in serving the site.">
     <meta name="theme-color" content="#fdfbf5" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -13,11 +13,11 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://app-inspect-doc.vercel.app/privacy.html">
     <meta property="og:title" content="Privacy policy — AppInspect docs">
-    <meta property="og:description" content="AppInspect privacy policy: what this website collects, and what the library stores on the device. No cloud backend, no telemetry.">
+    <meta property="og:description" content="Privacy policy for the AppInspect documentation website: no cookies, cookie-free analytics, and the third parties involved in serving the site.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Privacy policy — AppInspect docs">
-    <meta name="twitter:description" content="AppInspect privacy policy: what this website collects, and what the library stores on the device. No cloud backend, no telemetry.">
+    <meta name="twitter:description" content="Privacy policy for the AppInspect documentation website: no cookies, cookie-free analytics, and the third parties involved in serving the site.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -112,137 +112,100 @@
                 <span class="eyebrow">Safety and privacy</span>
                 <h1>Privacy policy</h1>
                 <p class="lede">
-                    Two separate things share this name, so this page covers both: what this
-                    documentation website collects, and what the AppInspect library does with data on a
-                    device. Neither sends anything to us.
+                    This policy covers <strong>this documentation website</strong> and nothing else. It
+                    is short because the site is a set of static pages: there is no account to create,
+                    nothing to log in to, and no form that submits anything.
                 </p>
                 <p><strong>Last updated:</strong> 21 August 2026</p>
 
-                <h2 id="website">This website</h2>
-                <p>
-                    No cookies are set. There are no accounts, no sign-up forms, no login, no advertising
-                    pixels, no session recording, no heatmaps, and no contact form that submits personal
-                    data.
-                </p>
-                <p>
-                    Three third-party resources are loaded, and it is worth being specific about each:
-                </p>
-                <dl>
-                    <div>
-                        <dt>Cloudflare Web Analytics</dt>
-                        <dd>
-                            A cookie-free beacon (<code>static.cloudflareinsights.com/beacon.min.js</code>)
-                            counts page views and measures performance. It sets no cookies, does not track
-                            individuals across sites, and does not fingerprint visitors. Only aggregate
-                            data &mdash; page views, countries, referrers &mdash; is visible, and only to
-                            the site owner.
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>Google Fonts</dt>
-                        <dd>
-                            Manrope and JetBrains Mono are loaded from <code>fonts.googleapis.com</code>.
-                            Google may log the request IP and user agent under its own privacy policy.
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>Outbound links</dt>
-                        <dd>
-                            Links to Maven Central, GitHub and LinkedIn go to sites with their own privacy
-                            policies, which may set cookies on their own domains.
-                        </dd>
-                    </div>
-                </dl>
-                <p>
-                    Your theme choice is stored in <code>localStorage</code> in your browser. It never
-                    leaves the device and is not readable by anyone else.
-                </p>
-
-                <h2 id="library">The library</h2>
-                <p>
-                    AppInspect is a developer tool that runs inside a host Android application. It has no
-                    cloud backend, requires no account, and never uploads anything to any
-                    AppInspect-operated service &mdash; because there is no such service.
-                </p>
-
-                <h3 id="never-does">What it never does</h3>
-                <ul>
-                    <li>Require an AppInspect account or registration.</li>
-                    <li>Upload captured network events, crash reports or storage data anywhere.</li>
-                    <li>Send usage or crash telemetry about the inspector itself.</li>
-                    <li>Include advertising SDKs or tracking libraries.</li>
-                    <li>Alter the requests your app sends. Response mocking changes only what your app receives back, entirely on the device &mdash; the matching conditions in a rule are filters, never transmitted data.</li>
-                </ul>
-
-                <h3 id="stores">What it stores on the device</h3>
-                <ul>
-                    <li>
-                        Captured OkHttp requests and responses, in an app-private SQLite database
-                        (<code>appinspect_storage.db</code>), subject to a retention cap.
-                    </li>
-                    <li>
-                        Uncaught exceptions, and on Android 11+ ANR and native crash records, in the same
-                        private database &mdash; up to 50 recent events.
-                    </li>
-                    <li>
-                        Storage and WorkManager data is read from the host app on demand and is never
-                        copied or persisted by AppInspect.
-                    </li>
-                    <li>
-                        Mock rules created in the inspector, in the same private database. A mirror copy is
-                        also written to
-                        <code>Android/data/&lt;your.package&gt;/files/appinspect/mocks.json</code> &mdash;
-                        app-scoped external storage, so the file can be retrieved with
-                        <code>adb pull</code> &mdash; and only on builds where mocking is allowed. Rules are
-                        developer-authored configuration and are stored exactly as written, so real
-                        credentials should never be placed in a mock response body.
-                    </li>
-                    <li>
-                        <code>EncryptedSharedPreferences</code> files are decrypted for read-only viewing
-                        using the host app's own on-device Keystore key. Decryption never leaves the
-                        device, and encrypted files can never be edited or deleted from the inspector.
-                    </li>
-                    <li>
-                        All of it is private to the host app and inaccessible to other apps without root.
-                    </li>
-                    <li>
-                        It is deleted when someone taps Clear inside the inspector, or when the host app is
-                        uninstalled.
-                    </li>
-                </ul>
-
-                <h2 id="exports">Exports</h2>
-                <p>
-                    The library can write network logs as TXT or HAR, mock rules as JSON, and crash
-                    reports for the Android share sheet. These files are created <strong>only when a
-                    person taps the export or share action</strong>, are written to
-                    <code>cacheDir/appinspect_exports/</code>, and are shared through a
-                    <code>FileProvider</code> that cannot grant access to any other path. Nothing is sent
-                    automatically.
-                </p>
-
-                <div class="warn">
-                    <span class="note-title">Exports can contain sensitive data</span>
+                <div class="note">
+                    <span class="note-title">Looking for what the library does with data?</span>
                     <p>
-                        A network export includes full request and response headers &mdash; which means
-                        authorization tokens, API keys and session cookies, including credentials attached
-                        downstream of AppInspect &mdash; plus body content up to the capture limit. They are
-                        intended for internal debugging. Redact credentials before sharing one outside your
-                        team; the <a href="qa-checklist.html">QA checklist</a> explains how.
+                        That is a different question, and it has its own page:
+                        <a href="data-handling.html">data handling</a> covers what AppInspect writes to a
+                        device, how long it keeps it, and what leaves. The short answer is that the
+                        library has no backend and sends nothing anywhere.
                     </p>
                 </div>
 
-                <h2 id="production">Production builds</h2>
+                <h2 id="collected">What this site collects</h2>
                 <p>
-                    With <code>appinspect-no-op</code> in your release variant, none of the above applies
-                    to your users: there is no inspector, no database and no capture code in the APK. Even
-                    if the full library ships by mistake, it detects the non-debuggable build and disables
-                    itself. <a href="security.html">The full security model &rarr;</a>
+                    No personal data, and no cookies. Specifically, this site does not:
+                </p>
+                <ul>
+                    <li>set any cookies;</li>
+                    <li>offer accounts, sign-up, or login;</li>
+                    <li>run advertising pixels or cross-site trackers;</li>
+                    <li>record sessions or build heatmaps;</li>
+                    <li>submit any form, because there are none.</li>
+                </ul>
+                <p>
+                    Aggregate page-view counts are collected, as described below. Nothing on this site
+                    identifies you or is used to build a profile of you.
+                </p>
+
+                <h2 id="third-parties">Third parties involved in serving this site</h2>
+                <p>
+                    Being specific about these matters more than a general reassurance, so here is the
+                    complete list.
+                </p>
+                <dl>
+                    <div>
+                        <dt>Vercel<span class="dt-default">hosting</span></dt>
+                        <dd>
+                            The site is hosted on Vercel, so every request necessarily reaches Vercel's
+                            servers. Like any web host, it processes request metadata &mdash; IP address,
+                            user agent, requested URL &mdash; to serve the page and to protect the service.
+                            This is handled under Vercel's own privacy policy.
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Cloudflare Web Analytics<span class="dt-default">page counts</span></dt>
+                        <dd>
+                            A cookie-free beacon (<code>static.cloudflareinsights.com/beacon.min.js</code>)
+                            counts page views and measures loading performance on every page. It sets no
+                            cookies, does not track individuals between sites, and does not fingerprint
+                            visitors. Only aggregate figures &mdash; page views, countries, referrers
+                            &mdash; are produced, and only the site owner can see them.
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Google Fonts<span class="dt-default">typefaces</span></dt>
+                        <dd>
+                            Manrope and JetBrains Mono are loaded from
+                            <code>fonts.googleapis.com</code> and <code>fonts.gstatic.com</code>. Google
+                            may log the request IP and user agent under its own privacy policy.
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Outbound links<span class="dt-default">only if you click them</span></dt>
+                        <dd>
+                            Links to Maven Central, GitHub and LinkedIn lead to sites with their own
+                            policies, which may set cookies on their own domains. Nothing is shared with
+                            them unless you follow a link.
+                        </dd>
+                    </div>
+                </dl>
+
+                <h2 id="local">What is stored in your browser</h2>
+                <p>
+                    One thing, and it never leaves your device: your light or dark theme choice, saved in
+                    <code>localStorage</code> under <code>appinspect-theme</code> so the site does not
+                    flash the wrong theme on your next visit. It is not a cookie, is not sent with any
+                    request, and is not readable by anyone else. Clearing your browser storage removes
+                    it, and the site falls back to following your operating system's preference.
+                </p>
+
+                <h2 id="changes">Changes to this policy</h2>
+                <p>
+                    The date at the top of this page changes whenever this policy does. Because it now
+                    covers only the website, it changes rarely &mdash; updates to the library itself do
+                    not affect it.
                 </p>
 
                 <h2 id="contact">Questions</h2>
                 <p>
-                    For questions about this policy or about how AppInspect handles data, email
+                    For anything about this policy, email
                     <a href="mailto:itssuryanshprajapati@gmail.com">itssuryanshprajapati@gmail.com</a>,
                     or reach out through
                     <a href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer">GitHub</a>
@@ -295,6 +258,7 @@
             <nav aria-label="More">
                 <span class="footer-group-title">More</span>
                 <a href="security.html">Security model</a>
+                <a href="data-handling.html">Data handling</a>
                 <a href="qa-checklist.html">QA checklist</a>
                 <a href="privacy.html">Privacy policy</a>
                 <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>

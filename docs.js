@@ -106,6 +106,12 @@
                     topics: "security release safety no-op self disable flag_debuggable hardening exported components telemetry mocking gates"
                 },
                 {
+                    url: "data-handling.html",
+                    title: "Data handling",
+                    blurb: "What the library writes to a device, how long it keeps it, and what leaves.",
+                    topics: "data handling storage retention appinspect_storage.db exports fileprovider backup deletion telemetry play data safety declaration gdpr controller processor vendor review encrypted keystore mirror"
+                },
+                {
                     url: "qa-checklist.html",
                     title: "QA checklist",
                     blurb: "Handling exports that contain real credentials.",
@@ -114,8 +120,8 @@
                 {
                     url: "privacy.html",
                     title: "Privacy policy",
-                    blurb: "What this site collects, and what the library stores on the device.",
-                    topics: "privacy policy cookies analytics on-device storage telemetry data handling gdpr"
+                    blurb: "What this documentation website collects. Nothing personal, no cookies.",
+                    topics: "privacy policy website cookies analytics cloudflare google fonts vercel hosting localStorage theme third parties"
                 }
             ]
         }

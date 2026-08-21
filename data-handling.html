@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opening the inspector | AppInspect docs</title>
-    <meta name="description" content="Every way to open the AppInspect inspector: shake gesture, launcher shortcut, long press, notification tap, or AppInspect.open(context).">
+    <title>Data handling | AppInspect docs</title>
+    <meta name="description" content="What the AppInspect library writes to a device, how long it keeps it, and what leaves — plus the answers for a Play Data Safety form or a vendor review.">
     <meta name="theme-color" content="#fdfbf5" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <link rel="canonical" href="https://app-inspect-doc.vercel.app/open-inspector.html">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/data-handling.html">
 
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://app-inspect-doc.vercel.app/open-inspector.html">
-    <meta property="og:title" content="Opening the inspector — AppInspect docs">
-    <meta property="og:description" content="Every way to open the AppInspect inspector: shake gesture, launcher shortcut, long press, notification tap, or AppInspect.open(context).">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/data-handling.html">
+    <meta property="og:title" content="Data handling — AppInspect docs">
+    <meta property="og:description" content="What the AppInspect library writes to a device, how long it keeps it, and what leaves — plus the answers for a Play Data Safety form or a vendor review.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Opening the inspector — AppInspect docs">
-    <meta name="twitter:description" content="Every way to open the AppInspect inspector: shake gesture, launcher shortcut, long press, notification tap, or AppInspect.open(context).">
+    <meta name="twitter:title" content="Data handling — AppInspect docs">
+    <meta name="twitter:description" content="What the AppInspect library writes to a device, how long it keeps it, and what leaves — plus the answers for a Play Data Safety form or a vendor review.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -109,205 +109,185 @@
             </details>
 
             <article class="prose">
-                <span class="eyebrow">Getting started</span>
-                <h1>Opening the inspector</h1>
+                <span class="eyebrow">Safety and privacy</span>
+                <h1>Data handling</h1>
                 <p class="lede">
-                    The inspector is a full screen inside your app, and there are six ways to reach it.
-                    Which one matters more than it sounds: a tester who cannot open the tool will not
-                    use it, and a gesture that fires by accident during a demo is worse than no gesture
-                    at all.
+                    What the library touches, what it writes to the device, how long it keeps it, and
+                    what leaves. The short version: AppInspect has no backend, so nothing is ever sent
+                    to us &mdash; data leaves the device only when a person taps share.
                 </p>
 
-                <h2 id="ways-in">The ways in</h2>
+                <div class="note">
+                    <span class="note-title">Looking for the website's policy?</span>
+                    <p>
+                        This page is about the library. What the documentation site itself collects is in
+                        the <a href="privacy.html">privacy policy</a>.
+                    </p>
+                </div>
+
+                <h2 id="never">What it never does</h2>
+                <p>
+                    AppInspect is a local tool, not a service. There is no account, no registration, and
+                    no infrastructure behind it.
+                </p>
+                <ul>
+                    <li><strong>No network calls of its own.</strong> It observes the traffic your app makes and never originates a request.</li>
+                    <li><strong>No telemetry</strong> of any kind &mdash; not usage, not crashes, not "anonymous" statistics about the inspector.</li>
+                    <li><strong>No advertising or tracking SDKs</strong> bundled or transitively pulled in.</li>
+                    <li><strong>No Logcat output</strong> of captured payloads, headers or crash traces.</li>
+                    <li><strong>No modification of the requests your app sends.</strong> <a href="mocks.html">Response mocking</a> changes only what your app receives back, on the device; a rule's matching conditions are filters, never transmitted data.</li>
+                </ul>
+
+                <h2 id="stored">What it writes to the device</h2>
+                <p>
+                    Everything below lives in your app's own private storage, inaccessible to other apps
+                    without root, and only in a build where the inspector is enabled.
+                </p>
 
                 <div class="table-scroll">
                     <table>
                         <thead>
-                            <tr><th>Entry point</th><th>Turned on by</th><th>Best for</th></tr>
+                            <tr><th>Data</th><th>Where</th><th>Kept</th></tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Shake the device</strong></td>
-                                <td><code>shakeToOpenEnabled</code></td>
-                                <td>Testers on physical devices. Nothing to find on screen.</td>
+                                <td><strong>Captured requests and responses</strong><br>headers and bodies, up to the capture limit</td>
+                                <td><code>appinspect_storage.db</code> &mdash; AppInspect's own app-private SQLite database</td>
+                                <td>300 most recent by default; oldest dropped</td>
                             </tr>
                             <tr>
-                                <td><strong>Launcher shortcut</strong></td>
-                                <td><code>launcherShortcutEnabled</code></td>
-                                <td>Opening the inspector before the app itself, or on an emulator where shaking is awkward.</td>
+                                <td><strong>Crashes, ANRs and native crashes</strong><br>type, message, thread, full stack trace</td>
+                                <td>The same private database</td>
+                                <td>50 most recent by default</td>
                             </tr>
                             <tr>
-                                <td><strong>Long press a view</strong></td>
-                                <td><code>autoOpenOnLongPressTrigger</code> plus a trigger you attach</td>
-                                <td>A deliberate, discoverable gesture on a screen you choose &mdash; a logo, a version label.</td>
+                                <td><strong>ANR bookkeeping</strong><br>which exit records have already been read</td>
+                                <td><code>appinspect_internal_state</code> preferences file</td>
+                                <td>Until uninstall</td>
                             </tr>
                             <tr>
-                                <td><strong>Tap a network notification</strong></td>
-                                <td><code>networkNotificationsEnabled</code></td>
-                                <td>Jumping straight to the call you just watched go past. See <a href="notifications.html">Network notifications</a>.</td>
+                                <td><strong>Mock rules</strong> created in the panel</td>
+                                <td>The same private database, plus a <a href="#mirror">mirror file</a></td>
+                                <td>Until deleted or cleared</td>
                             </tr>
                             <tr>
-                                <td><strong><code>AppInspect.open(context)</code></strong></td>
-                                <td>Always available</td>
-                                <td>Wiring the inspector into a debug menu you already have.</td>
-                            </tr>
-                            <tr>
-                                <td><strong><code>AppInspectActivity</code></strong></td>
-                                <td>Always available</td>
-                                <td>Starting the activity yourself when you need control over the intent.</td>
+                                <td><strong>Storage and WorkManager contents</strong></td>
+                                <td>Read from your app on demand &mdash; <strong>never copied or persisted</strong> by AppInspect</td>
+                                <td>Not stored</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <h2 id="shake">Shake to open</h2>
                 <p>
-                    Shake detection watches the total accelerometer magnitude, gravity included &mdash;
-                    the same approach as Square's Seismic. At rest that reads about 1&nbsp;g, and
-                    ordinary handling such as picking the phone up stays around 1.0&ndash;1.5&nbsp;g, so
-                    only a deliberate shake crosses the default threshold of 2.7&nbsp;g.
-                </p>
-                <p>
-                    A single spike is not enough: the threshold has to be crossed by at least two
-                    samples inside a 500&nbsp;ms window. Cheaper or older accelerometers occasionally
-                    report one wild value, and that lone sample is ignored, while a real shake produces
-                    several.
+                    Both retention caps are configurable; see
+                    <a href="configuration.html#retention">retention</a>. The
+                    <a href="storage.html">Storage panel</a> excludes AppInspect's own database and
+                    preference files, so the inspector never shows you itself.
                 </p>
 
-                <div class="snippet">
-                    <div class="snippet-head">
-                        <span class="snippet-file">AppInspectEntryPoints</span>
-                        <button class="copy-button" type="button">Copy</button>
-                    </div>
-<pre><code data-lang="kotlin">AppInspectEntryPoints(
-    shakeToOpenEnabled = true,
-    shakeThresholdGravity = 2.7f,   // total g-force, gravity included
-    shakeCooldownMillis = 1_500L,   // ignore repeats for this long after opening
-)</code></pre>
-                </div>
-
+                <h3 id="encrypted">Encrypted preferences</h3>
                 <p>
-                    Lower the threshold to about 2.3&nbsp;g if your testers report that shaking never
-                    works; raise it if the inspector keeps appearing in someone's pocket. Values below
-                    roughly 1.5&nbsp;g are floored, because at that point normal movement would trigger
-                    it constantly.
+                    <code>EncryptedSharedPreferences</code> files are decrypted for viewing using your
+                    app's own on-device Keystore key. The decryption happens in the process and the
+                    plaintext is never written anywhere &mdash; and those files are read-only in the
+                    inspector, so an encrypted store cannot be edited or corrupted.
                 </p>
 
-                <h2 id="shortcut">Launcher shortcut</h2>
+                <h3 id="mirror">The mock rule mirror file</h3>
                 <p>
-                    With <code>launcherShortcutEnabled</code>, AppInspect registers a dynamic shortcut
-                    on your app icon. Long-press the icon on the home screen and the inspector is one
-                    tap away, without launching into the app first. This is usually the easiest entry
-                    point to explain to a non-developer, and the most reliable on an emulator.
-                </p>
-
-                <h2 id="long-press">Long press a view</h2>
-                <p>
-                    A long-press trigger is the option to reach for when you want the gesture to be
-                    predictable. You attach it to a specific view or composable &mdash; a version number
-                    in the settings screen is a common choice &mdash; so nobody opens the inspector by
-                    accident, and anyone who knows the trick can open it instantly.
-                </p>
-
-                <div class="snippet">
-                    <div class="snippet-head">
-                        <span class="snippet-file">Views</span>
-                        <button class="copy-button" type="button">Copy</button>
-                    </div>
-<pre><code data-lang="kotlin">val handle = AppInspect.attachLongPressTrigger(versionLabel)
-
-// Later, if the view outlives the trigger
-handle.unregister()</code></pre>
-                </div>
-
-                <div class="snippet">
-                    <div class="snippet-head">
-                        <span class="snippet-file">Compose</span>
-                        <button class="copy-button" type="button">Copy</button>
-                    </div>
-<pre><code data-lang="kotlin">val handle = rememberAppInspectLongPressTriggerHandle()
-
-Text(
-    text = "v${BuildConfig.VERSION_NAME}",
-    modifier = Modifier.appInspectLongPressTrigger(handle),
-)</code></pre>
-                </div>
-
-                <p>
-                    An accepted long press opens the inspector automatically as long as
-                    <code>autoOpenOnLongPressTrigger</code> is on. Turn that off and the trigger still
-                    reports the gesture, which lets you show your own confirmation first.
-                </p>
-
-                <h2 id="from-code">From your own debug menu</h2>
-                <p>
-                    If your app already has an internal debug screen, add one row to it:
-                </p>
-
-                <div class="snippet">
-                    <div class="snippet-head">
-                        <span class="snippet-file">Anywhere with a Context</span>
-                        <button class="copy-button" type="button">Copy</button>
-                    </div>
-<pre><code data-lang="kotlin">AppInspect.open(context)</code></pre>
-                </div>
-
-                <p>
-                    The call is refused when the library is disabled, so it is safe to leave in place
-                    &mdash; but remember that <code>AppInspect.open()</code> does not exist in
-                    <code>appinspect-no-op</code>, so keep the call in a debug-only source set. The
-                    <a href="install.html#guard-calls">install page</a> explains which parts of the API
-                    are safe in shared code.
-                </p>
-
-                <h2 id="own-task">It opens in its own Recents card</h2>
-                <p>
-                    By default the inspector opens in a <strong>separate task</strong>. That means it
-                    appears as its own card in Recents, next to your app, and the two can sit side by
-                    side in split-screen &mdash; genuinely useful when you want to watch calls arrive
-                    while tapping through a flow.
+                    So that <code>adb pull</code> works without <code>run-as</code>, the current rule set
+                    is mirrored to <code>&lt;external-files&gt;/appinspect/mocks.json</code> &mdash;
+                    app-scoped external storage. It is removed when the app is uninstalled, and it is
+                    never written on a build where mocking is not allowed; a build that cannot mock also
+                    deletes any mirror an earlier install left behind.
                 </p>
                 <p>
-                    It still runs in your app's process, so nothing is lost by doing this: a task is a
-                    back-stack and Recents grouping, not a separate process. Every panel works exactly
-                    the same.
-                </p>
-                <p>
-                    If you would rather it appeared stacked on top of the current screen, set
-                    <code>openInSeparateTask = false</code>. No manifest change is needed either way
-                    &mdash; the activity and its task affinity are merged in from the library's manifest.
+                    It is app-scoped but <strong>not app-private the way internal storage is</strong>, so
+                    treat it like an export. And note that mock rules are developer-authored
+                    configuration: they are stored verbatim and are never redacted, so real credentials
+                    must not go into a mock response body.
                 </p>
 
-                <h2 id="moving-around">Moving around once it is open</h2>
+                <h2 id="leaving">What leaves the device</h2>
                 <p>
-                    Five panels sit on the bottom bar: <a href="network.html">Network</a>,
-                    <a href="mocks.html">Mocks</a>, <a href="storage.html">Storage</a>,
-                    <a href="workmanager.html">Work</a> and <a href="crashes.html">Crashes</a>. Tap
-                    them or swipe left and right across the content &mdash; the bar and the swipe stay in
-                    sync.
+                    Only files a person deliberately shares. There is no automatic upload, no background
+                    sync, and nowhere for data to go.
                 </p>
+                <ul>
+                    <li>Network logs as <code>.txt</code> (with cURL commands) or <code>.har</code>.</li>
+                    <li>Mock rules as <code>.json</code>.</li>
+                    <li>Individual crash reports, and runtime summaries, through the Android share sheet.</li>
+                </ul>
                 <p>
-                    <a href="runtime.html">Runtime</a> is deliberately not on the bottom bar. It is
-                    reference data you consult occasionally rather than a workflow you switch between,
-                    so it lives behind a circular icon button in the top bar, just left of the close
-                    button, badged with the number of sections it has. Tapping it opens Runtime as its
-                    own full screen.
-                </p>
-                <p>
-                    Any panel can hand an oversized value to the shared
-                    <a href="value-viewer.html">value viewer</a> &mdash; a response body, a preference
-                    holding a large JSON blob, a database cell.
+                    Export files are written to <code>cacheDir/appinspect_exports/</code> and handed out
+                    through a <strong>non-exported <code>FileProvider</code> scoped to that directory
+                    alone</strong>, with per-URI grants &mdash; it cannot be induced to serve any other
+                    path. Files stay in the app cache until Android clears it or the app is uninstalled.
                 </p>
 
-                <div class="note">
-                    <span class="note-title">Hiding entry points</span>
+                <div class="warn">
+                    <span class="note-title">Exports carry real credentials</span>
                     <p>
-                        Every entry point can be switched off independently, which is how you hand a
-                        build to a wider audience without advertising that the inspector is there. The
-                        <a href="configuration.html#entry-points">configuration reference</a> lists all
-                        of them in one place.
+                        A network export contains the same <code>Authorization</code> headers, API keys
+                        and cookies the original requests used &mdash; including ones your own code never
+                        set, because request headers are recorded
+                        <a href="install.html#wire-headers">as they went out on the wire</a>. Redact
+                        before attaching one anywhere. The
+                        <a href="qa-checklist.html">QA checklist</a> is the procedure.
                     </p>
                 </div>
+
+                <h2 id="backups">Device backups</h2>
+                <p>
+                    In a debug build, if your app enables Android auto-backup, <code>appinspect_storage.db</code>
+                    can be included like any other app file &mdash; and it may contain captured auth
+                    headers. Exclude it in your backup rules if that matters to you. Production builds
+                    have nothing to back up, because the file is never created.
+                </p>
+
+                <h2 id="deleting">Deleting it</h2>
+                <ul>
+                    <li><strong>Clear</strong> inside the inspector removes captured data immediately.</li>
+                    <li><strong>Clear runtime rules</strong> in the Mocks panel removes device-made rules.</li>
+                    <li><strong>Uninstalling the app</strong> removes everything, including the mirror file.</li>
+                </ul>
+
+                <h2 id="production">In a production build, none of this exists</h2>
+                <p>
+                    With the recommended setup there is no inspector, no database and no capture code in
+                    the release APK at all. Even if the full library ships by mistake, it detects the
+                    non-debuggable build and writes nothing: no <code>appinspect_storage.db</code>, no
+                    internal state file, no mirror, no captured events. See the
+                    <a href="security.html">security model</a> for how both layers work.
+                </p>
+
+                <h2 id="declaring">For a vendor review or a Play Data Safety form</h2>
+                <p>
+                    Google Play asks you to declare what every SDK in your app collects and shares. The
+                    answer here is unusually simple, and the reason is the build variant.
+                </p>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Question</th><th>Answer</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Is the SDK in the production app?</td><td>Not in the recommended setup &mdash; release builds get <code>appinspect-no-op</code>, which contains no inspection code. If it is not in the shipped APK, there is nothing to declare.</td></tr>
+                            <tr><td>Does it collect data?</td><td>No. Collection means transmission off the device, and the library never transmits.</td></tr>
+                            <tr><td>Does it share data with third parties?</td><td>No. There are no third parties and no network calls.</td></tr>
+                            <tr><td>Is data encrypted in transit?</td><td>Not applicable &mdash; there is no transit.</td></tr>
+                            <tr><td>Can a user request deletion?</td><td>Data is local to their device and is removed on clear or uninstall.</td></tr>
+                            <tr><td>Who is the data controller?</td><td>You are. AppInspect never receives the data, so it is neither a controller nor a processor for it.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    If you do enable the library in a build you distribute more widely, treat it as you
+                    would any internal tooling: the data is on the tester's device, exports are the only
+                    way out, and the <a href="configuration.html#power-tools">power tools</a> decide what
+                    a tester can see in the first place.
+                </p>
                 <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
                 <p class="doc-feedback" data-feedback-line></p>
             </article>

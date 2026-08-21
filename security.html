@@ -120,7 +120,7 @@
                 <h2 id="short-version">The short version</h2>
                 <ul>
                     <li><strong>Two independent layers</strong> keep the inspector out of production. Either one alone would be sufficient.</li>
-                    <li><strong>No network calls of its own.</strong> The library observes the traffic your app makes and sends nothing anywhere. Zero telemetry, no account, no backend.</li>
+                    <li><strong>No network calls of its own.</strong> The library observes the traffic your app makes and sends nothing anywhere. Zero telemetry, no account, no backend &mdash; <a href="data-handling.html">data handling</a> has the detail.</li>
                     <li><strong>No logging.</strong> Captured payloads, headers and crash traces are never written to Logcat.</li>
                     <li><strong>Nothing is exported.</strong> No component of the library is reachable from another app.</li>
                     <li><strong>Debug builds are open on purpose.</strong> That is the trade, and it is configurable.</li>
@@ -258,13 +258,19 @@
                 </p>
 
                 <h2 id="internal-storage">The library's own storage</h2>
-                <ul>
-                    <li>In debug and staging builds, captured network events and crashes live in <code>appinspect_storage.db</code>, AppInspect's own app-private SQLite database.</li>
-                    <li>In production builds that file is <strong>never created</strong>, and neither is the <code>appinspect_internal_state</code> preferences file used by ANR detection.</li>
-                    <li>The Storage panel excludes AppInspect's own database and preference files, so the inspector never shows you itself.</li>
-                    <li>SharedPreferences and host database edits are written straight to your app's real storage. There is no sandbox.</li>
-                    <li><strong>Backups.</strong> In debug builds, if your app enables Android auto-backup, <code>appinspect_storage.db</code> can be included like any other app file &mdash; and it may contain captured auth headers. Exclude it in your backup rules if that matters. Production builds have nothing to back up.</li>
-                </ul>
+                <p>
+                    What AppInspect writes to a device, how long it keeps it, and what leaves is covered
+                    in full on <a href="data-handling.html">data handling</a> &mdash; including the
+                    retention caps, the mock rule mirror file, export scoping and the auto-backup
+                    caveat.
+                </p>
+                <p>
+                    The part that belongs here is what happens when the library is disabled: no database
+                    file, no internal state file, no mirror, nothing captured. And one thing worth
+                    stating plainly in a security context &mdash; SharedPreferences and host database
+                    edits made in the inspector are written <strong>straight to your app's real
+                    storage</strong>. There is no sandbox and no undo.
+                </p>
 
                 <h2 id="review">If you are reviewing this for an organisation</h2>
                 <p>
@@ -278,7 +284,7 @@
                         <tbody>
                             <tr><td>Does it phone home?</td><td>No. The library makes no network calls of its own and has no backend.</td></tr>
                             <tr><td>Can it run in production?</td><td>Not unless two separate opt-ins are compiled into the APK, and the recommended setup does not compile the code in at all.</td></tr>
-                            <tr><td>What data leaves the device?</td><td>Only files a person explicitly shares, through the Android share sheet.</td></tr>
+                            <tr><td>What data leaves the device?</td><td>Only files a person explicitly shares, through the Android share sheet. See <a href="data-handling.html">data handling</a>.</td></tr>
                             <tr><td>Can another app read what it captured?</td><td>No. Storage is app-private, no component is exported, and export files are served through a scoped, non-exported <code>FileProvider</code>.</td></tr>
                             <tr><td>What is the residual risk?</td><td>Shared exports. They contain real credentials by design &mdash; that is a process control, and the <a href="qa-checklist.html">QA checklist</a> is the process.</td></tr>
                         </tbody>
@@ -330,6 +336,7 @@
             <nav aria-label="More">
                 <span class="footer-group-title">More</span>
                 <a href="security.html">Security model</a>
+                <a href="data-handling.html">Data handling</a>
                 <a href="qa-checklist.html">QA checklist</a>
                 <a href="privacy.html">Privacy policy</a>
                 <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>

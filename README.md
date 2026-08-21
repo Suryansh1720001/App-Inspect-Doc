@@ -89,8 +89,9 @@ If the address changes, update `docs.js` *and* `privacy.html`.
 | `configuration.html` | Configuration reference |
 | `notifications.html` | Network notifications + Android 13 permission |
 | `security.html` | Security model |
+| `data-handling.html` | What the library stores on a device, and what leaves it |
 | `qa-checklist.html` | Export-handling checklist |
-| `privacy.html` | Privacy policy |
+| `privacy.html` | Privacy policy — **the website only** |
 | `styles.css` | Tokens (light + dark), reset, top bar, buttons, code blocks, footer, search dialog, landing page |
 | `docs.css` | Docs shell only: sidebar, TOC, prose typography, callouts, tables, prev/next, mobile drawer |
 | `script.js` | Theme toggle, syntax highlighting, copy buttons, support modal, mobile drawer |
@@ -160,7 +161,7 @@ Defined by `NAV` in `docs.js`. Groups and pages:
 - **Getting started** — Introduction, Install, Opening the inspector
 - **Panels** — Network, Mocks, Storage, WorkManager, Crashes and ANRs, Runtime, Value viewer
 - **Configuration** — Configuration reference, Network notifications
-- **Safety and privacy** — Security model, QA checklist, Privacy policy
+- **Safety and privacy** — Security model, Data handling, QA checklist, Privacy policy
 
 ### De-duplication rules — one canonical home per topic
 
@@ -175,15 +176,37 @@ Other pages may summarise a topic in a line or two **with a link**, never re-exp
 | How mocking works: sources, modes, matching, `mocks.json` shape, rule actions, priority, the five gates, `adb pull` | `mocks.html` |
 | Every configuration field and its default; the two ready-made profiles | `configuration.html` |
 | `POST_NOTIFICATIONS` on Android 13+ | `notifications.html` |
-| Release safety (both layers), hardening, what debug builds expose, mocking's security posture, internal storage and backups | `security.html` |
+| Release safety (both layers), hardening, what debug builds expose, mocking's security posture | `security.html` |
+| What the library stores on a device, retention, encryption, the mirror file, exports, backups, deletion, Play Data Safety answers | `data-handling.html` |
 | Export credential hygiene for humans | `qa-checklist.html` |
-| Website and library data handling | `privacy.html` |
+| **The website's** own data practices — cookies, analytics, hosting, `localStorage` | `privacy.html` |
 
 Note the split on mocking: **how it works and how to switch it on** is `mocks.html`
 (including the gate table, because that is what you consult when a rule will not
 fire); **why the design is safe** — rules are not redacted, the mirror file is
 external storage, `src/debug/assets`, `allowResponseMocking = false` on non-debuggable
 builds — is `security.html#mocking`.
+
+### Privacy vs. data handling — keep these separate
+
+Two different questions, deliberately on two pages:
+
+- **`privacy.html` is about the website only** — cookies, analytics, hosting,
+  `localStorage`. That is what a privacy policy is: a statement by whoever runs a
+  service about how they handle *your* personal data. Do not put library behaviour back
+  on this page. Its "Last updated" date is meaningful precisely because library
+  releases no longer touch it.
+- **`data-handling.html` is about the library** — what it writes to a device, retention,
+  encryption, the mirror file, exports, backups, deletion, and the answers an adopter
+  needs for a Google Play Data Safety form or a vendor questionnaire. This is a
+  technical disclosure, **not** a privacy policy: AppInspect never receives the data, so
+  it is neither controller nor processor. The host app developer is.
+
+`security.html` keeps only the release-safety framing of the same facts — "when the
+library is disabled, none of this is written" — and links here for the rest. The one
+claim that intentionally appears on both is *no network calls / zero telemetry*, because
+it is the answer to a security question **and** a data question; on `security.html` it
+is a one-line summary with a link.
 
 ## Content policies
 
@@ -199,8 +222,9 @@ builds — is `security.html#mocking`.
   hiding sentences.
 - **Security claims** must mirror the library README's "Security Model": Layer 1 =
   compile-time no-op, Layer 2 = runtime self-disable. Never overstate.
-- **`privacy.html`** must stay in sync with actual library behaviour, and its "Last
-  updated" date must be bumped when its content changes.
+- **`privacy.html`** covers the website only; bump its "Last updated" date when its
+  content changes. **`data-handling.html`** is the page that must stay in sync with
+  actual library behaviour.
 - Never invent a configuration field name. If the library repo does not document it,
   do not put it on the site.
 
@@ -299,6 +323,24 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 
 ## Changelog
 
+- **2026-08-21 (privacy / data-handling split)** — `privacy.html` was covering two
+  unrelated things, and an audit showed its library section duplicated `security.html`
+  on every single topic (`appinspect_storage.db`, the mirror file, retention,
+  `FileProvider`, `EncryptedSharedPreferences`, telemetry). Split them: **`privacy.html`
+  is now the website only** — no cookies, no accounts, the three third parties involved
+  in serving the site, and the `localStorage` theme key — roughly one screen, and its
+  date no longer moves when the library changes. It also now discloses **Vercel
+  hosting**, which the old page omitted despite naming Cloudflare and Google Fonts.
+  Library data handling moved to a new **`data-handling.html`** in the Safety group:
+  what is written where, both retention caps, encrypted-preference decryption, the mock
+  rule mirror, export scoping, auto-backup, deletion, and a section answering a Google
+  Play **Data Safety** form or vendor questionnaire — the headline being that the
+  recommended setup keeps the library out of the production APK entirely, so there is
+  nothing to declare. `security.html`'s storage section shrank to the release-safety
+  framing plus a link. Also repointed: the homepage FAQ's telemetry answer, both
+  footers, `docs.js` `NAV`, `sitemap.xml`, and `llms.txt` (which now separates library
+  data handling from website privacy). Rationale for keeping both pages rather than
+  deleting the library content is recorded under "Privacy vs. data handling" above.
 - **2026-08-21 (cream light theme)** — Replaced pure white in the light theme with a
   warm cream: `--bg` `#ffffff` → `#fdfbf5`, `--bg-soft` `#f4f7f6` → `#f7f2e7`, surfaces
   `#fffdf8`, and the cool grey-green borders and neutrals retoned warm. Shadows moved
