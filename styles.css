@@ -11,27 +11,33 @@
 :root {
     color-scheme: light;
 
-    --bg: #ffffff;
-    --bg-soft: #f4f7f6;
-    --bg-sunken: #eef2f1;
-    --surface: #ffffff;
-    --surface-raised: #ffffff;
-    --border: #dfe6e4;
-    --border-strong: #c6d2cf;
+    /* Warm cream rather than pure white — deep teal on paper-cream reads much
+       better than teal on clinical white, and it is easier on the eyes over a
+       long documentation page. Surfaces sit slightly lighter than the page so
+       cards still lift off it. */
+    --bg: #fdfbf5;
+    --bg-soft: #f7f2e7;
+    --bg-sunken: #f1ead9;
+    --surface: #fffdf8;
+    --surface-raised: #fffefb;
+    --border: #e7dfcd;
+    --border-strong: #d4c8b1;
 
-    --text: #0e1a19;
-    --text-muted: #4f605c;
-    --text-faint: #778783;
+    --text: #101a18;
+    --text-muted: #4e5b55;
+    --text-faint: #626d67;
 
     --accent: #145f5b;
     --accent-hover: #0f4b48;
     --accent-text: #0d4b47;
-    --accent-soft: #e4f0ee;
-    --accent-on: #ffffff;
+    --accent-soft: #e2ede6;
+    --accent-on: #fffdf8;
 
-    --warn: #a4610a;
-    --warn-soft: #fdf5e7;
-    --warn-border: #f0dcb6;
+    /* Deeper amber than the old #fdf5e7 — against cream, a pale amber fill no
+       longer reads as a callout. */
+    --warn: #9c5a08;
+    --warn-soft: #fbeed1;
+    --warn-border: #ecd8a8;
     --ok: #1c7a4f;
     --err: #b3392f;
 
@@ -48,9 +54,10 @@
     --code-comment: #647b77;
     --code-attr: #9fb8f0;
 
-    --shadow-sm: 0 1px 2px rgba(9, 24, 22, 0.05);
-    --shadow-md: 0 10px 30px -12px rgba(9, 24, 22, 0.16);
-    --shadow-lg: 0 30px 70px -30px rgba(9, 24, 22, 0.30);
+    /* Warm-toned shadows, so nothing casts a grey shadow onto cream. */
+    --shadow-sm: 0 1px 2px rgba(48, 38, 20, 0.06);
+    --shadow-md: 0 10px 30px -12px rgba(48, 38, 20, 0.18);
+    --shadow-lg: 0 30px 70px -30px rgba(48, 38, 20, 0.32);
 
     --radius-sm: 6px;
     --radius: 10px;
@@ -308,10 +315,25 @@ button {
     text-decoration: none;
 }
 
-.brand img {
+/* The logo is two-tone ink on a transparent lens, so a single asset cannot
+   work on both themes — the dark variant uses the brand teal. It is a CSS
+   background rather than an <img> because the mark is decorative: the word
+   "AppInspect" sits right beside it. */
+.brand-mark {
     width: 28px;
     height: 28px;
-    border-radius: 7px;
+    flex: none;
+    background: url("fevicon/logo.svg") center / contain no-repeat;
+}
+
+:root[data-theme="dark"] .brand-mark {
+    background-image: url("fevicon/logo-dark.svg");
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .brand-mark {
+        background-image: url("fevicon/logo-dark.svg");
+    }
 }
 
 .brand-name {
@@ -1798,6 +1820,8 @@ a.feature-card:hover {
     font-weight: 700;
 }
 
+/* Stays pure white in both themes on purpose — a QR needs maximum contrast for
+   a phone camera, so this one does not follow the cream page. */
 .modal-qr {
     margin: 16px auto 0;
     padding: 10px;

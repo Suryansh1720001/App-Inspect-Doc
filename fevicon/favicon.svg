@@ -1,17 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Debug inspector favicon">
-  <title>Debug Inspector</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="AppInspect favicon">
+  <title>AppInspect</title>
+
+  <!-- A favicon is rendered by the browser chrome, which has no access to the
+       site's theme toggle, so this one follows the OS preference instead. The
+       .ico and .png fallbacks stay light-only for browsers that ignore SVG
+       favicons. -->
+  <style>
+    :root { --ink: #000000; --void: #ffffff; }
+    @media (prefers-color-scheme: dark) {
+      :root { --ink: #4fd1c5; --void: #08201e; }
+    }
+  </style>
 
   <!-- Handle -->
-  <rect x="44" y="44" width="8" height="22" rx="4" transform="rotate(-45 48 55)" fill="#000"/>
+  <rect x="44" y="44" width="8" height="22" rx="4" transform="rotate(-45 48 55)" fill="var(--ink)"/>
 
   <!-- Ring -->
-  <circle cx="26" cy="26" r="22" fill="#000"/>
-  <circle cx="26" cy="26" r="16" fill="#fff"/>
+  <circle cx="26" cy="26" r="22" fill="var(--ink)"/>
+  <circle cx="26" cy="26" r="16" fill="var(--void)"/>
 
-  <!-- Bug body (bold, simple) -->
-  <ellipse cx="26" cy="28" rx="8" ry="10" fill="#000"/>
-  <!-- Bug head -->
-  <circle cx="26" cy="18" r="4.5" fill="#000"/>
-  <!-- Stripe -->
-  <line x1="26" y1="19" x2="26" y2="37" stroke="#fff" stroke-width="1.8"/>
+  <!-- Bug -->
+  <ellipse cx="26" cy="28" rx="8" ry="10" fill="var(--ink)"/>
+  <circle cx="26" cy="18" r="4.5" fill="var(--ink)"/>
+  <line x1="26" y1="19" x2="26" y2="37" stroke="var(--void)" stroke-width="1.8"/>
 </svg>

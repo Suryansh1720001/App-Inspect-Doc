@@ -95,7 +95,7 @@ If the address changes, update `docs.js` *and* `privacy.html`.
 | `docs.css` | Docs shell only: sidebar, TOC, prose typography, callouts, tables, prev/next, mobile drawer |
 | `script.js` | Theme toggle, syntax highlighting, copy buttons, support modal, mobile drawer |
 | `docs.js` | The `NAV` tree and everything generated from it (see above) |
-| `fevicon/` | Favicons (note the folder spelling: `fevicon`) |
+| `fevicon/` | Favicons and the wordmark logo (note the folder spelling: `fevicon`) — see "The logo" below |
 | `Qr_code.jpeg` | UPI payment QR for the Support section |
 | `sitemap.xml` | Search-engine sitemap; bump `lastmod` when a listed page changes |
 | `robots.txt` | Crawler rules (allows all crawlers, including AI crawlers) |
@@ -208,6 +208,17 @@ builds — is `security.html#mocking`.
 
 - **Accent:** teal — `#145f5b` in light, `#4fd1c5` in dark. One amber for warnings.
   No gradients beyond the faint hero grid.
+- **The light theme is warm cream, not white.** `--bg` is `#fdfbf5`, bands are
+  `#f7f2e7`, cards `#fffdf8`, borders warm (`#e7dfcd`). Deep teal on paper-cream reads
+  better than teal on clinical white and is easier over a long page. Shadows are
+  warm-toned (`rgba(48, 38, 20, …)`) so nothing casts grey onto cream, and `--warn-soft`
+  is a deeper amber than it needs to be on white, because a pale amber fill disappears
+  against cream. Two things deliberately stay pure white: `--accent-on` (label on a
+  teal button) and `.modal-qr` (a QR needs maximum camera contrast).
+- **Contrast is a constraint, not a preference.** Every text token must clear WCAG AA
+  (4.5:1) against **all three** light surfaces — page, band and card. `--text-faint` is
+  the tight one: it sits at 4.82:1 on `--bg-soft`, so lightening it any further breaks
+  AA. Re-check after changing any neutral.
 - **Themes:** light and dark are both first-class. The default follows the OS; the
   toggle persists to `localStorage` under `appinspect-theme`. An inline script in every
   `<head>` applies the stored choice before first paint, so there is no flash.
@@ -222,6 +233,25 @@ builds — is `security.html#mocking`.
   `closest('.snippet')`, so no ids are needed.
 - **Callouts:** `.note` (neutral), `.warn` (amber), `.tip` (teal), each with a
   `.note-title`.
+- **The logo.** The mark is two-tone ink with a see-through lens, so **one asset
+  cannot serve both themes** — the original black-on-transparent version vanishes on
+  dark. There are two variants with identical geometry:
+
+  | File | Ink | Used by |
+  |---|---|---|
+  | `fevicon/logo.svg` | `#0e1a19` | Light theme |
+  | `fevicon/logo-dark.svg` | `#4fd1c5` (brand teal) | Dark theme |
+  | `fevicon/favicon.svg` | Both, via its own `@media` block | Browser tab only |
+
+  In the page it is a **CSS background on `<span class="brand-mark">`**, not an
+  `<img>` — CSS cannot swap an `img` `src`, and the mark is decorative anyway since
+  the word "AppInspect" sits beside it. The swap is driven by `data-theme` **and** the
+  `prefers-color-scheme` fallback, so it follows the site toggle rather than the OS.
+  The favicon is the one exception: browser chrome cannot see our toggle, so
+  `favicon.svg` carries an internal `@media (prefers-color-scheme: dark)` and follows
+  the OS. The `.ico` and `.png` fallbacks stay light-only.
+  **Both lens centres are transparent** (the ring is a stroke, not two stacked
+  circles), so the mark sits correctly on the page, a panel or the footer.
 - **Landing-page band layouts — pick by what is underneath.** A narrow `.band-head`
   (62ch) is only correct when a **full-width grid follows it**, as in "How it works",
   "What you can inspect" and "Who it is for". When a band is text-only or has one
@@ -269,6 +299,29 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 
 ## Changelog
 
+- **2026-08-21 (cream light theme)** — Replaced pure white in the light theme with a
+  warm cream: `--bg` `#ffffff` → `#fdfbf5`, `--bg-soft` `#f4f7f6` → `#f7f2e7`, surfaces
+  `#fffdf8`, and the cool grey-green borders and neutrals retoned warm. Shadows moved
+  from `rgba(9, 24, 22, …)` to `rgba(48, 38, 20, …)` so nothing casts a grey shadow onto
+  cream, and `--warn-soft` was deepened to `#fbeed1` because the old pale amber no
+  longer read as a callout against a cream page. The light `theme-color` meta changed
+  from brand teal to `#fdfbf5`, matching what the dark theme already did with its own
+  background. Verified every text token against all three light surfaces: all pass WCAG
+  AA, and `--text-faint` was darkened to `#626d67` because at `#67726c` it landed at
+  4.48:1 on `--bg-soft` — just under the 4.5 threshold. The dark theme is unchanged.
+- **2026-08-21 (theme-aware logo)** — The logo is black ink on a transparent lens, so
+  it disappeared against the dark theme's background. Added `fevicon/logo.svg` (dark
+  ink) and `fevicon/logo-dark.svg` (brand teal), same geometry, both with a
+  **transparent lens centre** — the ring is now a stroke rather than two stacked
+  circles, so the mark works on any surface instead of only on white. The header and
+  footer use `<span class="brand-mark">` with a CSS background swap keyed off
+  `data-theme` plus the `prefers-color-scheme` fallback, so it follows the site toggle;
+  a background is also more correct than an `<img>` here, since the mark is decorative
+  next to the wordmark. `favicon.svg` gained its own internal
+  `@media (prefers-color-scheme: dark)` block, because browser chrome cannot see the
+  site toggle; the `.ico`/`.png` fallbacks are unchanged. Chose a teal reverse lockup
+  over a `filter: invert()` hack so the dark logo looks designed and matches the accent
+  used by links and the version pill.
 - **2026-08-21 (interactive hero mockup)** — The phone mockup became a real tab
   interface instead of a static picture of the Network panel. All six panels are now
   in the markup — Network, Mocks, Storage, Work, Crashes on the bottom bar, Runtime on
