@@ -3,33 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AppInspect | Android In-App Inspector</title>
+    <title>AppInspect — Android in-app inspector for debug and QA builds</title>
     <meta
         name="description"
-        content="AppInspect is an Android in-app inspector for developer and QA builds: network, storage, WorkManager, crash and ANR capture, runtime metadata — 100% on-device, with a no-op artifact that keeps inspection code out of release APKs."
+        content="AppInspect is a free Android library that opens a full-screen inspector inside your own app: OkHttp traffic with response mocking, SharedPreferences, DataStore, SQLite, WorkManager, crashes and ANRs. Everything on-device, and a no-op artifact keeps it out of release APKs."
     >
-    <meta name="theme-color" content="#145f5b">
+    <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="keywords" content="android debugging library, android in-app inspector, network inspector android, in-app debugger android, appinspect, android developer tools, android crash inspector, workmanager inspector, android qa tools">
+    <meta name="keywords" content="android debugging library, android in-app inspector, network inspector android, in-app debugger android, appinspect, android developer tools, android crash inspector, workmanager inspector, android qa tools, mock api response android, okhttp mock interceptor">
     <link rel="canonical" href="https://app-inspect-doc.vercel.app/">
     <meta name="google-site-verification" content="tbcBjWcu8kriYNS4Iv1_8wPii960Mh67IybPdjYqbKA">
 
-    <!-- Open Graph -->
-    <meta property="og:type"        content="website">
-    <meta property="og:url"         content="https://app-inspect-doc.vercel.app/">
-    <meta property="og:title"       content="AppInspect — Android In-App Inspector">
-    <meta property="og:description" content="Network, storage, WorkManager, crash & ANR capture inside your Android app. Zero-overhead no-op for release builds. Free and open source.">
-    <meta property="og:image"       content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/">
+    <meta property="og:title" content="AppInspect — Android in-app inspector">
+    <meta property="og:description" content="Inspect network traffic, mock any API response, and review storage, background work, crashes and ANRs from inside your own Android app. No proxy, no USB cable, no telemetry.">
+    <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
-    <!-- Twitter / X Card -->
-    <meta name="twitter:card"        content="summary">
-    <meta name="twitter:title"       content="AppInspect — Android In-App Inspector">
-    <meta name="twitter:description" content="On-device inspector for Android debug builds. Network, storage, crashes, ANRs — no proxy, no USB. Free and open source.">
-    <meta name="twitter:image"       content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="AppInspect — Android in-app inspector">
+    <meta name="twitter:description" content="On-device inspector for Android debug builds. Network, mocks, storage, work, crashes, ANRs. Free and open.">
+    <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
-        document.documentElement.classList.add("js");
+        (function () {
+            try {
+                var stored = localStorage.getItem("appinspect-theme");
+                if (stored) {
+                    document.documentElement.setAttribute("data-theme", stored);
+                }
+            } catch (error) {
+                /* no persisted preference available */
+            }
+        })();
     </script>
+
     <link rel="icon" href="fevicon/favicon.ico" sizes="any">
     <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
@@ -37,499 +46,862 @@
     <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="page-shell">
-        <header class="site-header">
-            <a class="brand" href="#top">
-                <img class="brand-logo" src="fevicon/favicon-180.png" alt="AppInspect logo" width="44" height="44">
-                <span class="brand-copy">
-                    <strong>AppInspect</strong>
-                    <span>Android in-app inspector</span>
-                </span>
-            </a>
-            <button
-                class="nav-toggle"
-                type="button"
-                aria-expanded="false"
-                aria-controls="site-nav"
-                aria-label="Toggle navigation"
-            >
-                Menu
-            </button>
-            <nav class="site-nav" id="site-nav" aria-label="Primary">
-                <a href="#top" aria-current="page">About</a>
-                <a href="#features">Features</a>
-                <a href="docs.html">Docs</a>
-                <a href="security.html">Security</a>
-                <a href="privacy.html">Privacy</a>
-                <a href="#support">Support</a>
-            </nav>
-        </header>
+<body class="landing">
+    <a class="skip-link" href="#content">Skip to content</a>
 
-        <main>
-            <!-- About / Hero -->
-            <section class="hero reveal" id="top">
-                <div class="hero-copy">
-                    <span class="eyebrow">Android in-app inspector library</span>
-                    <h1>Inspect your Android app from inside the app.</h1>
-                    <p class="hero-text">
-                        AppInspect is a drop-in Android library that opens a full-screen inspector
-                        inside your app. Review network traffic, local storage, background jobs,
-                        crashes and ANRs, and runtime metadata from the exact build being tested —
-                        while the no-op artifact keeps inspection code completely out of your
-                        production APK.
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+            <span class="brand-name">AppInspect</span>
+            <span class="brand-version">0.7.0</span>
+        </a>
+        <span class="topbar-spacer"></span>
+        <button class="search-trigger" type="button" data-search-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <span>Search the docs</span>
+            <kbd>&#8984;K</kbd>
+        </button>
+        <nav class="topbar-nav" aria-label="Primary">
+            <a href="docs.html">Docs</a>
+            <a class="wide-only" href="security.html">Security</a>
+            <a class="wide-only" href="privacy.html">Privacy</a>
+            <a href="#support">Support</a>
+        </nav>
+        <div class="topbar-tools">
+            <a class="icon-button" href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer" aria-label="AppInspect on Maven Central">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+            </a>
+            <a class="icon-button" href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.34c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.24.54.72.54 1.45l-.01 2.15c0 .21.14.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+            </a>
+            <button class="icon-button" type="button" data-theme-toggle aria-label="Switch between light and dark theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <main id="content">
+        <!-- ============================================================ hero -->
+        <section class="hero">
+            <div class="hero-inner">
+                <div>
+                    <span class="eyebrow">Android in-app inspector</span>
+                    <h1>See what your app is really doing &mdash; <em>from inside the app</em>.</h1>
+                    <p class="hero-lede">
+                        AppInspect is a Gradle dependency that adds a full-screen inspector to your own
+                        debug builds. Open it on the device and you get the OkHttp calls your app just
+                        made, the responses you can replace on the spot, what is in
+                        SharedPreferences and SQLite, which background jobs ran, and the last crash or
+                        ANR &mdash; with no proxy to configure and no cable attached.
                     </p>
                     <div class="hero-actions">
-                        <a
-                            class="button button-primary"
-                            href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            View Maven Central
-                        </a>
-                        <a class="button button-secondary" href="#features">Explore Features</a>
+                        <a class="button button-primary" href="docs.html">Read the docs</a>
+                        <a class="button button-secondary" href="install.html">Install in 2 minutes</a>
                     </div>
-                </div>
-
-                <div class="hero-panel" aria-label="AppInspect capability summary">
-                    <div class="status-strip">
-                        <span class="status-dot"></span>
-                        <span>Built for Android development and QA</span>
-                    </div>
-
-                    <!-- Inspector UI showcase -->
-                    <div class="inspector-window" aria-hidden="true">
-                        <div class="inspector-chrome">
-                            <div class="chrome-dots">
-                                <span class="cdot cdot-r"></span>
-                                <span class="cdot cdot-y"></span>
-                                <span class="cdot cdot-g"></span>
-                            </div>
-                            <span class="chrome-title">AppInspect — Network</span>
-                        </div>
-                        <div class="inspector-tabs">
-                            <span class="itab itab-active">Network</span>
-                            <span class="itab">Storage</span>
-                            <span class="itab">Work</span>
-                            <span class="itab">Crashes</span>
-                            <span class="itab">Runtime</span>
-                        </div>
-                        <div class="inspector-split">
-                            <div class="inspector-list">
-                                <div class="irow">
-                                    <span class="imethod imethod-get">GET</span>
-                                    <span class="iurl">/api/v2/user/profile</span>
-                                    <span class="icode icode-ok">200</span>
-                                    <span class="ims">124ms</span>
-                                </div>
-                                <div class="irow irow-sel">
-                                    <span class="imethod imethod-post">POST</span>
-                                    <span class="iurl">/api/v2/auth/refresh</span>
-                                    <span class="icode icode-ok">201</span>
-                                    <span class="ims">88ms</span>
-                                </div>
-                                <div class="irow">
-                                    <span class="imethod imethod-err">GET</span>
-                                    <span class="iurl">/api/v2/upload/avatar</span>
-                                    <span class="icode icode-err">404</span>
-                                    <span class="ims">42ms</span>
-                                </div>
-                                <div class="irow">
-                                    <span class="imethod imethod-get">GET</span>
-                                    <span class="iurl">/api/v2/feed/items</span>
-                                    <span class="icode icode-ok">200</span>
-                                    <span class="ims">310ms</span>
-                                </div>
-                                <div class="irow">
-                                    <span class="imethod imethod-post">POST</span>
-                                    <span class="iurl">/api/v2/events/track</span>
-                                    <span class="icode icode-ok">200</span>
-                                    <span class="ims">56ms</span>
-                                </div>
-                            </div>
-                            <div class="inspector-detail">
-                                <div class="idetail-tabs">
-                                    <span class="idtab">Overview</span>
-                                    <span class="idtab">Request</span>
-                                    <span class="idtab idtab-active">Response</span>
-                                    <span class="idtab">Tools</span>
-                                </div>
-                                <div class="idetail-body">
-                                    <p class="idetail-meta">POST /api/v2/auth/refresh &middot; 201 &middot; 88ms</p>
-                                    <div class="idetail-divider"></div>
-                                    <p class="idetail-section">Response body</p>
-                                    <div class="json-block">
-                                        <span class="json-punc">{</span><br>
-                                        &nbsp;&nbsp;<span class="json-key">"access_token"</span><span class="json-punc">: </span><span class="json-str">"eyJhbGci&#8230;"</span><span class="json-punc">,</span><br>
-                                        &nbsp;&nbsp;<span class="json-key">"token_type"</span><span class="json-punc">: </span><span class="json-str">"Bearer"</span><span class="json-punc">,</span><br>
-                                        &nbsp;&nbsp;<span class="json-key">"expires_in"</span><span class="json-punc">: </span><span class="json-num">3600</span><br>
-                                        <span class="json-punc">}</span>
-                                    </div>
-                                    <div class="idetail-divider"></div>
-                                    <div class="idetail-tools">
-                                        <span class="itool">Copy cURL</span>
-                                        <span class="itool">HAR</span>
-                                        <span class="itool">Share</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="trust-row">
-                        <span>Published on Maven Central</span>
-                        <span>100% on-device, zero telemetry</span>
-                        <span>No-op safe for release builds</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Who it is for -->
-            <section class="section reveal" id="audiences">
-                <div class="section-heading">
-                    <span class="eyebrow">Who it is for</span>
-                    <h2>A practical debugging surface for real Android teams.</h2>
-                    <p>
-                        Use AppInspect when a bug report needs more than screenshots and logs.
-                        Developers reproduce faster, QA attaches real evidence, and companies
-                        standardize internal diagnostics across Android apps.
+                    <p class="hero-meta">
+                        <span><strong>Maven Central</strong> &middot; io.github.suryansh1720001.appinspect</span>
+                        <span><strong>Android 7.0+</strong> (API 24)</span>
+                        <span><strong>Free</strong>, no account, no telemetry</span>
                     </p>
                 </div>
 
-                <div class="audience-grid">
-                    <article class="content-panel">
-                        <span class="label">Developers and QA engineers</span>
-                        <h3>Faster debugging from the exact build being tested.</h3>
-                        <ul class="check-list">
-                            <li>Inspect OkHttp calls with filters, content search, payload previews, and one-tap cURL or HAR export.</li>
-                            <li>Attach crash, ANR, and native-crash evidence captured automatically — persisted across app restarts.</li>
-                            <li>Validate SharedPreferences, DataStore, SQLite, and WorkManager state with search across every panel.</li>
-                            <li>Open through shake, launcher shortcut, long press, notification tap, or <code>AppInspect.open(context)</code>.</li>
-                        </ul>
-                    </article>
+                <div>
+                    <div class="phone" data-mock>
+                        <div class="phone-screen">
+                            <div class="phone-status" aria-hidden="true">
+                                <span>9:41</span>
+                                <span>&#9679;&#9679;&#9679; &#9863; 100</span>
+                            </div>
 
-                    <article class="content-panel">
-                        <span class="label">Companies and private app teams</span>
-                        <h3>A reusable library instead of a one-off internal screen.</h3>
-                        <ul class="check-list">
-                            <li>Give teams the same inspector experience across apps and environments.</li>
-                            <li>Adopt from Maven Central with normal Gradle dependency management.</li>
-                            <li>Configure entry points, panels, raw-value visibility, and editing tools per rollout.</li>
-                            <li>Ship release builds with confidence: compile-time no-op plus a runtime gate that self-disables the library in production.</li>
-                        </ul>
-                    </article>
+                            <div class="phone-bar">
+                                <span class="phone-bar-copy">
+                                    <span class="phone-bar-title" data-mock-title>Network</span>
+                                    <span class="phone-bar-sub">AppInspect &middot; debug build</span>
+                                </span>
+                                <button class="phone-pill" type="button" data-mock-tab="runtime" data-mock-label="Runtime" data-mock-doc="runtime.html" data-mock-note="Runtime sits in the top bar, not the bottom one — reference data you read, not a workflow you switch between.">
+                                    RUNTIME
+                                    <span class="phone-dot" aria-hidden="true">4</span>
+                                </button>
+                                <span class="phone-x" aria-hidden="true">&#10005;</span>
+                            </div>
+
+                            <div class="phone-body">
+                                <!-- Network -->
+                                <div class="phone-view is-on" data-mock-view="network" role="tabpanel" aria-label="Network panel">
+                                    <div class="phone-search" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                                        <span>Search endpoint, header, body&hellip;</span>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+                                    </div>
+                                    <div class="phone-meta">
+                                        <strong>API log</strong>
+                                        <span>198 calls captured &middot; 52 with issues</span>
+                                    </div>
+                                    <div class="phone-scroll">
+                                        <div class="phone-card is-bad">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-err">500</span>
+                                                <span class="phone-badge b-info">GET</span>
+                                                <span class="phone-card-time is-slow">6711 ms</span>
+                                            </div>
+                                            <span class="phone-card-path">/api/v1/orders</span>
+                                            <span class="phone-card-host">api-qa.example.co</span>
+                                            <div class="phone-card-foot">
+                                                <span class="phone-tag">11:55:13</span>
+                                                <span class="phone-tag">77 B</span>
+                                            </div>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-warn">503</span>
+                                                <span class="phone-badge b-info">GET</span>
+                                                <span class="phone-badge b-warn">MOCK</span>
+                                                <span class="phone-card-time is-fast">0 ms</span>
+                                            </div>
+                                            <span class="phone-card-path">/api/v1/payments</span>
+                                            <span class="phone-card-host">rule: payments-down</span>
+                                            <div class="phone-card-foot">
+                                                <span class="phone-tag">11:55:09</span>
+                                                <span class="phone-tag">SHORT_CIRCUIT</span>
+                                            </div>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-ok">200</span>
+                                                <span class="phone-badge b-info">POST</span>
+                                                <span class="phone-card-time">1488 ms</span>
+                                            </div>
+                                            <span class="phone-card-path">/api/v1/auth/refresh</span>
+                                            <span class="phone-card-host">api-qa.example.co</span>
+                                            <div class="phone-card-foot">
+                                                <span class="phone-tag">11:55:07</span>
+                                                <span class="phone-tag">1.1 KB</span>
+                                            </div>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-ok">200</span>
+                                                <span class="phone-badge b-info">GET</span>
+                                                <span class="phone-card-time is-fast">124 ms</span>
+                                            </div>
+                                            <span class="phone-card-path">/api/v1/user/profile</span>
+                                            <span class="phone-card-host">api-qa.example.co</span>
+                                            <div class="phone-card-foot">
+                                                <span class="phone-tag">11:55:02</span>
+                                                <span class="phone-tag">842 B</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mocks -->
+                                <div class="phone-view" data-mock-view="mocks" role="tabpanel" aria-label="Mocks panel">
+                                    <div class="phone-master" aria-hidden="true">
+                                        <span class="phone-master-copy">
+                                            <strong>Mocking is on</strong>
+                                            <span>Device override &middot; 2 rules active</span>
+                                        </span>
+                                        <span class="phone-switch"></span>
+                                    </div>
+                                    <div class="phone-meta">
+                                        <strong>Runtime rules</strong>
+                                        <span>Made on this device &mdash; no rebuild</span>
+                                    </div>
+                                    <div class="phone-scroll">
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-teal">SHORT_CIRCUIT</span>
+                                                <span class="phone-badge b-err">503</span>
+                                            </div>
+                                            <span class="phone-card-path">GET */api/v1/payments</span>
+                                            <span class="phone-card-host">Payments service down</span>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-quiet">OVERRIDE</span>
+                                                <span class="phone-badge b-ok">200</span>
+                                                <span class="phone-badge b-warn">2 s delay</span>
+                                            </div>
+                                            <span class="phone-card-path">GET /api/v1/orders</span>
+                                            <span class="phone-card-host">Orders &mdash; empty state</span>
+                                        </div>
+                                        <div class="phone-meta">
+                                            <strong>Bundled rules</strong>
+                                            <span>From mocks.json, committed in git</span>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-teal">SHORT_CIRCUIT</span>
+                                                <span class="phone-badge b-warn">OVERRIDDEN</span>
+                                            </div>
+                                            <span class="phone-card-path">GET /api/v1/config/flags</span>
+                                            <span class="phone-card-host">Feature flags &mdash; all on</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Storage -->
+                                <div class="phone-view" data-mock-view="storage" role="tabpanel" aria-label="Storage panel">
+                                    <div class="phone-seg" aria-hidden="true">
+                                        <span class="is-on">Preferences</span>
+                                        <span>DataStore</span>
+                                        <span>Databases</span>
+                                    </div>
+                                    <div class="phone-search" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                                        <span>Search files, keys and values&hellip;</span>
+                                    </div>
+                                    <div class="phone-meta">
+                                        <strong>session_prefs.xml</strong>
+                                        <span>14 keys &middot; tap a row to edit</span>
+                                    </div>
+                                    <div class="phone-scroll">
+                                        <dl class="phone-kv"><dt>onboarding_done</dt><dd>true</dd></dl>
+                                        <dl class="phone-kv"><dt>user_tier</dt><dd>"gold"</dd></dl>
+                                        <dl class="phone-kv"><dt>last_sync_at</dt><dd>1755712493</dd></dl>
+                                        <dl class="phone-kv"><dt>cached_profile</dt><dd>{&hellip;} 214 KB</dd></dl>
+                                        <dl class="phone-kv"><dt>retry_count</dt><dd>3</dd></dl>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-quiet">&#128274; ENCRYPTED</span>
+                                            </div>
+                                            <span class="phone-card-path">auth_secure_prefs.xml</span>
+                                            <span class="phone-card-host">Decrypted for viewing &mdash; read only</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Work -->
+                                <div class="phone-view" data-mock-view="work" role="tabpanel" aria-label="WorkManager panel">
+                                    <div class="phone-search" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                                        <span>Search class, tag, unique name&hellip;</span>
+                                    </div>
+                                    <div class="phone-meta">
+                                        <strong>Work specs</strong>
+                                        <span>9 persisted &middot; 1 failed, 3 enqueued</span>
+                                    </div>
+                                    <div class="phone-scroll">
+                                        <div class="phone-card is-bad">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-err">FAILED</span>
+                                                <span class="phone-badge b-quiet">attempt 4/5</span>
+                                            </div>
+                                            <span class="phone-card-path">UploadReceiptWorker</span>
+                                            <span class="phone-card-host">backoff EXPONENTIAL &middot; 30s</span>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-warn">ENQUEUED</span>
+                                                <span class="phone-badge b-quiet">PERIODIC</span>
+                                            </div>
+                                            <span class="phone-card-path">SyncCatalogWorker</span>
+                                            <span class="phone-card-host">waiting on: UNMETERED network</span>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-info">RUNNING</span>
+                                            </div>
+                                            <span class="phone-card-path">AnalyticsFlushWorker</span>
+                                            <span class="phone-card-host">tag: analytics &middot; expedited</span>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-ok">SUCCEEDED</span>
+                                                <span class="phone-badge b-quiet">6 periods</span>
+                                            </div>
+                                            <span class="phone-card-path">CleanupCacheWorker</span>
+                                            <span class="phone-card-host">every 6h, flex 1h</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Crashes -->
+                                <div class="phone-view" data-mock-view="crashes" role="tabpanel" aria-label="Crashes panel">
+                                    <div class="phone-meta">
+                                        <strong>Crashes and ANRs</strong>
+                                        <span>3 records &middot; kept across restarts</span>
+                                    </div>
+                                    <div class="phone-scroll">
+                                        <div class="phone-card is-bad">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-err">ANR</span>
+                                                <span class="phone-card-time">today 11:52</span>
+                                            </div>
+                                            <span class="phone-card-path">Input dispatching timed out</span>
+                                            <span class="phone-card-host">main &middot; OS thread dump attached</span>
+                                            <div class="phone-card-foot">
+                                                <span class="phone-tag">ApplicationExitInfo</span>
+                                            </div>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-warn">CRASH</span>
+                                                <span class="phone-card-time">today 09:14</span>
+                                            </div>
+                                            <span class="phone-card-path">NullPointerException</span>
+                                            <span class="phone-card-host">OrderDetailFragment.kt:212</span>
+                                            <div class="phone-card-foot">
+                                                <span class="phone-tag">thread: main</span>
+                                                <span class="phone-tag">42 frames</span>
+                                            </div>
+                                        </div>
+                                        <div class="phone-card">
+                                            <div class="phone-card-top">
+                                                <span class="phone-badge b-quiet">NATIVE</span>
+                                                <span class="phone-card-time">yesterday</span>
+                                            </div>
+                                            <span class="phone-card-path">SIGSEGV in libimage.so</span>
+                                            <span class="phone-card-host">reported on next launch</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Runtime -->
+                                <div class="phone-view" data-mock-view="runtime" role="tabpanel" aria-label="Runtime panel">
+                                    <div class="phone-scroll">
+                                        <p class="phone-group">App</p>
+                                        <dl class="phone-kv"><dt>Version</dt><dd>4.18.2 (41802)</dd></dl>
+                                        <dl class="phone-kv"><dt>Build type</dt><dd>debug</dd></dl>
+                                        <dl class="phone-kv"><dt>Target / min SDK</dt><dd>35 / 24</dd></dl>
+                                        <p class="phone-group">Environment</p>
+                                        <dl class="phone-kv"><dt>Backend</dt><dd>qa-2</dd></dl>
+                                        <dl class="phone-kv"><dt>Flag cohort</dt><dd>internal</dd></dl>
+                                        <p class="phone-group">Device</p>
+                                        <dl class="phone-kv"><dt>Model</dt><dd>Pixel 8a</dd></dl>
+                                        <dl class="phone-kv"><dt>Android</dt><dd>15 (API 35)</dd></dl>
+                                        <dl class="phone-kv"><dt>Memory free</dt><dd>2.1 / 8 GB</dd></dl>
+                                        <dl class="phone-kv"><dt>Locale &middot; dark</dt><dd>en-IN &middot; on</dd></dl>
+                                        <p class="phone-group">Session</p>
+                                        <dl class="phone-kv"><dt>Started</dt><dd>11:48:07</dd></dl>
+                                        <dl class="phone-kv"><dt>Session id</dt><dd>a91f&hellip;4c2</dd></dl>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="phone-tabs" role="tablist" aria-label="Inspector panels">
+                                <button class="phone-tab is-on" type="button" role="tab" aria-selected="true" data-mock-tab="network" data-mock-label="Network" data-mock-doc="network.html" data-mock-note="Every OkHttp call, with filters, full-text search and export as cURL, TXT or HAR.">
+                                    <span class="phone-tab-badge" aria-hidden="true">99+</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12 2.5-6h5"/></svg>
+                                    Network
+                                </button>
+                                <button class="phone-tab" type="button" role="tab" aria-selected="false" data-mock-tab="mocks" data-mock-label="Mocks" data-mock-doc="mocks.html" data-mock-note="Replace a live response with your own status, body, delay or simulated timeout.">
+                                    <span class="phone-tab-badge is-amber" aria-hidden="true">2</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.5 3.5a4.5 4.5 0 0 1 5.9 5.9l-9 9-4.4 1.6 1.6-4.4Z"/><path d="m4 20 2-2"/></svg>
+                                    Mocks
+                                </button>
+                                <button class="phone-tab" type="button" role="tab" aria-selected="false" data-mock-tab="storage" data-mock-label="Storage" data-mock-doc="storage.html" data-mock-note="SharedPreferences, DataStore, SQLite and Room — searchable, and editable when you allow it.">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3V6M4.5 12v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6"/></svg>
+                                    Storage
+                                </button>
+                                <button class="phone-tab" type="button" role="tab" aria-selected="false" data-mock-tab="work" data-mock-label="Work" data-mock-doc="workmanager.html" data-mock-note="Every persisted work spec, and the constraint that explains why it has not run.">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5"/></svg>
+                                    Work
+                                </button>
+                                <button class="phone-tab" type="button" role="tab" aria-selected="false" data-mock-tab="crashes" data-mock-label="Crashes" data-mock-doc="crashes.html" data-mock-note="Uncaught exceptions, plus ANRs and native crashes read from the OS on Android 11+.">
+                                    <span class="phone-tab-badge" aria-hidden="true">3</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4.5 21 19H3Z"/><path d="M12 10v4M12 16.5h.01"/></svg>
+                                    Crashes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="phone-caption" data-mock-caption>
+                        Every OkHttp call, with filters, full-text search and export as cURL, TXT or HAR.
+                        <a href="network.html">Network docs &rarr;</a>
+                    </p>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Features -->
-            <section class="section reveal" id="features">
-                <div class="section-heading">
-                    <span class="eyebrow">Inspector tools</span>
-                    <h2>Six inspection areas in one Android library.</h2>
+        <!-- ==================================================== how it works -->
+        <section class="band">
+            <div class="wrap">
+                <div class="band-head">
+                    <span class="eyebrow">How it works</span>
+                    <h2>Three things happen, and none of them involve your laptop.</h2>
                     <p>
-                        AppInspect is built around the views developers and testers reach for first:
-                        API calls, on-device data, background work, crashes and ANRs, runtime
-                        context, and simple ways to open the inspector.
+                        Most Android debugging tools ask you to set something up outside the app &mdash;
+                        a desktop proxy, a certificate, a cable, a separate desktop client. AppInspect
+                        is a library, so the tool ships with the build the tester already has.
+                    </p>
+                </div>
+
+                <div class="flow">
+                    <div class="flow-step">
+                        <span class="flow-num">01</span>
+                        <h3>You add a dependency</h3>
+                        <p>
+                            One line for debug builds, one for release. AppInspect starts itself through
+                            AndroidX Startup, so there is nothing to add to your <code>Application</code>
+                            class for the basic setup.
+                        </p>
+                    </div>
+                    <div class="flow-step">
+                        <span class="flow-num">02</span>
+                        <h3>Anyone opens it on the device</h3>
+                        <p>
+                            Shake the phone, tap a launcher shortcut, long-press a view, tap a network
+                            notification, or call <code>AppInspect.open(context)</code> from your own
+                            debug menu.
+                        </p>
+                    </div>
+                    <div class="flow-step">
+                        <span class="flow-num">03</span>
+                        <h3>Evidence leaves as a file</h3>
+                        <p>
+                            A cURL command, a <code>.txt</code> log, a HAR file for DevTools, a crash
+                            report, or a set of mock rules &mdash; through the normal Android share sheet,
+                            straight into the ticket.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================== features -->
+        <section class="band band-sunken" id="features">
+            <div class="wrap">
+                <div class="band-head">
+                    <span class="eyebrow">What you can inspect</span>
+                    <h2>Seven surfaces, each with its own page in the docs.</h2>
+                    <p>
+                        The inspector has five panels along the bottom bar, Runtime one tap away in the
+                        top bar, and a shared value viewer that any of them can open. Pick one to read
+                        how it actually behaves.
                     </p>
                 </div>
 
                 <div class="feature-grid">
-                    <article class="feature-card">
-                        <span class="feature-icon">N</span>
+                    <a class="feature-card" href="network.html">
+                        <span class="feature-mark">N</span>
                         <h3>Network</h3>
-                        <p>OkHttp capture with filters, content search, and swipeable detail tabs. Long-press to multi-select calls and share them — or the whole filtered list — as cURL, TXT, or HAR 1.2.</p>
-                    </article>
+                        <p>
+                            Every OkHttp call with filters and full-text search, request headers read
+                            off the wire so downstream credentials still show up, and export as cURL,
+                            TXT, or HAR 1.2.
+                        </p>
+                        <span class="feature-more">Network panel &rarr;</span>
+                    </a>
 
-                    <article class="feature-card">
-                        <span class="feature-icon">S</span>
+                    <a class="feature-card" href="mocks.html">
+                        <span class="feature-mark">M</span>
+                        <h3>Mocks</h3>
+                        <p>
+                            Replace a live response with your own status, headers, body, delay, or a
+                            simulated timeout. Build a rule from a call you just captured, or commit a
+                            <code>mocks.json</code> the whole team shares.
+                        </p>
+                        <span class="feature-more">Response mocking &rarr;</span>
+                    </a>
+
+                    <a class="feature-card" href="storage.html">
+                        <span class="feature-mark">S</span>
                         <h3>Storage</h3>
-                        <p>Edit SharedPreferences (with read-only decrypted views of EncryptedSharedPreferences), browse SQLite or Room with a SQL console, and read DataStore Preferences via a built-in protobuf parser — with search across files, keys, and values.</p>
-                    </article>
+                        <p>
+                            Read and edit SharedPreferences, read Jetpack DataStore, browse SQLite and
+                            Room with an optional SQL console. Encrypted preferences are decrypted for
+                            viewing but never edited.
+                        </p>
+                        <span class="feature-more">Storage panel &rarr;</span>
+                    </a>
 
-                    <article class="feature-card">
-                        <span class="feature-icon">W</span>
+                    <a class="feature-card" href="workmanager.html">
+                        <span class="feature-mark">W</span>
                         <h3>WorkManager</h3>
-                        <p>Every persisted work spec with status badges, constraints, attempts, payloads, last stop reason, and periodic or expedited indicators — searchable by class, ID, state, or tag.</p>
-                    </article>
+                        <p>
+                            Every persisted work spec &mdash; yours and any library's &mdash; with state,
+                            constraints, attempts, backoff, input and output data, and the last stop
+                            reason.
+                        </p>
+                        <span class="feature-more">WorkManager panel &rarr;</span>
+                    </a>
 
-                    <article class="feature-card">
-                        <span class="feature-icon">C</span>
-                        <h3>Crashes &amp; ANRs</h3>
-                        <p>Automatic uncaught-exception capture plus ANR and native crash detection on Android 11+. The 50 most recent reports persist across restarts, with copy, share, and TXT export.</p>
-                    </article>
+                    <a class="feature-card" href="crashes.html">
+                        <span class="feature-mark">C</span>
+                        <h3>Crashes and ANRs</h3>
+                        <p>
+                            Uncaught exceptions are captured before the process dies. ANRs and native
+                            crashes are reported on the next launch on Android 11+, including the OS
+                            thread dump.
+                        </p>
+                        <span class="feature-more">Crashes and ANRs &rarr;</span>
+                    </a>
 
-                    <article class="feature-card">
-                        <span class="feature-icon">R</span>
+                    <a class="feature-card" href="runtime.html">
+                        <span class="feature-mark">R</span>
                         <h3>Runtime</h3>
-                        <p>App, environment, device, and session metadata with custom data sections — tap any row to copy its value, or share the full runtime summary.</p>
-                    </article>
+                        <p>
+                            Build type, version, target SDK, device model, memory, locale, dark mode,
+                            session id, and your own metadata &mdash; the details a bug report always
+                            asks for.
+                        </p>
+                        <span class="feature-more">Runtime panel &rarr;</span>
+                    </a>
 
-                    <article class="feature-card">
-                        <span class="feature-icon">U</span>
-                        <h3>Inspector UI</h3>
-                        <p>Built-in full-screen inspector opened by direct call, shake, launcher shortcut, long press, or tapping a live network notification — opens in its own task, with panels and tabs you swipe between, plus a shared JSON tree viewer with search for any large value.</p>
-                    </article>
+                    <a class="feature-card" href="value-viewer.html">
+                        <span class="feature-mark">V</span>
+                        <h3>Value viewer</h3>
+                        <p>
+                            One full-screen JSON tree for any large value, from any panel: collapse and
+                            expand, child counts, escaped JSON opened as a real subtree, and search
+                            that stays responsive on huge payloads.
+                        </p>
+                        <span class="feature-more">Value viewer &rarr;</span>
+                    </a>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Quick Start -->
-            <section class="section reveal" id="install">
-                <div class="section-heading">
-                    <span class="eyebrow">Quick start</span>
-                    <h2>Two Gradle lines and you're running.</h2>
-                    <p>
-                        Add the full inspector for debug builds and the no-op stub for release.
-                        AppInspect auto-initializes — no <code>Application</code> class changes needed.
-                    </p>
+        <!-- ====================================================== audiences -->
+        <section class="band">
+            <div class="wrap">
+                <div class="band-head">
+                    <span class="eyebrow">Who it is for</span>
+                    <h2>The person debugging, and the person signing off on the build.</h2>
                 </div>
 
-                <div class="quickstart-layout">
-                    <div class="snippet-card">
-                        <div class="snippet-head">
-                            <span>build.gradle.kts</span>
-                            <button class="copy-button" type="button" data-copy-target="qs-deps">Copy</button>
+                <div class="split">
+                    <div class="panel">
+                        <span class="panel-label">Developers and testers</span>
+                        <h3>Fewer round trips to reproduce a bug</h3>
+                        <p>
+                            The inspector is already in the build under test, so the evidence comes
+                            from the run that actually failed rather than from a second attempt on
+                            someone else's machine.
+                        </p>
+                        <ul class="tick-list">
+                            <li><strong>Answer "what did the API return?"</strong> without a proxy, a certificate, or a developer sitting next to the tester.</li>
+                            <li><strong>Force the edge case</strong> &mdash; a 500, an empty list, a timeout, an endpoint that does not exist yet &mdash; with a mock rule instead of a backend change.</li>
+                            <li><strong>Attach a real artifact</strong> to the ticket: a HAR file, a cURL command, a stack trace, an ANR thread dump.</li>
+                            <li><strong>Check the state behind the screen</strong> &mdash; a stale preference, a row that never got written, a job stuck in <code>ENQUEUED</code>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="panel">
+                        <span class="panel-label">Companies and platform teams</span>
+                        <h3>One library instead of a debug screen per app</h3>
+                        <p>
+                            Most Android teams eventually build their own internal debug menu. This is
+                            that screen, maintained outside your codebase and consistent across every
+                            app you ship.
+                        </p>
+                        <ul class="tick-list">
+                            <li><strong>Adopt it like any dependency</strong> from Maven Central &mdash; no vendor account, no server to run, nothing to procure.</li>
+                            <li><strong>Decide what testers can see and change</strong>: mask sensitive values, make storage read-only, hide panels, or block mocking outright.</li>
+                            <li><strong>Keep it out of production</strong> with a compile-time no-op artifact, backed by a runtime gate that refuses to run in a non-debuggable build.</li>
+                            <li><strong>Nothing leaves the device</strong> &mdash; no telemetry, no network calls of its own, no Logcat output of captured payloads.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================= release safety -->
+        <section class="band band-sunken">
+            <div class="wrap">
+                <div class="band-split">
+                    <div class="band-head">
+                        <span class="eyebrow">Release safety</span>
+                        <h2>A tool like this must never ship to users.</h2>
+                    </div>
+                    <div class="band-body">
+                        <p>
+                            It does not, and there are two independent reasons why. The recommended
+                            setup puts a no-op artifact in your release variant, so the inspector's
+                            code is not compiled into the production APK at all.
+                        </p>
+                        <p>
+                            And if the full module ever ships by mistake, it detects the
+                            non-debuggable build and switches itself off &mdash; no database, no crash
+                            handler, no capture, every <code>open()</code> refused. Neither layer
+                            depends on the other being in place.
+                        </p>
+                        <div class="button-row">
+                            <a class="button button-secondary" href="security.html">Read the security model</a>
                         </div>
-                        <pre><code id="qs-deps">dependencies {
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================== quick start -->
+        <section class="band" id="quick-start">
+            <div class="wrap">
+                <div class="band-split">
+                    <div class="band-head">
+                        <span class="eyebrow">Quick start</span>
+                        <h2>Two lines to try it.</h2>
+                    </div>
+                    <div class="band-body">
+                        <p>
+                            Add the inspector to debug builds and the no-op stub to release builds.
+                            The snippet uses a placeholder instead of a pinned version, so check Maven
+                            Central for the current one.
+                        </p>
+                        <p>
+                            That is enough to open the inspector. Network capture needs one more line
+                            on your <code>OkHttpClient</code>, and it has to go last &mdash; the
+                            install page explains why.
+                        </p>
+                        <div class="button-row">
+                            <a class="button button-primary" href="install.html">Full install guide</a>
+                            <a class="button button-secondary" href="configuration.html">Configuration reference</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="snippet quickstart-snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">app/build.gradle.kts</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">dependencies {
     debugImplementation("io.github.suryansh1720001.appinspect:appinspect:&lt;latest-version&gt;")
     releaseImplementation("io.github.suryansh1720001.appinspect:appinspect-no-op:&lt;latest-version&gt;")
 }</code></pre>
-                    </div>
-                    <div class="quickstart-actions">
-                        <a class="button button-primary" href="docs.html">Full integration guide</a>
-                        <a class="button button-secondary" href="security.html">Security model</a>
-                    </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- FAQ -->
-            <section class="section reveal" id="faq">
-                <div class="section-heading">
-                    <span class="eyebrow">FAQ</span>
-                    <h2>Common questions about AppInspect.</h2>
-                </div>
+        <!-- ============================================================= faq -->
+        <section class="band band-sunken" id="faq">
+            <div class="wrap">
+                <div class="band-split">
+                    <div class="band-head">
+                        <span class="eyebrow">FAQ</span>
+                        <h2>Questions people ask before adopting it.</h2>
+                    </div>
 
-                <div class="faq-list">
+                    <div class="faq">
                     <details class="faq-item">
                         <summary>Is AppInspect free?</summary>
-                        <p>Yes. AppInspect is completely free — no paid tier, no license fee, no usage limits. It is published on Maven Central at no cost.</p>
+                        <p>Yes. There is no paid tier, no license fee, and no usage limit. It is published on Maven Central at no cost.</p>
                     </details>
 
                     <details class="faq-item">
                         <summary>Does AppInspect add any code to my release APK?</summary>
-                        <p>No. You use the <code>appinspect-no-op</code> artifact for release builds. It is a pass-through stub with no UI, no storage, no network capture, and no crash handler — inspection code is completely absent from the release APK.</p>
+                        <p>No, provided you use the <code>appinspect-no-op</code> artifact for release builds. It is a pass-through stub with no UI, no storage, no network capture, and no crash handler, so inspection code is absent from the release APK. The <a href="security.html">security model</a> covers the runtime gate that backs this up.</p>
                     </details>
 
                     <details class="faq-item">
                         <summary>What can AppInspect inspect?</summary>
-                        <p>Network requests and responses via OkHttp (exportable as <code>.har</code> or <code>.txt</code> with cURL commands), SharedPreferences, DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs, native crashes (Android 11+), and full runtime and device metadata.</p>
+                        <p>OkHttp requests and responses, SharedPreferences (including decrypted <code>EncryptedSharedPreferences</code>), Jetpack DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs and native crashes on Android 11+, and app, device and session metadata.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Can I mock API responses without changing my app's code?</summary>
+                        <p>Yes. A rule replaces a live OkHttp response with one you define — status code, headers, body, an artificial delay, or a simulated timeout or IO failure. Rules can be created in the panel, prefilled from a call you just captured, or committed to your repository as <code>mocks.json</code>. Because a mock is a real OkHttp response, your app's own logic runs unchanged. See <a href="mocks.html">Mocks</a>.</p>
                     </details>
 
                     <details class="faq-item">
                         <summary>Does AppInspect require root access?</summary>
-                        <p>No. AppInspect works on any unrooted Android device running API 24 (Android 7.0) or higher. No special permissions or developer mode are needed beyond what a normal debug build already has.</p>
+                        <p>No. It works on any unrooted device running Android 7.0 (API 24) or newer, with no special permissions beyond what a normal debug build already has.</p>
                     </details>
 
                     <details class="faq-item">
                         <summary>Is my app's data safe in release builds?</summary>
-                        <p>Yes — two independent layers protect you. <strong>Layer 1 (compile-time):</strong> the no-op artifact contains no inspection code, so nothing is added to the release APK. <strong>Layer 2 (runtime):</strong> even if the full SDK accidentally ships in a release build, it detects the non-debuggable flag and self-disables completely — no database, no crash handler, no callbacks, all <code>open()</code> calls refused.</p>
+                        <p>Two independent layers protect it. At compile time, the no-op artifact contains no inspection code. At runtime, even the full module detects a non-debuggable build and disables itself completely — no database, no crash handler, no callbacks, and all <code>open()</code> calls refused.</p>
                     </details>
 
                     <details class="faq-item">
                         <summary>Does AppInspect collect or send any data outside the device?</summary>
-                        <p>No. AppInspect never makes network calls of its own. Zero telemetry. All captured data — network logs, storage values, crash traces — stays entirely on-device. Nothing is sent to any server.</p>
+                        <p>No. The library makes no network calls of its own and has zero telemetry. Captured network logs, storage values and crash traces stay on the device. See the <a href="privacy.html">privacy policy</a>.</p>
                     </details>
 
                     <details class="faq-item">
-                        <summary>How is AppInspect different from Charles Proxy or Flipper?</summary>
-                        <p>AppInspect runs entirely on-device inside the app — no desktop proxy, no SSL certificate installation, no Wi-Fi MITM setup, no USB cable. QA testers can open the inspector directly on their device via shake, launcher shortcut, or long-press, without involving a developer or any external tool.</p>
+                        <summary>How is this different from Charles Proxy or Flipper?</summary>
+                        <p>It runs on-device, inside the app. There is no desktop proxy, no SSL certificate to install, no Wi-Fi interception to configure, and no USB cable. A tester can open the inspector on their own phone without a developer or a second tool involved.</p>
                     </details>
 
                     <details class="faq-item">
-                        <summary>What Android versions does AppInspect support?</summary>
-                        <p>Android API 24 (Android 7.0) and above. ANR detection and native crash detection require Android API 30 (Android 11+).</p>
+                        <summary>What Android versions are supported?</summary>
+                        <p>Android 7.0 (API 24) and above. ANR and native crash detection need Android 11 (API 30), because they rely on the OS <code>ApplicationExitInfo</code> API.</p>
                     </details>
 
                     <details class="faq-item">
-                        <summary>Can QA testers use AppInspect without developer help?</summary>
-                        <p>Yes. Once the library is integrated, testers open the inspector on their own device at any time — via shake gesture, launcher shortcut, or long-press trigger. No Android Studio, adb, or USB cable needed during testing.</p>
+                        <summary>Can testers use it without developer help?</summary>
+                        <p>Yes. Once a developer has added the library, testers open the inspector themselves through a shake, a launcher shortcut, or a long press. No Android Studio, adb, or cable is needed during testing. See <a href="open-inspector.html">Opening the inspector</a>.</p>
                     </details>
 
                     <details class="faq-item">
-                        <summary>How do I integrate AppInspect into my Android project?</summary>
-                        <p>Add two Gradle lines: <code>debugImplementation</code> for the full SDK and <code>releaseImplementation</code> for the no-op stub. AppInspect auto-initializes via AndroidX Startup — no <code>Application</code> class changes needed for basic usage. For network capture, add <code>.addAppInspectInterceptor()</code> to your <code>OkHttpClient</code> builder.</p>
+                        <summary>How do I integrate it into my project?</summary>
+                        <p>Add <code>debugImplementation</code> for the full library and <code>releaseImplementation</code> for the no-op stub. AppInspect initialises itself through AndroidX Startup, so no <code>Application</code> class change is needed for basic use. For network capture, add <code>.addAppInspectInterceptor()</code> to your <code>OkHttpClient</code> builder, last. The <a href="install.html">install guide</a> has the full steps.</p>
                     </details>
 
                     <details class="faq-item">
-                        <summary>Can I export data captured by AppInspect?</summary>
-                        <p>Yes. Network logs export as <code>.txt</code> (with cURL commands) or <code>.har</code> in HAR 1.2 format, compatible with browser DevTools and Proxyman. Long-press to select specific calls and share just those, or export the whole filtered list. Storage contents and runtime summaries can be shared via the Android share sheet.</p>
+                        <summary>Can I export what AppInspect captured?</summary>
+                        <p>Yes. Network logs export as <code>.txt</code> with cURL commands, or as <code>.har</code> for browser DevTools and Proxyman. Mock rules export as <code>.json</code>. Crash reports and runtime summaries go through the Android share sheet. Exports can contain real credentials — the <a href="qa-checklist.html">QA checklist</a> explains how to handle them.</p>
                     </details>
+
+                    <details class="faq-item">
+                        <summary>Why don't network notifications appear on Android 13+?</summary>
+                        <p>Because the <code>POST_NOTIFICATIONS</code> runtime permission has not been granted. AppInspect declares it but has no Activity of its own, so it cannot prompt — your app has to request it. Without the grant, notifications silently never appear. See <a href="notifications.html">Network notifications</a>.</p>
+                    </details>
+                    </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- CTA -->
-            <section class="section section-compact reveal">
-                <div class="cta-card">
+        <!-- ============================================================= cta -->
+        <section class="band">
+            <div class="wrap">
+                <div class="cta">
                     <div>
-                        <span class="eyebrow">Ready to try</span>
-                        <h2>Add AppInspect to your Android app from Maven Central.</h2>
+                        <h2>Add it to your next debug build.</h2>
                         <p>
-                            Start with the debug dependency, wire the OkHttp interceptor if you want
-                            network capture, and tune the panels and power tools for your team's workflow.
+                            Two Gradle lines, one interceptor, and the inspector is on the device the
+                            next time anyone runs the app.
                         </p>
                     </div>
                     <div class="cta-actions">
-                        <a
-                            class="button button-primary"
-                            href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Open Maven Central
-                        </a>
-                        <a class="button button-secondary" href="docs.html">Read the Docs</a>
+                        <a class="button button-primary" href="install.html">Install AppInspect</a>
+                        <a class="button button-secondary" href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Developer / Maintainer -->
-            <section class="section section-compact reveal" id="developer">
-                <div class="developer-card">
-                    <div class="developer-copy">
+        <!-- ====================================================== maintainer -->
+        <section class="band" id="developer">
+            <div class="wrap">
+                <div class="maintainer">
+                    <div>
                         <span class="eyebrow">Maintainer</span>
                         <h2>Built and maintained by Suryansh Prajapati.</h2>
                         <p>
-                            AppInspect is published for Android teams that want practical internal
-                            debugging without building their own inspector surface from scratch.
+                            AppInspect exists because most Android teams end up writing the same
+                            internal debug screen twice. Suggestions, bug reports and corrections to
+                            these docs are all welcome.
                         </p>
                     </div>
-                    <div class="developer-links">
-                        <a
-                            class="button button-secondary"
-                            href="https://github.com/Suryansh1720001"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            GitHub
-                        </a>
-                        <a
-                            class="button button-secondary"
-                            href="https://www.linkedin.com/in/itssuryansh/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            LinkedIn
-                        </a>
+                    <div class="maintainer-links">
+                        <a class="button button-secondary" href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer">GitHub</a>
+                        <a class="button button-secondary" href="https://www.linkedin.com/in/itssuryansh/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Support -->
-            <section class="section section-compact reveal" id="support">
-                <div class="coffee-card">
-                    <div class="coffee-layout">
-                        <div class="coffee-text">
-                            <span class="eyebrow eyebrow-dark">Support the developer</span>
-                            <h2>AppInspect is free. If it saved you time, support the work.</h2>
-                            <p>
-                                AppInspect is free to use. Contributions help keep the project maintained,
-                                documented, and improving for Android developers and QA teams.
-                            </p>
-                            <ul class="check-list check-list-dark">
-                                <li>Free library with no subscription gate</li>
-                                <li>Focused updates, docs, and release quality work</li>
-                            </ul>
-                        </div>
-                        <div class="support-tiers">
-                            <button class="tier-card" data-tier="Coffee" data-icon="&#9749;" type="button">
-                                <span class="tier-icon" aria-hidden="true">&#9749;</span>
-                                <span class="tier-name">Coffee</span>
-                            </button>
-                            <button class="tier-card" data-tier="Sandwich" data-icon="&#129386;" type="button">
-                                <span class="tier-icon" aria-hidden="true">&#129386;</span>
-                                <span class="tier-name">Sandwich</span>
-                            </button>
-                            <button class="tier-card" data-tier="Lunch" data-icon="&#127857;" type="button">
-                                <span class="tier-icon" aria-hidden="true">&#127857;</span>
-                                <span class="tier-name">Lunch</span>
-                            </button>
-                            <button class="tier-card" data-tier="Huge" data-icon="&#128640;" type="button">
-                                <span class="tier-icon" aria-hidden="true">&#128640;</span>
-                                <span class="tier-name">Huge</span>
-                            </button>
-                        </div>
+        <!-- ========================================================= support -->
+        <section class="band" id="support">
+            <div class="wrap">
+                <div class="support-card">
+                    <div>
+                        <span class="eyebrow">Support the work</span>
+                        <h2>AppInspect is free. If it saved you an afternoon, that is enough of a reason.</h2>
+                        <p>
+                            There is no subscription and nothing gated. Contributions go towards keeping
+                            the library maintained, documented and released.
+                        </p>
+                    </div>
+                    <div class="tier-grid">
+                        <button class="tier-card" type="button" data-tier="Coffee" data-icon="&#9749;">
+                            <span class="tier-icon" aria-hidden="true">&#9749;</span>
+                            <span class="tier-name">Coffee</span>
+                        </button>
+                        <button class="tier-card" type="button" data-tier="Sandwich" data-icon="&#129386;">
+                            <span class="tier-icon" aria-hidden="true">&#129386;</span>
+                            <span class="tier-name">Sandwich</span>
+                        </button>
+                        <button class="tier-card" type="button" data-tier="Lunch" data-icon="&#127857;">
+                            <span class="tier-icon" aria-hidden="true">&#127857;</span>
+                            <span class="tier-name">Lunch</span>
+                        </button>
+                        <button class="tier-card" type="button" data-tier="Huge" data-icon="&#128640;">
+                            <span class="tier-icon" aria-hidden="true">&#128640;</span>
+                            <span class="tier-name">Huge</span>
+                        </button>
                     </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
+    </main>
 
-        <footer class="site-footer">
-            <div class="footer-brand">
-                <a class="footer-brand-link" href="#top">
-                    <img src="fevicon/favicon-180.png" alt="AppInspect logo" width="32" height="32">
-                    <span>AppInspect</span>
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-about">
+                <a class="brand" href="index.html">
+                    <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+                    <span class="brand-name">AppInspect</span>
                 </a>
-                <p class="footer-brand-desc">
-                    Android in-app inspector for developers and QA teams. Drop in one library,
-                    inspect network traffic, storage, background work, crashes and ANRs, and
-                    runtime metadata from inside the running app. No cloud. No telemetry.
+                <p>
+                    An Android in-app inspector for debug and QA builds. Network traffic and response
+                    mocking, storage, background work, crashes and ANRs, runtime metadata &mdash; all
+                    on the device, with nothing sent anywhere.
                 </p>
-                <p class="footer-copy">&#169; 2026 Suryansh Prajapati</p>
+                <p class="footer-legal">&copy; 2026 Suryansh Prajapati</p>
             </div>
 
-            <nav class="footer-nav" aria-label="Footer">
-                <div class="footer-nav-group">
-                    <span class="footer-nav-label">Docs</span>
-                    <a href="#features">Features</a>
-                    <a href="docs.html">Integration</a>
-                    <a href="security.html">Security</a>
-                    <a href="privacy.html">Privacy Policy</a>
-                </div>
-                <div class="footer-nav-group">
-                    <span class="footer-nav-label">Links</span>
-                    <a
-                        href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >Maven Central</a>
-                    <a
-                        href="https://github.com/Suryansh1720001"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >GitHub</a>
-                    <a
-                        href="https://www.linkedin.com/in/itssuryansh/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >LinkedIn</a>
-                </div>
+            <nav aria-label="Documentation">
+                <span class="footer-group-title">Docs</span>
+                <a href="docs.html">Introduction</a>
+                <a href="install.html">Install</a>
+                <a href="open-inspector.html">Opening the inspector</a>
+                <a href="configuration.html">Configuration</a>
             </nav>
-        </footer>
-    </div>
 
-    <!-- QR payment modal -->
-    <div class="support-modal" id="support-modal" role="dialog" aria-modal="true" aria-labelledby="modal-tier-name" hidden>
-        <div class="modal-backdrop"></div>
+            <nav aria-label="Panels">
+                <span class="footer-group-title">Panels</span>
+                <a href="network.html">Network</a>
+                <a href="mocks.html">Mocks</a>
+                <a href="storage.html">Storage</a>
+                <a href="workmanager.html">WorkManager</a>
+                <a href="crashes.html">Crashes and ANRs</a>
+            </nav>
+
+            <nav aria-label="More">
+                <span class="footer-group-title">More</span>
+                <a href="security.html">Security model</a>
+                <a href="qa-checklist.html">QA checklist</a>
+                <a href="privacy.html">Privacy policy</a>
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>
+                <a href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://www.linkedin.com/in/itssuryansh/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <span data-contact-slot></span>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Support QR -->
+    <div class="modal" id="support-modal" role="dialog" aria-modal="true" aria-labelledby="modal-tier" hidden>
+        <div class="modal-scrim"></div>
         <div class="modal-box">
-            <button class="modal-close" type="button" aria-label="Close">&#x2715;</button>
-            <div class="modal-tier-info">
-                <span class="modal-tier-icon" id="modal-tier-icon" aria-hidden="true"></span>
-                <p class="modal-tier-name" id="modal-tier-name"></p>
-            </div>
-            <div class="modal-qr-frame">
+            <button class="modal-close" type="button" aria-label="Close">&#10005;</button>
+            <p class="tier-icon" id="modal-icon" aria-hidden="true"></p>
+            <p class="modal-tier" id="modal-tier"></p>
+            <div class="modal-qr">
                 <img src="Qr_code.jpeg" alt="UPI payment QR code for Suryansh Prajapati">
             </div>
-            <p class="modal-scan-label">Scan with any UPI app to pay</p>
+            <p class="modal-hint">Scan with any UPI app to pay</p>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-dialog" id="search-dialog" role="dialog" aria-modal="true" aria-label="Search the documentation" hidden>
+        <div class="search-scrim"></div>
+        <div class="search-box">
+            <div class="search-field">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+            </div>
+            <ul class="search-results"></ul>
+            <p class="search-empty" hidden>No page matches that.</p>
+            <div class="search-foot">
+                <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move</span>
+                <span><kbd>Enter</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script src="docs.js"></script>
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -537,15 +909,11 @@
       "name": "AppInspect",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Android",
-      "description": "AppInspect is a free Android in-app inspector for developer and QA builds. Inspect network requests, storage, WorkManager jobs, crashes, ANRs, and runtime metadata — all on-device with no proxy or USB cable required.",
+      "description": "AppInspect is a free Android in-app inspector for developer and QA builds. Inspect OkHttp network traffic, mock API responses, and review storage, WorkManager jobs, crashes, ANRs and runtime metadata — all on-device, with no proxy or USB cable required.",
       "url": "https://app-inspect-doc.vercel.app/",
       "downloadUrl": "https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview",
-      "softwareVersion": "0.6.1",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
+      "softwareVersion": "0.7.0",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "author": {
         "@type": "Person",
         "name": "Suryansh Prajapati",
@@ -561,90 +929,67 @@
         {
           "@type": "Question",
           "name": "Is AppInspect free?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. AppInspect is completely free. It is published on Maven Central at no cost. There is no paid tier, no license fee, and no usage limits."
-          }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. There is no paid tier, no license fee, and no usage limit. It is published on Maven Central at no cost." }
         },
         {
           "@type": "Question",
           "name": "Does AppInspect add any code to my release APK?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. You use the appinspect-no-op artifact for release builds. It is a pass-through stub with no UI, no storage, no network capture, and no crash handler. Inspection code is completely absent from the release APK."
-          }
+          "acceptedAnswer": { "@type": "Answer", "text": "No, provided you use the appinspect-no-op artifact for release builds. It is a pass-through stub with no UI, no storage, no network capture, and no crash handler, so inspection code is absent from the release APK." }
         },
         {
           "@type": "Question",
           "name": "What can AppInspect inspect?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "AppInspect inspects: network requests and responses captured via OkHttp (exportable as .har or .txt with cURL commands), SharedPreferences, DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs, native crashes (Android 11+), and full runtime and device metadata."
-          }
+          "acceptedAnswer": { "@type": "Answer", "text": "OkHttp requests and responses, SharedPreferences including decrypted EncryptedSharedPreferences, Jetpack DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs and native crashes on Android 11+, and app, device and session metadata." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I mock API responses without changing my app's code?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. A rule replaces a live OkHttp response with one you define — status code, headers, body, an artificial delay, or a simulated timeout or IO failure. Rules can be created in the panel, prefilled from a call you just captured, or committed to your repository as mocks.json. Because a mock is a real OkHttp response, your app's own logic runs unchanged." }
         },
         {
           "@type": "Question",
           "name": "Does AppInspect require root access?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. AppInspect works on any unrooted Android device running API 24 (Android 7.0) or higher. No special device permissions or developer mode are required beyond what a normal debug build needs."
-          }
+          "acceptedAnswer": { "@type": "Answer", "text": "No. It works on any unrooted device running Android 7.0 (API 24) or newer, with no special permissions beyond what a normal debug build already has." }
         },
         {
           "@type": "Question",
-          "name": "Is my app's data safe when using AppInspect in release builds?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, through two independent layers. Layer 1 (compile-time): the no-op artifact contains no inspection code, so nothing is added to the release APK. Layer 2 (runtime): even if the full SDK accidentally ships in a release build, it detects that the build is non-debuggable and self-disables completely — no database is created, no crash handler is installed, no lifecycle callbacks are registered, and all open() calls are refused."
-          }
+          "name": "Is my app's data safe in release builds?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Two independent layers protect it. At compile time, the no-op artifact contains no inspection code. At runtime, even the full module detects a non-debuggable build and disables itself completely — no database, no crash handler, no callbacks, and all open() calls refused." }
         },
         {
           "@type": "Question",
           "name": "Does AppInspect collect or send any data outside the device?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. AppInspect never makes network calls of its own. It has zero telemetry. All captured data — network logs, storage values, crash traces — stays entirely on-device. Nothing is sent to any server."
-          }
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The library makes no network calls of its own and has zero telemetry. Captured network logs, storage values and crash traces stay on the device." }
         },
         {
           "@type": "Question",
           "name": "How is AppInspect different from Charles Proxy or Flipper?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "AppInspect runs entirely on-device inside the app — no desktop proxy, no SSL certificate installation, no Wi-Fi MITM configuration, and no USB cable needed. QA testers can open the inspector on their device at any time via shake gesture, a launcher shortcut, or a long-press trigger without involving a developer or any external tool."
-          }
+          "acceptedAnswer": { "@type": "Answer", "text": "It runs on-device, inside the app. There is no desktop proxy, no SSL certificate to install, no Wi-Fi interception to configure, and no USB cable. A tester can open the inspector on their own phone without a developer or a second tool involved." }
         },
         {
           "@type": "Question",
           "name": "What Android versions does AppInspect support?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "AppInspect supports Android API 24 (Android 7.0) and above. ANR detection and native crash detection require Android API 30 (Android 11+)."
-          }
+          "acceptedAnswer": { "@type": "Answer", "text": "Android 7.0 (API 24) and above. ANR and native crash detection need Android 11 (API 30), because they rely on the OS ApplicationExitInfo API." }
         },
         {
           "@type": "Question",
-          "name": "Can QA testers use AppInspect without developer help after initial setup?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Once the library is integrated into the app by a developer, testers can open the inspector on their own device at any time — via a shake gesture, a launcher shortcut, or a long-press trigger. No Android Studio, adb, USB cable, or developer involvement is needed during testing."
-          }
+          "name": "Can testers use AppInspect without developer help?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Once a developer has added the library, testers open the inspector themselves through a shake, a launcher shortcut, or a long press. No Android Studio, adb, or cable is needed during testing." }
         },
         {
           "@type": "Question",
-          "name": "How do I integrate AppInspect into my Android project?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Add two lines to your Gradle dependencies: debugImplementation for the full SDK and releaseImplementation for the no-op stub. AppInspect auto-initializes via AndroidX Startup — no changes to your Application class are needed for basic usage. For OkHttp network capture, add .addAppInspectInterceptor() to your OkHttpClient builder."
-          }
+          "name": "How do I integrate AppInspect into my project?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Add debugImplementation for the full library and releaseImplementation for the no-op stub. AppInspect initialises itself through AndroidX Startup, so no Application class change is needed for basic use. For network capture, add .addAppInspectInterceptor() to your OkHttpClient builder, last." }
         },
         {
           "@type": "Question",
-          "name": "Can I export data captured by AppInspect?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. Network logs can be exported as .txt files (including cURL commands for every request) or as .har files in HAR 1.2 format, which is compatible with browser DevTools and tools like Proxyman. You can long-press to select specific calls and share just those, or export the whole filtered list. Storage contents and runtime summaries can also be shared via the Android share sheet."
-          }
+          "name": "Can I export what AppInspect captured?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Network logs export as .txt with cURL commands, or as .har for browser DevTools and Proxyman. Mock rules export as .json. Crash reports and runtime summaries go through the Android share sheet. Exports can contain real credentials, so they should be redacted before sharing." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why don't network notifications appear on Android 13+?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Because the POST_NOTIFICATIONS runtime permission has not been granted. AppInspect declares it but has no Activity of its own, so it cannot prompt — the host app has to request it. Without the grant, notifications silently never appear." }
         }
       ]
     }

@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introduction | AppInspect docs</title>
-    <meta name="description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <title>Network panel | AppInspect docs</title>
+    <meta name="description" content="Inspect captured OkHttp calls in AppInspect: filters and search, wire request headers, request and response bodies, cURL, TXT and HAR export.">
     <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <link rel="canonical" href="https://app-inspect-doc.vercel.app/docs.html">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/network.html">
 
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://app-inspect-doc.vercel.app/docs.html">
-    <meta property="og:title" content="Introduction — AppInspect docs">
-    <meta property="og:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/network.html">
+    <meta property="og:title" content="Network panel — AppInspect docs">
+    <meta property="og:description" content="Inspect captured OkHttp calls in AppInspect: filters and search, wire request headers, request and response bodies, cURL, TXT and HAR export.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Introduction — AppInspect docs">
-    <meta name="twitter:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta name="twitter:title" content="Network panel — AppInspect docs">
+    <meta name="twitter:description" content="Inspect captured OkHttp calls in AppInspect: filters and search, wire request headers, request and response bodies, cURL, TXT and HAR export.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -109,161 +109,175 @@
             </details>
 
             <article class="prose">
-                <span class="eyebrow">Getting started</span>
-                <h1>Introduction</h1>
+                <span class="eyebrow">Panels</span>
+                <h1>Network</h1>
                 <p class="lede">
-                    AppInspect is an Android library that adds a full-screen inspector to your own
-                    app. You add it as a Gradle dependency to your debug and internal builds; anyone
-                    holding the phone can then open it and see the network calls the app just made,
-                    what is stored on the device, which background jobs ran, and the last crash or
-                    ANR &mdash; without a laptop, a proxy, or a cable.
+                    Every OkHttp call your instrumented client makes is recorded and listed here, newest
+                    first, and it survives closing the app. This is the panel most people open first,
+                    usually to settle the question of whether the app sent the wrong thing or the server
+                    sent it back.
                 </p>
 
-                <div class="chip-row">
-                    <span class="chip"><strong>Android 7.0+</strong> &nbsp;API 24</span>
-                    <span class="chip"><strong>Maven Central</strong></span>
-                    <span class="chip"><strong>Kotlin</strong> &nbsp;Compose UI</span>
-                    <span class="chip"><strong>Free</strong></span>
+                <h2 id="what-is-captured">What is captured, and what is not</h2>
+                <p>
+                    Capture happens in the interceptor you added to your
+                    <code>OkHttpClient</code>, so the panel sees exactly the calls that went through
+                    that client &mdash; and nothing else. Traffic from a WebView, from another HTTP
+                    library, or from an <code>OkHttpClient</code> built somewhere you forgot to
+                    instrument will not appear. If a call you expected is missing, that is almost always
+                    the reason.
+                </p>
+                <p>
+                    For each call you get the method, scheme, host, path, protocol, status, duration,
+                    request and response content types and payload sizes, the full headers on both
+                    sides, and the bodies up to the configured capture limit.
+                </p>
+
+                <div class="note">
+                    <span class="note-title">Request headers come off the wire</span>
+                    <p>
+                        The headers shown are the ones that actually went out, not just the ones your
+                        calling code set &mdash; an <code>Authorization</code> header added by a
+                        downstream interceptor, a token refresh, or OkHttp's own bridge is included.
+                        <a href="install.html#wire-headers">How that works</a> is on the install page,
+                        and it is the reason exports need care before you share them.
+                    </p>
                 </div>
 
-                <h2 id="the-idea">The idea</h2>
+                <h2 id="finding-a-call">Finding the call you want</h2>
                 <p>
-                    Nearly every Android team eventually builds an internal debug screen: a list of
-                    recent API calls, a way to look at SharedPreferences, a button that dumps the last
-                    crash. It is useful, it is never anyone's priority, and it gets rewritten in the
-                    next app.
+                    On a busy app the list fills up fast, so it is built list-first: filter down, then
+                    open one call.
+                </p>
+                <ul>
+                    <li><strong>Filters</strong> by method, host, outcome, and time window &mdash; "only errors in the last five minutes" is two taps.</li>
+                    <li><strong>Search</strong> across endpoints, headers, bodies, and the generated cURL command. Searching the body is what makes it possible to find a call by an order id you saw on screen.</li>
+                </ul>
+                <p>
+                    A call whose response came from a mock rule carries a <code>MOCK</code> badge in the
+                    list, so a surprising response is never mysterious &mdash; see
+                    <a href="mocks.html">Mocks</a>.
                 </p>
                 <p>
-                    AppInspect is that screen, packaged as a dependency and kept out of your codebase.
-                    Because it lives inside the app rather than outside it, the person who found the
-                    bug is the person who can capture the evidence &mdash; on the build that actually
-                    failed, at the moment it failed.
-                </p>
-
-                <h2 id="what-you-get">What is inside the inspector</h2>
-                <p>
-                    The inspector opens as its own full screen. Five panels sit along the bottom bar
-                    and you move between them by tapping or swiping. Runtime is one tap away in the top
-                    bar, and any panel can hand a large value to a shared full-screen viewer. Each of
-                    them has its own page here.
-                </p>
-
-                <div class="card-grid">
-                    <a class="doc-card" href="network.html">
-                        <strong>Network</strong>
-                        <span>Captured OkHttp calls, filters and search, wire headers, cURL / TXT / HAR export.</span>
-                    </a>
-                    <a class="doc-card" href="mocks.html">
-                        <strong>Mocks</strong>
-                        <span>Replace a live response with your own status, body, delay or simulated failure.</span>
-                    </a>
-                    <a class="doc-card" href="storage.html">
-                        <strong>Storage</strong>
-                        <span>SharedPreferences, DataStore, SQLite and Room &mdash; read, search, and edit.</span>
-                    </a>
-                    <a class="doc-card" href="workmanager.html">
-                        <strong>WorkManager</strong>
-                        <span>Every persisted work spec with state, constraints, attempts and payloads.</span>
-                    </a>
-                    <a class="doc-card" href="crashes.html">
-                        <strong>Crashes and ANRs</strong>
-                        <span>Uncaught exceptions, plus ANRs and native crashes on Android 11+.</span>
-                    </a>
-                    <a class="doc-card" href="runtime.html">
-                        <strong>Runtime</strong>
-                        <span>App, device, environment and session metadata, ready to copy into a ticket.</span>
-                    </a>
-                    <a class="doc-card" href="value-viewer.html">
-                        <strong>Value viewer</strong>
-                        <span>One JSON tree for any oversized value, shared by every panel.</span>
-                    </a>
-                </div>
-
-                <h2 id="how-it-differs">How this differs from a proxy</h2>
-                <p>
-                    A desktop proxy such as Charles or Proxyman sees traffic from the outside. That is
-                    powerful, and it costs you a certificate on every test device, a Wi-Fi
-                    configuration, a machine on the same network, and a developer to run it. Android
-                    Studio's own inspectors need the device attached over adb.
-                </p>
-                <p>
-                    AppInspect trades breadth for reach. It only sees what your app hands to the
-                    <code>OkHttpClient</code> you instrumented &mdash; not WebView traffic, not another
-                    HTTP stack, not other apps. In exchange, it works on any tester's phone with no
-                    setup at all, and it can see things a proxy cannot: which coroutine wrote that
-                    preference, what WorkManager did overnight, the stack trace of the crash that
-                    happened before anyone could attach a debugger.
-                </p>
-                <p>
-                    They are not exclusive. Plenty of teams keep the proxy for deep protocol work and
-                    use AppInspect for everything a tester needs during a normal test pass.
+                    Two different empty states tell you which situation you are in: a fresh install with
+                    nothing captured shows a "No API calls yet" card, while a filter or search that
+                    matches nothing shows a distinct "No matching captures" card. You never have to
+                    guess whether the list is empty or just filtered.
                 </p>
 
-                <h2 id="how-it-is-built">How it is put together</h2>
+                <h2 id="reading-a-call">Reading a call</h2>
                 <p>
-                    The library is published as several artifacts, but you normally depend on just one
-                    umbrella module for your debug builds and one stub for release. The rest are
-                    transitive.
+                    Tapping a row opens the detail screen, which has four tabs &mdash; Overview,
+                    Request, Response, Tools. As on the main panel, you can swipe left and right between
+                    them instead of aiming at the tab bar.
+                </p>
+                <ul>
+                    <li><strong>Overview</strong> &mdash; the summary line, timing, sizes, and the query parameters split out. Tap any row to copy its value.</li>
+                    <li><strong>Request</strong> and <strong>Response</strong> &mdash; full headers, then the body. JSON and XML are pretty-printed, with a raw fallback when the payload is not what its content type claimed.</li>
+                    <li><strong>Tools</strong> &mdash; copy or share the URL, headers, body, cURL command, or the whole event; export; and build a mock rule from this call.</li>
+                </ul>
+                <p>
+                    Large bodies are rendered in chunks so scrolling stays smooth, and there is a
+                    find-in-body search inside the body card. When a payload is genuinely big, hand it
+                    to the <a href="value-viewer.html">value viewer</a> instead: a real JSON tree with
+                    collapse and expand, child counts, and search that does not block while you type.
+                </p>
+
+                <h3 id="quick-actions">Quick actions from the list</h3>
+                <p>
+                    You do not have to open a call to act on it. Long-press a row for
+                    <strong>Copy URL</strong>, <strong>Copy cURL</strong> and
+                    <strong>Share cURL</strong>. You can also select several calls and share them
+                    together, or share the whole filtered list at once, as cURL, TXT or HAR.
+                </p>
+
+                <h3 id="mock-from-here">Turning a captured call into a mock</h3>
+                <p>
+                    <strong>Mock this response</strong> on a captured call prefills a rule from what the
+                    app actually received &mdash; same method, same URL, same status, same body. It is
+                    the fastest way to freeze a real response and then edit it into the case you
+                    actually want to test. <a href="mocks.html">Response mocking</a> covers what
+                    happens next.
+                </p>
+
+                <h2 id="exporting">Exporting</h2>
+                <p>
+                    Two formats, both covering the calls currently visible after filtering:
                 </p>
 
                 <div class="table-scroll">
                     <table>
                         <thead>
-                            <tr><th>Artifact</th><th>What it is for</th></tr>
+                            <tr><th>Format</th><th>Contains</th><th>Good for</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td><code>appinspect</code></td><td>The umbrella dependency. Pulls in the UI, storage, network capture, WorkManager and crash modules, and auto-initialises. This is the one you add to debug, staging and internal-test builds.</td></tr>
-                            <tr><td><code>appinspect-no-op</code></td><td>The release stub. Mirrors only the OkHttp API surface so shared client code compiles, and does nothing at runtime.</td></tr>
-                            <tr><td><code>appinspect-api</code></td><td>Public contracts &mdash; <code>AppInspectConfiguration</code>, mock rule models, entry points. Comes in transitively.</td></tr>
-                            <tr><td><code>appinspect-ui</code></td><td>The inspector activity and its Compose screens.</td></tr>
-                            <tr><td><code>appinspect-network-okhttp</code>, <code>appinspect-storage</code>, <code>appinspect-insights-storage</code>, <code>appinspect-workmanager</code>, <code>appinspect-core</code></td><td>The capture and inspection implementations behind each panel.</td></tr>
+                            <tr>
+                                <td><strong><code>.txt</code></strong></td>
+                                <td>A readable log of each call including its full cURL command, and a <code>Mock:</code> line naming the rule where one fired.</td>
+                                <td>Pasting into a ticket, or handing to someone who wants to reproduce a single call.</td>
+                            </tr>
+                            <tr>
+                                <td><strong><code>.har</code></strong></td>
+                                <td>Standard HAR 1.2.</td>
+                                <td>Opening in browser DevTools or Proxyman and using their tooling on a capture from a phone.</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="note">
-                    <span class="note-title">On versions</span>
+                <p>
+                    Exports are written to a private cache directory and shared through a
+                    non-exported <code>FileProvider</code>, so nothing is world-readable. The library
+                    never uploads them anywhere; a file leaves the device only when a person taps share.
+                </p>
+
+                <div class="warn">
+                    <span class="note-title">Exports contain real credentials</span>
                     <p>
-                        Snippets in these docs use <code>&lt;latest-version&gt;</code> rather than a
-                        pinned number, so nothing here goes stale. Check
-                        <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">the versions page on Maven Central</a>
-                        for the current release. These pages describe 0.7.0.
+                        A HAR, TXT or cURL export carries the same <code>Authorization</code> headers,
+                        API keys and cookies the original requests used &mdash; including ones your own
+                        code never set. Redact before attaching one to a ticket. The
+                        <a href="qa-checklist.html">QA checklist</a> is a short, practical procedure for
+                        this.
                     </p>
                 </div>
 
-                <h2 id="production">It does not ship to your users</h2>
+                <h2 id="watching-live">Watching traffic without the inspector open</h2>
                 <p>
-                    This is the first question most teams ask, so it is worth answering here rather
-                    than at the end. Two independent things keep the inspector out of production.
+                    AppInspect can post a notification per captured call showing just the method, status
+                    code, host and path. Tapping one opens the inspector on that exact request. Mocked
+                    calls are distinct in the shade: a <code>MOCK &middot;</code> title prefix and an
+                    amber tint.
                 </p>
                 <p>
-                    The recommended setup puts <code>appinspect-no-op</code> in your release variant,
-                    so the inspector's code is never compiled into the production APK. And if the full
-                    module ever ends up in a release build by mistake, it checks
-                    <code>FLAG_DEBUGGABLE</code> at runtime and switches itself off completely &mdash;
-                    no database on disk, no crash handler, no capture, every <code>open()</code>
-                    refused.
-                </p>
-                <p>
-                    The <a href="security.html">security model</a> page covers both layers, what debug
-                    builds deliberately do expose, and the extra gates around response mocking.
+                    On Android 13 and newer this needs a runtime permission that your app has to request
+                    &mdash; AppInspect cannot prompt for it. See
+                    <a href="notifications.html">Network notifications</a>.
                 </p>
 
-                <h2 id="next">Where to go next</h2>
-                <div class="card-grid">
-                    <a class="doc-card" href="install.html">
-                        <strong>Install &rarr;</strong>
-                        <span>Gradle dependencies per variant, and the one OkHttp line that turns on network capture.</span>
-                    </a>
-                    <a class="doc-card" href="open-inspector.html">
-                        <strong>Opening the inspector &rarr;</strong>
-                        <span>Shake, launcher shortcut, long press, notification tap, or your own debug menu.</span>
-                    </a>
-                    <a class="doc-card" href="configuration.html">
-                        <strong>Configuration &rarr;</strong>
-                        <span>Decide what a tester can see and change before you hand the build over.</span>
-                    </a>
-                </div>
+                <h2 id="retention">How long calls are kept</h2>
+                <p>
+                    Captured events are persisted in AppInspect's own app-private SQLite database, so
+                    they are still there after the app restarts. The default cap is
+                    <strong>300 events</strong>; when it is reached the oldest are dropped. Clearing
+                    captured data from inside the inspector removes them immediately.
+                </p>
+                <p>
+                    Two consequences worth knowing. In debug builds that database can contain captured
+                    auth headers, so if your app enables Android auto-backup you may want to exclude it
+                    &mdash; the <a href="qa-checklist.html">QA checklist</a> has the detail. And in
+                    release builds it is never created at all: see the
+                    <a href="security.html">security model</a>.
+                </p>
+
+                <h2 id="turning-off">Turning it down</h2>
+                <p>
+                    You can hide the panel entirely with
+                    <code>AppInspectPanels(networkEnabled = false)</code>, mask sensitive header and
+                    body values with <code>showRawSensitiveValues = false</code>, or keep capture on and
+                    just switch notifications off. All of it is on the
+                    <a href="configuration.html">configuration reference</a>.
+                </p>
                 <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
                 <p class="doc-feedback" data-feedback-line></p>
             </article>

@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introduction | AppInspect docs</title>
-    <meta name="description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <title>QA checklist | AppInspect docs</title>
+    <meta name="description" content="Network exports carry real credentials. What to redact before attaching a HAR, TXT or cURL export to a ticket.">
     <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <link rel="canonical" href="https://app-inspect-doc.vercel.app/docs.html">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/qa-checklist.html">
 
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://app-inspect-doc.vercel.app/docs.html">
-    <meta property="og:title" content="Introduction — AppInspect docs">
-    <meta property="og:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/qa-checklist.html">
+    <meta property="og:title" content="QA checklist — AppInspect docs">
+    <meta property="og:description" content="Network exports carry real credentials. What to redact before attaching a HAR, TXT or cURL export to a ticket.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Introduction — AppInspect docs">
-    <meta name="twitter:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta name="twitter:title" content="QA checklist — AppInspect docs">
+    <meta name="twitter:description" content="Network exports carry real credentials. What to redact before attaching a HAR, TXT or cURL export to a ticket.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -109,161 +109,112 @@
             </details>
 
             <article class="prose">
-                <span class="eyebrow">Getting started</span>
-                <h1>Introduction</h1>
+                <span class="eyebrow">Safety and privacy</span>
+                <h1>QA checklist</h1>
                 <p class="lede">
-                    AppInspect is an Android library that adds a full-screen inspector to your own
-                    app. You add it as a Gradle dependency to your debug and internal builds; anyone
-                    holding the phone can then open it and see the network calls the app just made,
-                    what is stored on the device, which background jobs ran, and the last crash or
-                    ANR &mdash; without a laptop, a proxy, or a cable.
+                    Everything on this page is about one risk: a network export is one of the most useful
+                    things you can attach to a bug report, and it contains live credentials. This is a
+                    short, practical routine for handling that &mdash; written for whoever is actually
+                    filing the ticket.
                 </p>
 
-                <div class="chip-row">
-                    <span class="chip"><strong>Android 7.0+</strong> &nbsp;API 24</span>
-                    <span class="chip"><strong>Maven Central</strong></span>
-                    <span class="chip"><strong>Kotlin</strong> &nbsp;Compose UI</span>
-                    <span class="chip"><strong>Free</strong></span>
-                </div>
-
-                <h2 id="the-idea">The idea</h2>
+                <h2 id="why">Why an export is sensitive</h2>
                 <p>
-                    Nearly every Android team eventually builds an internal debug screen: a list of
-                    recent API calls, a way to look at SharedPreferences, a button that dumps the last
-                    crash. It is useful, it is never anyone's priority, and it gets rewritten in the
-                    next app.
+                    A TXT, HAR or cURL export reproduces the request faithfully, which is exactly why it
+                    is worth attaching &mdash; and it means the <code>Authorization</code> header, the API
+                    key and the session cookie come with it. A cURL command always carries the token the
+                    original request used; paste it into a terminal and it authenticates.
                 </p>
                 <p>
-                    AppInspect is that screen, packaged as a dependency and kept out of your codebase.
-                    Because it lives inside the app rather than outside it, the person who found the
-                    bug is the person who can capture the evidence &mdash; on the build that actually
-                    failed, at the moment it failed.
+                    There is a subtler version of the same problem. Captured request headers are read
+                    <a href="install.html#wire-headers">off the wire</a>, so an export can contain
+                    credentials your calling code never set &mdash; added by an auth interceptor, a token
+                    refresh, or the cookie jar. "My code doesn't attach a token to that call" is not a
+                    reason to skip the check.
                 </p>
 
-                <h2 id="what-you-get">What is inside the inspector</h2>
-                <p>
-                    The inspector opens as its own full screen. Five panels sit along the bottom bar
-                    and you move between them by tapping or swiping. Runtime is one tap away in the top
-                    bar, and any panel can hand a large value to a shared full-screen viewer. Each of
-                    them has its own page here.
-                </p>
+                <h2 id="before-sharing">Before you attach an export</h2>
+                <ol>
+                    <li>
+                        <strong>Search the file</strong> for <code>Authorization</code>,
+                        <code>Cookie</code>, <code>Set-Cookie</code>, <code>X-API-Key</code>, and whatever
+                        credential headers your own API uses.
+                    </li>
+                    <li>
+                        <strong>Replace the values with <code>[REDACTED]</code></strong> &mdash; the header
+                        name is useful to whoever debugs it, the value never is.
+                    </li>
+                    <li>
+                        <strong>Strip <code>-H "Authorization: …"</code></strong> from any cURL command you
+                        paste into a ticket or a chat message.
+                    </li>
+                    <li>
+                        <strong>Check where it is going.</strong> An internal ticket is not the same as a
+                        shared drive, a vendor's support portal, or a screenshot in a group chat.
+                    </li>
+                </ol>
 
-                <div class="card-grid">
-                    <a class="doc-card" href="network.html">
-                        <strong>Network</strong>
-                        <span>Captured OkHttp calls, filters and search, wire headers, cURL / TXT / HAR export.</span>
-                    </a>
-                    <a class="doc-card" href="mocks.html">
-                        <strong>Mocks</strong>
-                        <span>Replace a live response with your own status, body, delay or simulated failure.</span>
-                    </a>
-                    <a class="doc-card" href="storage.html">
-                        <strong>Storage</strong>
-                        <span>SharedPreferences, DataStore, SQLite and Room &mdash; read, search, and edit.</span>
-                    </a>
-                    <a class="doc-card" href="workmanager.html">
-                        <strong>WorkManager</strong>
-                        <span>Every persisted work spec with state, constraints, attempts and payloads.</span>
-                    </a>
-                    <a class="doc-card" href="crashes.html">
-                        <strong>Crashes and ANRs</strong>
-                        <span>Uncaught exceptions, plus ANRs and native crashes on Android 11+.</span>
-                    </a>
-                    <a class="doc-card" href="runtime.html">
-                        <strong>Runtime</strong>
-                        <span>App, device, environment and session metadata, ready to copy into a ticket.</span>
-                    </a>
-                    <a class="doc-card" href="value-viewer.html">
-                        <strong>Value viewer</strong>
-                        <span>One JSON tree for any oversized value, shared by every panel.</span>
-                    </a>
-                </div>
-
-                <h2 id="how-it-differs">How this differs from a proxy</h2>
-                <p>
-                    A desktop proxy such as Charles or Proxyman sees traffic from the outside. That is
-                    powerful, and it costs you a certificate on every test device, a Wi-Fi
-                    configuration, a machine on the same network, and a developer to run it. Android
-                    Studio's own inspectors need the device attached over adb.
-                </p>
-                <p>
-                    AppInspect trades breadth for reach. It only sees what your app hands to the
-                    <code>OkHttpClient</code> you instrumented &mdash; not WebView traffic, not another
-                    HTTP stack, not other apps. In exchange, it works on any tester's phone with no
-                    setup at all, and it can see things a proxy cannot: which coroutine wrote that
-                    preference, what WorkManager did overnight, the stack trace of the crash that
-                    happened before anyone could attach a debugger.
-                </p>
-                <p>
-                    They are not exclusive. Plenty of teams keep the proxy for deep protocol work and
-                    use AppInspect for everything a tester needs during a normal test pass.
-                </p>
-
-                <h2 id="how-it-is-built">How it is put together</h2>
-                <p>
-                    The library is published as several artifacts, but you normally depend on just one
-                    umbrella module for your debug builds and one stub for release. The rest are
-                    transitive.
-                </p>
-
-                <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr><th>Artifact</th><th>What it is for</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>appinspect</code></td><td>The umbrella dependency. Pulls in the UI, storage, network capture, WorkManager and crash modules, and auto-initialises. This is the one you add to debug, staging and internal-test builds.</td></tr>
-                            <tr><td><code>appinspect-no-op</code></td><td>The release stub. Mirrors only the OkHttp API surface so shared client code compiles, and does nothing at runtime.</td></tr>
-                            <tr><td><code>appinspect-api</code></td><td>Public contracts &mdash; <code>AppInspectConfiguration</code>, mock rule models, entry points. Comes in transitively.</td></tr>
-                            <tr><td><code>appinspect-ui</code></td><td>The inspector activity and its Compose screens.</td></tr>
-                            <tr><td><code>appinspect-network-okhttp</code>, <code>appinspect-storage</code>, <code>appinspect-insights-storage</code>, <code>appinspect-workmanager</code>, <code>appinspect-core</code></td><td>The capture and inspection implementations behind each panel.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="note">
-                    <span class="note-title">On versions</span>
+                <div class="warn">
+                    <span class="note-title">If an unredacted export already went out</span>
                     <p>
-                        Snippets in these docs use <code>&lt;latest-version&gt;</code> rather than a
-                        pinned number, so nothing here goes stale. Check
-                        <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">the versions page on Maven Central</a>
-                        for the current release. These pages describe 0.7.0.
+                        Rotate the exposed token and ask the backend team to invalidate the session. Do
+                        that first and worry about how it happened afterwards &mdash; a token in a ticket
+                        stays valid until someone revokes it, and tickets are searchable for years.
                     </p>
                 </div>
 
-                <h2 id="production">It does not ship to your users</h2>
+                <h2 id="habits">Habits for a build that has the inspector</h2>
+                <ul>
+                    <li>
+                        <strong>Export files linger.</strong> They stay in the app's cache directory until
+                        Android clears it or the app is uninstalled. They are not world-readable, but they
+                        are still there.
+                    </li>
+                    <li>
+                        <strong>Crash and ANR reports are source-adjacent.</strong> They name your
+                        packages, classes, methods and line numbers. Treat a shared report like a code
+                        excerpt.
+                    </li>
+                    <li>
+                        <strong>Mock rule sets are shareable artifacts too.</strong> Review a rule set
+                        before committing it, and keep real credentials out of mock response bodies
+                        &mdash; rules are stored verbatim and are never redacted.
+                    </li>
+                    <li>
+                        <strong>Exclude AppInspect's database from auto-backup</strong> if your debug build
+                        enables it. <code>appinspect_storage.db</code> can contain captured auth headers.
+                        Production builds have nothing to back up.
+                    </li>
+                    <li>
+                        <strong>If a response looks impossible, check for a mock.</strong> A
+                        <code>MOCK</code> badge on the row, an amber notification, or a <code>Mock:</code>
+                        line in a TXT export all name the rule that fired. This has cost people a whole
+                        afternoon more than once.
+                    </li>
+                </ul>
+
+                <h2 id="handing-over">Handing the build to people outside the team</h2>
                 <p>
-                    This is the first question most teams ask, so it is worth answering here rather
-                    than at the end. Two independent things keep the inspector out of production.
+                    The checklist above is a process control. When a build is going to a wider audience,
+                    reduce what is exposed in the first place instead of relying on everyone remembering
+                    it: mask sensitive values before they are stored, make storage read-only, hide the
+                    panels that audience does not need, and turn off response mocking.
                 </p>
                 <p>
-                    The recommended setup puts <code>appinspect-no-op</code> in your release variant,
-                    so the inspector's code is never compiled into the production APK. And if the full
-                    module ever ends up in a release build by mistake, it checks
-                    <code>FLAG_DEBUGGABLE</code> at runtime and switches itself off completely &mdash;
-                    no database on disk, no crash handler, no capture, every <code>open()</code>
-                    refused.
-                </p>
-                <p>
-                    The <a href="security.html">security model</a> page covers both layers, what debug
-                    builds deliberately do expose, and the extra gates around response mocking.
+                    There is a ready-made profile for exactly this on the
+                    <a href="configuration.html#profile-qa">configuration reference</a>.
                 </p>
 
-                <h2 id="next">Where to go next</h2>
-                <div class="card-grid">
-                    <a class="doc-card" href="install.html">
-                        <strong>Install &rarr;</strong>
-                        <span>Gradle dependencies per variant, and the one OkHttp line that turns on network capture.</span>
-                    </a>
-                    <a class="doc-card" href="open-inspector.html">
-                        <strong>Opening the inspector &rarr;</strong>
-                        <span>Shake, launcher shortcut, long press, notification tap, or your own debug menu.</span>
-                    </a>
-                    <a class="doc-card" href="configuration.html">
-                        <strong>Configuration &rarr;</strong>
-                        <span>Decide what a tester can see and change before you hand the build over.</span>
-                    </a>
-                </div>
+                <h2 id="quick-questions">Two questions worth asking once</h2>
+                <p>
+                    <strong>Who can install this build?</strong> If the answer is "anyone with the link",
+                    the inspector should be configured down before that link exists.
+                </p>
+                <p>
+                    <strong>Where do our tickets live?</strong> If your issue tracker is readable by
+                    contractors, vendors or the whole company, redaction is not optional &mdash; it is the
+                    only control between an export and a much longer conversation.
+                </p>
                 <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
                 <p class="doc-feedback" data-feedback-line></p>
             </article>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response mocking | AppInspect docs</title>
+    <meta name="description" content="Replace a live API response on the device with AppInspect: rule sources, SHORT_CIRCUIT and OVERRIDE modes, matching, failure simulation and mocks.json.">
+    <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/mocks.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/mocks.html">
+    <meta property="og:title" content="Response mocking — AppInspect docs">
+    <meta property="og:description" content="Replace a live API response on the device with AppInspect: rule sources, SHORT_CIRCUIT and OVERRIDE modes, matching, failure simulation and mocks.json.">
+    <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Response mocking — AppInspect docs">
+    <meta name="twitter:description" content="Replace a live API response on the device with AppInspect: rule sources, SHORT_CIRCUIT and OVERRIDE modes, matching, failure simulation and mocks.json.">
+    <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem("appinspect-theme");
+                if (stored) {
+                    document.documentElement.setAttribute("data-theme", stored);
+                }
+            } catch (error) {
+                /* no persisted preference available */
+            }
+        })();
+    </script>
+
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body class="docs">
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="topbar">
+        <button class="topbar-menu" type="button" aria-expanded="false" aria-controls="docs-sidebar" aria-label="Show documentation navigation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <a class="brand" href="index.html">
+            <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+            <span class="brand-name">AppInspect</span>
+            <span class="brand-version">0.7.0</span>
+        </a>
+        <span class="topbar-spacer"></span>
+        <button class="search-trigger" type="button" data-search-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <span>Search the docs</span>
+            <kbd>&#8984;K</kbd>
+        </button>
+        <nav class="topbar-nav" aria-label="Primary">
+            <a href="index.html">Home</a>
+            <a class="wide-only" href="docs.html">Docs</a>
+            <a class="wide-only" href="index.html#support">Support</a>
+        </nav>
+        <div class="topbar-tools">
+            <a class="icon-button" href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer" aria-label="AppInspect on Maven Central">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+            </a>
+            <a class="icon-button" href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.34c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.24.54.72.54 1.45l-.01 2.15c0 .21.14.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+            </a>
+            <button class="icon-button" type="button" data-theme-toggle aria-label="Switch between light and dark theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+
+    <div class="docs-shell">
+        <aside class="docs-sidebar" id="docs-sidebar">
+            <nav id="docs-nav" aria-label="Documentation"></nav>
+            <div class="nav-aside">
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/></svg>
+                    Released versions
+                </a>
+                <a href="index.html#faq">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 17h.01"/></svg>
+                    FAQ
+                </a>
+                <a href="index.html#support">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 8a4 4 0 0 1 7 2.7C19 15.6 12 20 12 20Z"/></svg>
+                    Support the project
+                </a>
+            </div>
+        </aside>
+
+        <main class="docs-main" id="content">
+            <details class="toc-inline">
+                <summary>On this page</summary>
+                <div data-toc></div>
+            </details>
+
+            <article class="prose">
+                <span class="eyebrow">Panels</span>
+                <h1>Response mocking</h1>
+                <p class="lede">
+                    A mock rule replaces the response to a matching API call with one you define. You
+                    use it to reach the states that are hard to produce on demand &mdash; a 500, an empty
+                    list, a timeout, an endpoint the backend has not built yet &mdash; without changing
+                    your app's code or asking anyone to break a server.
+                </p>
+
+                <h2 id="what-it-does">What it changes, and what it does not</h2>
+                <p>
+                    A mock is a real <code>okhttp3.Response</code> handed back from the interceptor. Your
+                    app cannot tell the difference, which is the whole point: <code>isSuccessful</code>,
+                    the response body, Retrofit's converters and a chained flow that only calls B after A
+                    succeeds all behave exactly as they would against the live server.
+                </p>
+                <p>
+                    <strong>Your outgoing request is never modified.</strong> The URL, query, headers and
+                    body your app sends are the ones it actually sends. Everything in a rule's match
+                    section is a filter used to decide whether the rule applies &mdash; not data that gets
+                    transmitted. This trips people up, so it is worth saying plainly: mocking changes what
+                    comes back, nothing else.
+                </p>
+
+                <h2 id="rule-sources">Where rules come from</h2>
+                <p>
+                    Two places, and they are meant for different situations.
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Source</th><th>Lives in</th><th>Why you would use it</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bundled</strong></td>
+                                <td><code>assets/appinspect/mocks.json</code> in your app</td>
+                                <td>Version-controlled, reviewable in a pull request, shared with the whole team, and already active on a fresh install with nobody opening the inspector.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Runtime</strong></td>
+                                <td>Created in the Mocks panel, stored on the device</td>
+                                <td>Instant. No rebuild, no commit. What you reach for while you are actually debugging.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    When both a bundled and a runtime rule match the same request, the runtime one wins.
+                    Rules you make on a device can be pulled back into the project later &mdash; see
+                    <a href="#adb-pull">getting device rules into git</a>.
+                </p>
+
+                <h2 id="modes">The two modes</h2>
+                <p>
+                    Every rule is either a short circuit or an override, and the difference is whether
+                    the real request happens at all.
+                </p>
+                <dl>
+                    <div>
+                        <dt>SHORT_CIRCUIT<span class="dt-default">default</span></dt>
+                        <dd>
+                            The network is never touched. AppInspect returns your response immediately.
+                            This is what you want for an endpoint that does not exist, for offline
+                            behaviour, or when you simply do not want the call to reach production.
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>OVERRIDE</dt>
+                        <dd>
+                            The real call completes normally, and then its status, headers and body are
+                            replaced with yours. The original status is preserved in an
+                            <code>X-AppInspect-Mock-Original-Status</code> response header, so you can
+                            still see what the server said. Use it when the request itself has a side
+                            effect you want to keep &mdash; a write that must really happen &mdash; while
+                            testing how your UI handles a different answer.
+                        </dd>
+                    </div>
+                </dl>
+
+                <h2 id="matching">What a rule matches on</h2>
+                <p>
+                    Four conditions, and <strong>every one you leave blank matches anything</strong>. A
+                    rule therefore only needs the fields you actually care about.
+                </p>
+                <dl>
+                    <div>
+                        <dt>method<span class="dt-default">default: ANY</span></dt>
+                        <dd>Exact HTTP method, or <code>ANY</code>.</dd>
+                    </div>
+                    <div>
+                        <dt>url<span class="dt-default">required, unless you use a query or body condition</span></dt>
+                        <dd>
+                            A case-insensitive <strong>substring</strong> of the full URL, with
+                            <code>*</code> as a wildcard. Because it is a substring,
+                            <code>/v1/users</code> matches on every host &mdash; so a rule keeps working
+                            after someone switches environments, which is usually what you want.
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>query</dt>
+                        <dd>Name and value pairs that must be present in the query string. Other parameters are ignored.</dd>
+                    </div>
+                    <div>
+                        <dt>bodyContains</dt>
+                        <dd>A substring the request body must contain. If the body was not captured, this condition fails closed &mdash; the rule does not fire rather than firing blindly.</dd>
+                    </div>
+                </dl>
+
+                <h2 id="response">What the rule sends back</h2>
+                <p>
+                    A status code, a content type, any response headers you want, and a body. On top of
+                    that, two things that are hard to arrange any other way:
+                </p>
+                <ul>
+                    <li><strong>A delay.</strong> <code>delayMillis</code> holds the response back, which is how you catch a spinner that never stops or a race between two calls.</li>
+                    <li><strong>A failure.</strong> <code>IO_EXCEPTION</code> and <code>SOCKET_TIMEOUT</code> make the call fail the way a real network failure does, so you can test timeout and offline handling on a perfectly good connection. For a failure rule there is no status code to set &mdash; the field is hidden.</li>
+                </ul>
+
+                <h2 id="mocks-json">Committing rules with your code</h2>
+                <p>
+                    A bundled file is read once, on AppInspect's background install thread, so it never
+                    blocks startup. A missing file is the normal case. A malformed one produces errors
+                    surfaced in the Mocks panel rather than an exception.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">app/src/debug/assets/appinspect/mocks.json</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="json">{
+  "version": 1,
+  "mockingEnabled": true,
+  "rules": [
+    {
+      "id": "orders-empty",
+      "name": "Orders list — empty state",
+      "enabled": true,
+      "priority": 10,
+      "mode": "SHORT_CIRCUIT",
+      "delayMillis": 250,
+      "match": { "method": "GET", "url": "/v2/orders", "query": { "page": "1" } },
+      "response": {
+        "status": 200,
+        "contentType": "application/json",
+        "headers": { "cache-control": "no-store" },
+        "body": { "items": [], "total": 0 }
+      }
+    }
+  ]
+}</code></pre>
+                </div>
+
+                <div class="warn">
+                    <span class="note-title">Use src/debug/assets, not src/main/assets</span>
+                    <p>
+                        Assets are not stripped per variant the way code is. A <code>mocks.json</code>
+                        under <code>src/main/</code> is packaged into your <strong>release</strong> APK
+                        too. Nothing there can be served in production, but the file itself &mdash; every
+                        URL and canned response body in it &mdash; ships to users and is readable by
+                        anyone who unzips the APK. A debug-only source set keeps it out entirely.
+                    </p>
+                    <p>
+                        Also: rules are developer-authored configuration and are stored verbatim.
+                        Redaction applies to captured traffic, not to rules, so never put a real
+                        credential in a mock response body.
+                    </p>
+                </div>
+
+                <h3 id="json-keys">The JSON keys are shorter than the Kotlin names</h3>
+                <p>
+                    Unknown keys are ignored, so a typo silently does nothing. This is the full mapping:
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>JSON key</th><th>Meaning</th><th>If omitted</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>id</code></td><td>Rule id</td><td><strong>Required.</strong> A rule without one is skipped and reported.</td></tr>
+                            <tr><td><code>name</code></td><td>Label shown in the panel</td><td>Empty</td></tr>
+                            <tr><td><code>enabled</code></td><td>Whether the rule can fire</td><td><code>true</code></td></tr>
+                            <tr><td><code>priority</code></td><td>Higher wins among rules of the same source</td><td><code>0</code></td></tr>
+                            <tr><td><code>mode</code></td><td><code>SHORT_CIRCUIT</code> or <code>OVERRIDE</code></td><td><code>SHORT_CIRCUIT</code></td></tr>
+                            <tr><td><code>failure</code></td><td><code>NONE</code>, <code>IO_EXCEPTION</code>, <code>SOCKET_TIMEOUT</code></td><td><code>NONE</code></td></tr>
+                            <tr><td><code>delayMillis</code></td><td>Artificial delay</td><td><code>0</code>, clamped to the maximum delay</td></tr>
+                            <tr><td><code>match.method</code></td><td>HTTP method</td><td><code>ANY</code></td></tr>
+                            <tr><td><code>match.url</code></td><td>URL substring, <code>*</code> wildcards</td><td>Matches every URL</td></tr>
+                            <tr><td><code>match.query</code></td><td>JSON <strong>object</strong> of name to value</td><td>Matches any query string</td></tr>
+                            <tr><td><code>match.bodyContains</code></td><td>Request-body substring</td><td>Matches any body</td></tr>
+                            <tr><td><code>response.status</code></td><td>Status code, <code>100</code>&ndash;<code>599</code></td><td><code>200</code></td></tr>
+                            <tr><td><code>response.contentType</code></td><td>Response content type</td><td><code>application/json</code></td></tr>
+                            <tr><td><code>response.headers</code></td><td>JSON <strong>object</strong> of name to value</td><td>None</td></tr>
+                            <tr><td><code>response.body</code></td><td>A JSON string, or an inline object or array</td><td>Empty</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    <code>match.query</code> and <code>response.headers</code> are objects, not arrays,
+                    and keep document order. <code>response.body</code> accepts either a string or an
+                    inline object; the inline form is stored as compact JSON, which is usually the more
+                    readable way to write it in a file a human will review.
+                </p>
+
+                <h2 id="in-the-panel">Working with rules in the panel</h2>
+                <p>
+                    The rule list is split into runtime rules and bundled rules. Every action, and what
+                    it actually does:
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Action</th><th>Where</th><th>Effect</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Add rule</strong></td><td>Runtime section header</td><td>A new rule with a generated <code>rt-…</code> id.</td></tr>
+                            <tr><td><strong>Edit</strong></td><td>Runtime rule menu, or tap the row</td><td>Updates that rule in place.</td></tr>
+                            <tr><td><strong>Override on this device</strong></td><td>Bundled rule menu, or tap the row</td><td>Opens the shipped rule with every field editable and saves a <em>runtime</em> rule under the same id &mdash; because an app cannot write into its own APK assets.</td></tr>
+                            <tr><td><strong>Edit device override</strong></td><td>Bundled rule menu, once overridden</td><td>The same action again. The row gains an amber <code>OVERRIDDEN</code> badge.</td></tr>
+                            <tr><td><strong>Duplicate as new rule</strong></td><td>Any rule menu</td><td>A genuinely separate rule with a fresh id and <code>priority + 1</code>. Use it when you want the shipped rule <em>and</em> a variant.</td></tr>
+                            <tr><td><strong>Restore from mocks.json</strong></td><td>Overridden bundled rule menu</td><td>Drops the override; the file's version serves again.</td></tr>
+                            <tr><td><strong>Delete</strong></td><td>Runtime rule menu</td><td>Removes it. Not offered on bundled rows &mdash; use <em>Restore</em>.</td></tr>
+                            <tr><td><strong>Row switch</strong></td><td>Any rule</td><td>Enables or disables. On a bundled row this writes an override too, which is how a shipped rule gets silenced without editing the file.</td></tr>
+                            <tr><td><strong>Clear runtime rules</strong></td><td>Panel overflow</td><td>Removes every device-made rule. Bundled rules are untouched.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    An override <strong>replaces</strong> the bundled rule rather than outranking it. So
+                    turning an override off silences the rule entirely instead of letting the shipped
+                    version resurface, and an export contains one entry per rule with your edits applied
+                    &mdash; never a stale copy of the original. The override is shown inside its bundled
+                    row rather than as a separate entry, which is why the <em>Bundled rules</em> count
+                    always equals the number of rules in your file.
+                </p>
+
+                <h3 id="editor">In the rule editor</h3>
+                <p>
+                    The editor is split into <strong>Match</strong> (filters on the outgoing request) and
+                    <strong>Response</strong> (what your app receives instead). Nothing in the Match
+                    section is ever sent.
+                </p>
+                <p>
+                    Only two fields are marked required: the URL pattern &mdash; unless you supply a query
+                    or body condition instead &mdash; and the status code, which disappears for failure
+                    rules. Everything else blank means "matches anything".
+                </p>
+
+                <h2 id="priority">When several rules match</h2>
+                <p>
+                    Rules are evaluated in this order, and the <strong>first match wins</strong>. They are
+                    never merged.
+                </p>
+                <ol>
+                    <li>Runtime rules, by <code>priority</code> descending, then most recently saved.</li>
+                    <li>Bundled rules, by <code>priority</code> descending, then file order.</li>
+                </ol>
+                <p>
+                    Two rules with the same matcher and the same priority therefore resolve to whichever
+                    was saved last, and the loser can never fire. Rather than leave that invisible, the
+                    panel flags it with a <code>NEVER FIRES</code> badge. The usual cause is running
+                    <em>Mock this response</em> twice on the same endpoint.
+                </p>
+
+                <h2 id="gates">Turning mocking on and off</h2>
+                <p>
+                    Mocking rewrites live traffic, so it is gated more heavily than the rest of the
+                    inspector. Five checks must all pass before a rule can fire &mdash; if a rule looks
+                    right but nothing happens, work down this list.
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Gate</th><th>Set in</th><th>Default</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Build tier / <code>FLAG_DEBUGGABLE</code></td><td><code>AppInspectEnablement</code></td><td>Debug builds only</td></tr>
+                            <tr><td><code>allowResponseMocking</code></td><td>Your <code>install()</code> configuration</td><td><code>true</code></td></tr>
+                            <tr><td>The device switch, in the Mocks panel</td><td>Persisted per install</td><td>Unset</td></tr>
+                            <tr><td><code>"mockingEnabled"</code></td><td>Your <code>mocks.json</code>, in git</td><td><code>true</code> when the file exists</td></tr>
+                            <tr><td>The rule's own <code>enabled</code></td><td>File, or the row switch</td><td><code>true</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    The device switch is a <strong>tri-state override</strong>. Unset means "follow
+                    <code>mocks.json</code>", which is what lets a shipped file work on a fresh install
+                    with nobody opening the inspector. Flip the switch and the device wins;
+                    <strong>Reset to mocks.json</strong> clears the override and hands control back.
+                    With no file and no override, mocking is off.
+                </p>
+                <p>
+                    So <code>"mockingEnabled": true</code> in a committed file does mean every
+                    teammate's debug build starts mocking those endpoints on first launch. That is the
+                    intent &mdash; it makes a test scenario reproducible and reviewable &mdash; and anyone
+                    can take control on their own device without touching the file.
+                </p>
+
+                <h2 id="adb-pull">Getting device rules back into your project</h2>
+                <p>
+                    Rules built on a device are worth keeping. AppInspect mirrors the current rule set to
+                    app-scoped external storage on every change, so you can pull the file without
+                    <code>run-as</code>:
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">Terminal</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="bash"># Downloads to ./mocks.json in your current directory
+adb pull /sdcard/Android/data/&lt;applicationId&gt;/files/appinspect/mocks.json ./mocks.json
+
+# Then move it into your module — adjust the module name
+mkdir -p app/src/debug/assets/appinspect
+mv mocks.json app/src/debug/assets/appinspect/mocks.json</code></pre>
+                </div>
+
+                <p>
+                    <strong>Copy adb pull command</strong> in the panel overflow gives you that first
+                    line with your package already filled in. It deliberately targets the current
+                    directory rather than guessing a path: <code>adb pull</code> does not create
+                    intermediate directories, and the library cannot know your module's name. The panel
+                    also has <strong>Export rules (.json)</strong> through the share sheet and
+                    <strong>Copy all as JSON</strong>, and the <strong>Mirror file (adb pull)</strong>
+                    disclosure in the master card shows the exact on-device path.
+                </p>
+                <p>
+                    The exported file contains <strong>one entry per rule</strong>: every runtime rule,
+                    plus every bundled rule that no runtime rule overrides. Edit a shipped rule on the
+                    device and the pulled file has your edited version, with no leftover copy of the
+                    original.
+                </p>
+
+                <div class="note">
+                    <span class="note-title">Treat the mirror file like an export</span>
+                    <p>
+                        It lives on app-scoped external storage, is removed when the app is uninstalled,
+                        and is never written on a build where mocking is not allowed &mdash; but it is not
+                        app-private the way internal storage is. The
+                        <a href="security.html#mocking">security model</a> covers what that means.
+                    </p>
+                </div>
+
+                <h2 id="caveats">Three things that surprise people</h2>
+                <p>
+                    Because a mock is a real response, almost everything behaves normally. The exceptions
+                    are worth knowing before you spend an hour on one.
+                </p>
+                <ul>
+                    <li><strong>Your mock body still has to parse.</strong> If the response model expects fields your mock leaves out, the converter throws. The chain breaks at deserialization, not at the network layer &mdash; and that is by far the most common surprise.</li>
+                    <li><strong><code>SHORT_CIRCUIT</code> skips the rest of the chain.</strong> Interceptors registered after AppInspect's, and OkHttp's own bridge, cache, connect and call-server interceptors, do not run. Installing AppInspect <a href="install.html#why-last">last</a> avoids this. <code>OVERRIDE</code> does not have the problem, because the real call completes first.</li>
+                    <li><strong>No cache write and no cookie storage</strong> on a short circuit, for the same reason.</li>
+                </ul>
+                <p>
+                    One more, less obvious: application interceptors see a call once, <em>before</em>
+                    redirects. A <code>SHORT_CIRCUIT</code> rule written against the final URL of a
+                    redirect chain will not fire.
+                </p>
+
+                <h2 id="spotting-a-mock">A mocked response is never silent</h2>
+                <p>
+                    The worst failure mode for a tool like this is someone debugging a response that
+                    AppInspect invented. So every mocked call is labelled, in every place it appears:
+                </p>
+                <ul>
+                    <li>A <code>MOCK</code> badge on the row and in the call detail in <a href="network.html">Network</a>.</li>
+                    <li>A <code>MOCK &middot;</code> prefix and an amber tint on the notification.</li>
+                    <li>An amber badge on the <em>Mocks</em> tab for as long as mocking is on.</li>
+                    <li>A <code>Mock:</code> line, naming the rule that fired, in <code>.txt</code> exports.</li>
+                </ul>
+                <p>
+                    If a response is confusing someone on your team, those badges are the first thing to
+                    check.
+                </p>
+                <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
+                <p class="doc-feedback" data-feedback-line></p>
+            </article>
+        </main>
+
+        <aside class="docs-toc">
+            <p class="toc-title">On this page</p>
+            <nav data-toc aria-label="On this page"></nav>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-about">
+                <a class="brand" href="index.html">
+                    <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+                    <span class="brand-name">AppInspect</span>
+                </a>
+                <p>
+                    An Android in-app inspector for debug and QA builds. Network traffic and response
+                    mocking, storage, background work, crashes and ANRs, runtime metadata &mdash; all
+                    on the device, with nothing sent anywhere.
+                </p>
+                <p class="footer-legal">&copy; 2026 Suryansh Prajapati</p>
+            </div>
+
+            <nav aria-label="Documentation">
+                <span class="footer-group-title">Docs</span>
+                <a href="docs.html">Introduction</a>
+                <a href="install.html">Install</a>
+                <a href="open-inspector.html">Opening the inspector</a>
+                <a href="configuration.html">Configuration</a>
+            </nav>
+
+            <nav aria-label="Panels">
+                <span class="footer-group-title">Panels</span>
+                <a href="network.html">Network</a>
+                <a href="mocks.html">Mocks</a>
+                <a href="storage.html">Storage</a>
+                <a href="workmanager.html">WorkManager</a>
+                <a href="crashes.html">Crashes and ANRs</a>
+            </nav>
+
+            <nav aria-label="More">
+                <span class="footer-group-title">More</span>
+                <a href="security.html">Security model</a>
+                <a href="qa-checklist.html">QA checklist</a>
+                <a href="privacy.html">Privacy policy</a>
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>
+                <a href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://www.linkedin.com/in/itssuryansh/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <span data-contact-slot></span>
+            </nav>
+        </div>
+    </footer>
+
+    <div class="search-dialog" id="search-dialog" role="dialog" aria-modal="true" aria-label="Search the documentation" hidden>
+        <div class="search-scrim"></div>
+        <div class="search-box">
+            <div class="search-field">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+            </div>
+            <ul class="search-results"></ul>
+            <p class="search-empty" hidden>No page matches that.</p>
+            <div class="search-foot">
+                <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move</span>
+                <span><kbd>Enter</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="docs.js"></script>
+    <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
+</body>
+</html>

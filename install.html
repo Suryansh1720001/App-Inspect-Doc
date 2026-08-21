@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install | AppInspect docs</title>
+    <meta name="description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor, and what to guard by variant.">
+    <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/install.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/install.html">
+    <meta property="og:title" content="Install — AppInspect docs">
+    <meta property="og:description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor, and what to guard by variant.">
+    <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Install — AppInspect docs">
+    <meta name="twitter:description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor, and what to guard by variant.">
+    <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem("appinspect-theme");
+                if (stored) {
+                    document.documentElement.setAttribute("data-theme", stored);
+                }
+            } catch (error) {
+                /* no persisted preference available */
+            }
+        })();
+    </script>
+
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body class="docs">
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="topbar">
+        <button class="topbar-menu" type="button" aria-expanded="false" aria-controls="docs-sidebar" aria-label="Show documentation navigation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <a class="brand" href="index.html">
+            <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+            <span class="brand-name">AppInspect</span>
+            <span class="brand-version">0.7.0</span>
+        </a>
+        <span class="topbar-spacer"></span>
+        <button class="search-trigger" type="button" data-search-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <span>Search the docs</span>
+            <kbd>&#8984;K</kbd>
+        </button>
+        <nav class="topbar-nav" aria-label="Primary">
+            <a href="index.html">Home</a>
+            <a class="wide-only" href="docs.html">Docs</a>
+            <a class="wide-only" href="index.html#support">Support</a>
+        </nav>
+        <div class="topbar-tools">
+            <a class="icon-button" href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer" aria-label="AppInspect on Maven Central">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+            </a>
+            <a class="icon-button" href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.34c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.24.54.72.54 1.45l-.01 2.15c0 .21.14.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+            </a>
+            <button class="icon-button" type="button" data-theme-toggle aria-label="Switch between light and dark theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+
+    <div class="docs-shell">
+        <aside class="docs-sidebar" id="docs-sidebar">
+            <nav id="docs-nav" aria-label="Documentation"></nav>
+            <div class="nav-aside">
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/></svg>
+                    Released versions
+                </a>
+                <a href="index.html#faq">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 17h.01"/></svg>
+                    FAQ
+                </a>
+                <a href="index.html#support">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 8a4 4 0 0 1 7 2.7C19 15.6 12 20 12 20Z"/></svg>
+                    Support the project
+                </a>
+            </div>
+        </aside>
+
+        <main class="docs-main" id="content">
+            <details class="toc-inline">
+                <summary>On this page</summary>
+                <div data-toc></div>
+            </details>
+
+            <article class="prose">
+                <span class="eyebrow">Getting started</span>
+                <h1>Install</h1>
+                <p class="lede">
+                    Two dependency lines get you a working inspector. A third line on your
+                    <code>OkHttpClient</code> turns on network capture. Everything after that is
+                    optional.
+                </p>
+
+                <h2 id="requirements">Before you start</h2>
+                <ul>
+                    <li><strong>minSdk 24</strong> (Android 7.0). ANR and native crash reporting additionally need Android 11, because they read the OS <code>ApplicationExitInfo</code> API.</li>
+                    <li><strong>OkHttp</strong>, if you want the Network and Mocks panels. Storage, WorkManager, Crashes and Runtime work without it.</li>
+                    <li><strong>Build variants you can target separately</strong> &mdash; at minimum <code>debug</code> and <code>release</code>. If you have a staging or internal-test variant, so much the better.</li>
+                </ul>
+
+                <h2 id="repository">Step 1 &mdash; resolve from Maven Central</h2>
+                <p>
+                    AppInspect is published to Maven Central, so in most projects this is already in
+                    place. If your project declares repositories centrally, confirm
+                    <code>mavenCentral()</code> is there.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">settings.gradle.kts</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}</code></pre>
+                </div>
+
+                <h2 id="dependency">Step 2 &mdash; add the dependency per variant</h2>
+                <p>
+                    Add the full library to the builds you test, and the no-op stub to the build you
+                    ship. Do not use plain <code>implementation</code> &mdash; that puts the inspector in
+                    your production APK.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">app/build.gradle.kts</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">dependencies {
+    val appInspect = "io.github.suryansh1720001.appinspect"
+
+    // The full inspector, for builds your team tests
+    debugImplementation("$appInspect:appinspect:&lt;latest-version&gt;")
+
+    // A pass-through stub, so shared OkHttp code still compiles in release
+    releaseImplementation("$appInspect:appinspect-no-op:&lt;latest-version&gt;")
+}</code></pre>
+                </div>
+
+                <p>
+                    That is enough to have a working inspector. AppInspect initialises itself through
+                    AndroidX Startup when the process starts, so there is nothing to add to your
+                    <code>Application</code> class for the default setup.
+                </p>
+
+                <h3 id="custom-variants">If you have more than two variants</h3>
+                <p>
+                    Gradle only generates <code>debugImplementation</code> and
+                    <code>releaseImplementation</code> automatically. For your own variants, add the
+                    configuration by name:
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">app/build.gradle.kts</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">dependencies {
+    val group = "io.github.suryansh1720001.appinspect"
+    val inspector = "$group:appinspect:&lt;latest-version&gt;"
+
+    debugImplementation(inspector)
+    add("stagingImplementation", inspector)
+    add("internalTestImplementation", inspector)
+
+    releaseImplementation("$group:appinspect-no-op:&lt;latest-version&gt;")
+}</code></pre>
+                </div>
+
+                <div class="note">
+                    <span class="note-title">A staging build is not automatically enabled</span>
+                    <p>
+                        Adding the artifact to a variant is not the same as letting it run there. The
+                        library also checks the build tier at runtime, and anything that is not
+                        debuggable stays off until you opt in explicitly. See
+                        <a href="configuration.html#enablement">enablement</a> if your staging build is
+                        signed as a release build.
+                    </p>
+                </div>
+
+                <h2 id="network-capture">Step 3 &mdash; capture network traffic</h2>
+                <p>
+                    Network capture is opt-in, because AppInspect never touches an
+                    <code>OkHttpClient</code> you did not hand to it. Add the extension to your
+                    builder, and add it <strong>last</strong>:
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">Your OkHttp setup</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">val client = OkHttpClient.Builder()
+    .addInterceptor(authInterceptor)
+    .addInterceptor(loggingInterceptor)
+    .addAppInspectInterceptor()   // last
+    .build()</code></pre>
+                </div>
+
+                <p>
+                    The same code compiles in every variant. In release the extension comes from
+                    <code>appinspect-no-op</code> and returns the builder untouched, so there is no
+                    <code>if (BuildConfig.DEBUG)</code> to write.
+                </p>
+
+                <h3 id="why-last">Why the order matters</h3>
+                <p>
+                    Two reasons, and both are easy to get wrong.
+                </p>
+                <p>
+                    <strong>Short-circuit mocks skip whatever comes after.</strong> When a
+                    <code>SHORT_CIRCUIT</code> rule fires, AppInspect returns a response without
+                    calling <code>chain.proceed()</code>, so every interceptor registered after it
+                    never runs. If your token-refresh interceptor sits after AppInspect, mocking will
+                    quietly bypass it. Last means nothing of yours gets skipped.
+                </p>
+                <p>
+                    <strong>Last is also where the request looks the way it really goes out</strong>
+                    &mdash; after your own interceptors have added their headers.
+                </p>
+
+                <h3 id="wire-headers">You get the real wire headers</h3>
+                <p>
+                    <code>addAppInspectInterceptor()</code> actually installs two interceptors: an
+                    application-level one that does the capturing and the mocking, and
+                    <code>AppInspectOkHttpWireHeaderInterceptor</code> at the network level, which
+                    only observes.
+                </p>
+                <p>
+                    The second one exists because an application interceptor cannot see headers added
+                    downstream of itself &mdash; an <code>Authenticator</code> retry, another network
+                    interceptor, or OkHttp's own <code>BridgeInterceptor</code>, which adds
+                    <code>Host</code>, <code>User-Agent</code>, <code>Accept-Encoding</code>,
+                    <code>Content-Length</code>, <code>Content-Type</code> and <code>Cookie</code>.
+                    Without it, an <code>Authorization</code> header attached later in the chain would
+                    simply be missing from the panel. With it, what you see matches what Android
+                    Studio's Network Inspector shows.
+                </p>
+                <p>
+                    Where wire headers genuinely do not exist &mdash; a short-circuited mock, a fully
+                    cached response, a call that failed before reaching the network &mdash; the event
+                    falls back to the application-level headers. This also means captured request
+                    headers can contain credentials your calling code never set, which matters when you
+                    share an export: see the <a href="qa-checklist.html">QA checklist</a>.
+                </p>
+
+                <h2 id="verify">Step 4 &mdash; check that it worked</h2>
+                <ol>
+                    <li>Install and launch a debug build.</li>
+                    <li>Shake the device firmly. The inspector should open full-screen. If shaking feels unreliable on your device, <a href="open-inspector.html">other entry points</a> work just as well.</li>
+                    <li>Trigger a network call in your app, then open the <a href="network.html">Network</a> panel. The call should be listed with its method, path, status and duration.</li>
+                </ol>
+                <p>
+                    If the inspector opens but Network is empty, the interceptor is not on the client
+                    that made the call &mdash; a second <code>OkHttpClient</code> built somewhere else is
+                    the usual culprit. If nothing opens at all, the build is probably not debuggable;
+                    check <a href="configuration.html#enablement">enablement</a>.
+                </p>
+
+                <h2 id="host-controlled">Optional &mdash; take over the setup yourself</h2>
+                <p>
+                    Auto-initialisation uses the default configuration. Call
+                    <code>AppInspect.install()</code> from your <code>Application</code> instead when
+                    you want to change something &mdash; which panels appear, what testers can edit,
+                    which build tiers are allowed.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">DebugApplication.kt (debug source set)</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">AppInspect.install(
+    application = this,
+    configuration = AppInspectConfiguration(
+        entryPoints = AppInspectEntryPoints(shakeToOpenEnabled = true),
+        panels = AppInspectPanels(mocksEnabled = true),
+    ),
+)</code></pre>
+                </div>
+
+                <p>
+                    Every field is documented on the
+                    <a href="configuration.html">configuration reference</a> page.
+                    <code>AppInspect.initialize(configuration)</code> still works and is kept for
+                    compatibility, but prefer <code>install()</code>.
+                </p>
+
+                <h2 id="guard-calls">One thing to guard by variant</h2>
+                <p>
+                    <code>appinspect-no-op</code> deliberately mirrors only the OkHttp API surface.
+                    <code>AppInspect.install()</code>, <code>AppInspect.open()</code> and the
+                    long-press trigger helpers do not exist there, so calling them from shared code
+                    breaks the release build.
+                </p>
+                <p>
+                    Keep those calls in a debug-only source set, or behind your own
+                    no-op indirection. The interceptor line is the only part designed to live in shared
+                    code.
+                </p>
+
+                <div class="note">
+                    <span class="note-title">Notifications</span>
+                    <p>
+                        AppInspect can post a notification for each captured call, which is handy for
+                        watching traffic without keeping the inspector open. On Android 13 and newer
+                        your app has to request the runtime permission itself &mdash; see
+                        <a href="notifications.html">Network notifications</a>.
+                    </p>
+                </div>
+                <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
+                <p class="doc-feedback" data-feedback-line></p>
+            </article>
+        </main>
+
+        <aside class="docs-toc">
+            <p class="toc-title">On this page</p>
+            <nav data-toc aria-label="On this page"></nav>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-about">
+                <a class="brand" href="index.html">
+                    <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+                    <span class="brand-name">AppInspect</span>
+                </a>
+                <p>
+                    An Android in-app inspector for debug and QA builds. Network traffic and response
+                    mocking, storage, background work, crashes and ANRs, runtime metadata &mdash; all
+                    on the device, with nothing sent anywhere.
+                </p>
+                <p class="footer-legal">&copy; 2026 Suryansh Prajapati</p>
+            </div>
+
+            <nav aria-label="Documentation">
+                <span class="footer-group-title">Docs</span>
+                <a href="docs.html">Introduction</a>
+                <a href="install.html">Install</a>
+                <a href="open-inspector.html">Opening the inspector</a>
+                <a href="configuration.html">Configuration</a>
+            </nav>
+
+            <nav aria-label="Panels">
+                <span class="footer-group-title">Panels</span>
+                <a href="network.html">Network</a>
+                <a href="mocks.html">Mocks</a>
+                <a href="storage.html">Storage</a>
+                <a href="workmanager.html">WorkManager</a>
+                <a href="crashes.html">Crashes and ANRs</a>
+            </nav>
+
+            <nav aria-label="More">
+                <span class="footer-group-title">More</span>
+                <a href="security.html">Security model</a>
+                <a href="qa-checklist.html">QA checklist</a>
+                <a href="privacy.html">Privacy policy</a>
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>
+                <a href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://www.linkedin.com/in/itssuryansh/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <span data-contact-slot></span>
+            </nav>
+        </div>
+    </footer>
+
+    <div class="search-dialog" id="search-dialog" role="dialog" aria-modal="true" aria-label="Search the documentation" hidden>
+        <div class="search-scrim"></div>
+        <div class="search-box">
+            <div class="search-field">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+            </div>
+            <ul class="search-results"></ul>
+            <p class="search-empty" hidden>No page matches that.</p>
+            <div class="search-foot">
+                <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move</span>
+                <span><kbd>Enter</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="docs.js"></script>
+    <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
+</body>
+</html>

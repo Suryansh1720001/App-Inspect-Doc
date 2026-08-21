@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introduction | AppInspect docs</title>
-    <meta name="description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <title>Storage panel | AppInspect docs</title>
+    <meta name="description" content="Browse and edit SharedPreferences, read Jetpack DataStore, and explore SQLite and Room databases from inside your Android app.">
     <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <link rel="canonical" href="https://app-inspect-doc.vercel.app/docs.html">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/storage.html">
 
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://app-inspect-doc.vercel.app/docs.html">
-    <meta property="og:title" content="Introduction — AppInspect docs">
-    <meta property="og:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/storage.html">
+    <meta property="og:title" content="Storage panel — AppInspect docs">
+    <meta property="og:description" content="Browse and edit SharedPreferences, read Jetpack DataStore, and explore SQLite and Room databases from inside your Android app.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Introduction — AppInspect docs">
-    <meta name="twitter:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta name="twitter:title" content="Storage panel — AppInspect docs">
+    <meta name="twitter:description" content="Browse and edit SharedPreferences, read Jetpack DataStore, and explore SQLite and Room databases from inside your Android app.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -109,160 +109,117 @@
             </details>
 
             <article class="prose">
-                <span class="eyebrow">Getting started</span>
-                <h1>Introduction</h1>
+                <span class="eyebrow">Panels</span>
+                <h1>Storage</h1>
                 <p class="lede">
-                    AppInspect is an Android library that adds a full-screen inspector to your own
-                    app. You add it as a Gradle dependency to your debug and internal builds; anyone
-                    holding the phone can then open it and see the network calls the app just made,
-                    what is stored on the device, which background jobs ran, and the last crash or
-                    ANR &mdash; without a laptop, a proxy, or a cable.
+                    Three kinds of on-device storage in one panel: SharedPreferences, Jetpack DataStore,
+                    and SQLite or Room databases. It answers the question a network log cannot &mdash;
+                    the API returned the right thing, so what did the app actually keep?
                 </p>
 
                 <div class="chip-row">
-                    <span class="chip"><strong>Android 7.0+</strong> &nbsp;API 24</span>
-                    <span class="chip"><strong>Maven Central</strong></span>
-                    <span class="chip"><strong>Kotlin</strong> &nbsp;Compose UI</span>
-                    <span class="chip"><strong>Free</strong></span>
+                    <span class="chip"><strong>Preferences</strong> &nbsp;read &amp; write</span>
+                    <span class="chip"><strong>DataStore</strong> &nbsp;read only</span>
+                    <span class="chip"><strong>Databases</strong> &nbsp;read &amp; write</span>
                 </div>
 
-                <h2 id="the-idea">The idea</h2>
+                <h2 id="preferences">SharedPreferences</h2>
                 <p>
-                    Nearly every Android team eventually builds an internal debug screen: a list of
-                    recent API calls, a way to look at SharedPreferences, a button that dumps the last
-                    crash. It is useful, it is never anyone's priority, and it gets rewritten in the
-                    next app.
+                    AppInspect discovers the preference files your app has, lists their keys and values in
+                    order, and lets you change them. Tap a row to open the editor, which handles each
+                    value by its type and offers Copy, Paste and Clear.
                 </p>
                 <p>
-                    AppInspect is that screen, packaged as a dependency and kept out of your codebase.
-                    Because it lives inside the app rather than outside it, the person who found the
-                    bug is the person who can capture the evidence &mdash; on the build that actually
-                    failed, at the moment it failed.
+                    Search runs across file names, keys <em>and</em> values, and results from every file
+                    appear in one list, a single tap from the editor. Matching is debounced and runs off
+                    the main thread, so typing stays smooth even when a preference holds a
+                    several-hundred-kilobyte JSON blob &mdash; which, in practice, plenty of them do.
                 </p>
-
-                <h2 id="what-you-get">What is inside the inspector</h2>
                 <p>
-                    The inspector opens as its own full screen. Five panels sit along the bottom bar
-                    and you move between them by tapping or swiping. Runtime is one tap away in the top
-                    bar, and any panel can hand a large value to a shared full-screen viewer. Each of
-                    them has its own page here.
+                    A value too large to lay out in a text field &mdash; above roughly 8,000 characters
+                    &mdash; opens as a bounded preview with an <strong>Open value</strong> button into the
+                    <a href="value-viewer.html">value viewer</a>. Copy, Paste and Clear still apply to
+                    the whole value, and nothing stored is ever truncated.
                 </p>
 
-                <div class="card-grid">
-                    <a class="doc-card" href="network.html">
-                        <strong>Network</strong>
-                        <span>Captured OkHttp calls, filters and search, wire headers, cURL / TXT / HAR export.</span>
-                    </a>
-                    <a class="doc-card" href="mocks.html">
-                        <strong>Mocks</strong>
-                        <span>Replace a live response with your own status, body, delay or simulated failure.</span>
-                    </a>
-                    <a class="doc-card" href="storage.html">
-                        <strong>Storage</strong>
-                        <span>SharedPreferences, DataStore, SQLite and Room &mdash; read, search, and edit.</span>
-                    </a>
-                    <a class="doc-card" href="workmanager.html">
-                        <strong>WorkManager</strong>
-                        <span>Every persisted work spec with state, constraints, attempts and payloads.</span>
-                    </a>
-                    <a class="doc-card" href="crashes.html">
-                        <strong>Crashes and ANRs</strong>
-                        <span>Uncaught exceptions, plus ANRs and native crashes on Android 11+.</span>
-                    </a>
-                    <a class="doc-card" href="runtime.html">
-                        <strong>Runtime</strong>
-                        <span>App, device, environment and session metadata, ready to copy into a ticket.</span>
-                    </a>
-                    <a class="doc-card" href="value-viewer.html">
-                        <strong>Value viewer</strong>
-                        <span>One JSON tree for any oversized value, shared by every panel.</span>
-                    </a>
+                <h3 id="encrypted">Encrypted preferences</h3>
+                <p>
+                    <code>EncryptedSharedPreferences</code> files are detected automatically and
+                    decrypted for viewing, using your app's own on-device Keystore key. Decryption never
+                    leaves the device. These files are marked with a lock badge and are deliberately
+                    <strong>read only</strong> &mdash; they can never be edited or deleted from the
+                    inspector, so an encrypted store cannot be corrupted by a stray tap.
+                </p>
+
+                <h2 id="datastore">Jetpack DataStore</h2>
+                <p>
+                    DataStore Preferences files (<code>.preferences_pb</code>) are read only, and are
+                    parsed by a small protobuf reader built into the library. That means AppInspect does
+                    not need a DataStore dependency of its own, and it will not drag one into your build.
+                </p>
+                <p>
+                    Decoded entries are shown with a type label &mdash; <code>STRING</code>,
+                    <code>INT</code>, <code>LONG</code>, <code>FLOAT</code>, <code>DOUBLE</code>,
+                    <code>BOOLEAN</code>, <code>STRING_SET</code>, <code>BYTES</code> &mdash; and search
+                    works across file names, keys and values, debounced and off the main thread as in
+                    Preferences.
+                </p>
+
+                <h2 id="databases">SQLite and Room</h2>
+                <p>
+                    Databases are discovered from your app's own storage. AppInspect's internal database
+                    is excluded from the list, as are its internal preference files, so what you see is
+                    your app's data and nothing else.
+                </p>
+                <ul>
+                    <li><strong>Schema browsing</strong> &mdash; tables, entities and column types.</li>
+                    <li><strong>Paged row inspection</strong>, with structured editing of a row's fields.</li>
+                    <li><strong>A SQL console</strong> for the queries a browser cannot express. Mutating statements require an explicit action rather than running on a stray Enter, and the console can be switched off entirely.</li>
+                </ul>
+                <p>
+                    Each area has its own empty-state card &mdash; no databases, no table selected yet, a
+                    file with nothing in it &mdash; rather than a blank screen you have to interpret.
+                </p>
+
+                <h2 id="editing">Editing writes to your app's real storage</h2>
+                <p>
+                    This is worth stating clearly: preference and database edits are applied directly to
+                    the host app's on-device storage. There is no sandbox and no undo. Setting a
+                    preference to force a state is genuinely useful &mdash; skipping onboarding, expiring a
+                    token, pretending a feature flag is on &mdash; and it is a real write.
+                </p>
+                <p>
+                    For builds that go to a wider audience, the write side can be removed while keeping
+                    everything readable:
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">AppInspectPowerTools</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">AppInspectPowerTools(
+    allowSharedPreferencesEditing = false,
+    allowDatabaseEditing = false,
+    allowSqlConsole = false,
+)</code></pre>
                 </div>
 
-                <h2 id="how-it-differs">How this differs from a proxy</h2>
                 <p>
-                    A desktop proxy such as Charles or Proxyman sees traffic from the outside. That is
-                    powerful, and it costs you a certificate on every test device, a Wi-Fi
-                    configuration, a machine on the same network, and a developer to run it. Android
-                    Studio's own inspectors need the device attached over adb.
+                    Hiding the panel altogether is <code>AppInspectPanels(storageEnabled = false)</code>.
+                    Both are covered on the
+                    <a href="configuration.html#power-tools">configuration reference</a>.
                 </p>
-                <p>
-                    AppInspect trades breadth for reach. It only sees what your app hands to the
-                    <code>OkHttpClient</code> you instrumented &mdash; not WebView traffic, not another
-                    HTTP stack, not other apps. In exchange, it works on any tester's phone with no
-                    setup at all, and it can see things a proxy cannot: which coroutine wrote that
-                    preference, what WorkManager did overnight, the stack trace of the crash that
-                    happened before anyone could attach a debugger.
-                </p>
-                <p>
-                    They are not exclusive. Plenty of teams keep the proxy for deep protocol work and
-                    use AppInspect for everything a tester needs during a normal test pass.
-                </p>
-
-                <h2 id="how-it-is-built">How it is put together</h2>
-                <p>
-                    The library is published as several artifacts, but you normally depend on just one
-                    umbrella module for your debug builds and one stub for release. The rest are
-                    transitive.
-                </p>
-
-                <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr><th>Artifact</th><th>What it is for</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>appinspect</code></td><td>The umbrella dependency. Pulls in the UI, storage, network capture, WorkManager and crash modules, and auto-initialises. This is the one you add to debug, staging and internal-test builds.</td></tr>
-                            <tr><td><code>appinspect-no-op</code></td><td>The release stub. Mirrors only the OkHttp API surface so shared client code compiles, and does nothing at runtime.</td></tr>
-                            <tr><td><code>appinspect-api</code></td><td>Public contracts &mdash; <code>AppInspectConfiguration</code>, mock rule models, entry points. Comes in transitively.</td></tr>
-                            <tr><td><code>appinspect-ui</code></td><td>The inspector activity and its Compose screens.</td></tr>
-                            <tr><td><code>appinspect-network-okhttp</code>, <code>appinspect-storage</code>, <code>appinspect-insights-storage</code>, <code>appinspect-workmanager</code>, <code>appinspect-core</code></td><td>The capture and inspection implementations behind each panel.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
 
                 <div class="note">
-                    <span class="note-title">On versions</span>
+                    <span class="note-title">What a tester can see here</span>
                     <p>
-                        Snippets in these docs use <code>&lt;latest-version&gt;</code> rather than a
-                        pinned number, so nothing here goes stale. Check
-                        <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">the versions page on Maven Central</a>
-                        for the current release. These pages describe 0.7.0.
+                        Storage contents are shown as they are, which in a debug build includes tokens,
+                        session data and anything else your app persists. That is intended for developer
+                        tooling &mdash; the <a href="security.html">security model</a> explains the
+                        boundary, and <code>showRawSensitiveValues = false</code> masks configured
+                        sensitive values.
                     </p>
-                </div>
-
-                <h2 id="production">It does not ship to your users</h2>
-                <p>
-                    This is the first question most teams ask, so it is worth answering here rather
-                    than at the end. Two independent things keep the inspector out of production.
-                </p>
-                <p>
-                    The recommended setup puts <code>appinspect-no-op</code> in your release variant,
-                    so the inspector's code is never compiled into the production APK. And if the full
-                    module ever ends up in a release build by mistake, it checks
-                    <code>FLAG_DEBUGGABLE</code> at runtime and switches itself off completely &mdash;
-                    no database on disk, no crash handler, no capture, every <code>open()</code>
-                    refused.
-                </p>
-                <p>
-                    The <a href="security.html">security model</a> page covers both layers, what debug
-                    builds deliberately do expose, and the extra gates around response mocking.
-                </p>
-
-                <h2 id="next">Where to go next</h2>
-                <div class="card-grid">
-                    <a class="doc-card" href="install.html">
-                        <strong>Install &rarr;</strong>
-                        <span>Gradle dependencies per variant, and the one OkHttp line that turns on network capture.</span>
-                    </a>
-                    <a class="doc-card" href="open-inspector.html">
-                        <strong>Opening the inspector &rarr;</strong>
-                        <span>Shake, launcher shortcut, long press, notification tap, or your own debug menu.</span>
-                    </a>
-                    <a class="doc-card" href="configuration.html">
-                        <strong>Configuration &rarr;</strong>
-                        <span>Decide what a tester can see and change before you hand the build over.</span>
-                    </a>
                 </div>
                 <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
                 <p class="doc-feedback" data-feedback-line></p>

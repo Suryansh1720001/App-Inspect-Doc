@@ -1,24 +1,39 @@
 # AppInspect
 
-AppInspect is a free, open-source Android in-app inspector library for developer and QA builds.
-It opens a full-screen diagnostics surface inside the host app — no proxy, no USB cable, no desktop tool required.
-All captured data stays on-device. Zero telemetry. Safe for debug and staging builds.
+> AppInspect is a free Android library that adds a full-screen inspector to a host
+> app's own debug and internal builds. It captures OkHttp traffic, can replace any
+> API response with a mock, and shows SharedPreferences, DataStore, SQLite/Room,
+> WorkManager jobs, crashes and ANRs, and runtime metadata — all on the device, with
+> no proxy, no USB cable, no account and no telemetry. A no-op artifact keeps the
+> inspection code out of release APKs.
 
-## What it inspects
+- Artifact group: `io.github.suryansh1720001.appinspect`
+- Published on: Maven Central
+- Current version documented here: 0.7.0
+- Minimum Android version: 7.0 (API 24). ANR and native crash reporting need Android 11 (API 30).
+- License cost: free
+- Website: https://app-inspect-doc.vercel.app/
 
-- Network — captures OkHttp requests/responses; export as .har or .txt with cURL
-- Storage — SharedPreferences, DataStore, SQLite/Room databases (with optional editing)
-- WorkManager — running, enqueued, and completed job specs
-- Crashes & ANRs — uncaught exceptions, ANRs (Android 11+), native crash detection (Android 11+)
-- Runtime — app version, build type, device model, OS, session metadata
+## Pages
 
-## Release safety
+- Home: https://app-inspect-doc.vercel.app/
+- Introduction: https://app-inspect-doc.vercel.app/docs.html
+- Install: https://app-inspect-doc.vercel.app/install.html
+- Opening the inspector: https://app-inspect-doc.vercel.app/open-inspector.html
+- Network panel: https://app-inspect-doc.vercel.app/network.html
+- Response mocking: https://app-inspect-doc.vercel.app/mocks.html
+- Storage panel: https://app-inspect-doc.vercel.app/storage.html
+- WorkManager panel: https://app-inspect-doc.vercel.app/workmanager.html
+- Crashes and ANRs: https://app-inspect-doc.vercel.app/crashes.html
+- Runtime panel: https://app-inspect-doc.vercel.app/runtime.html
+- Value viewer: https://app-inspect-doc.vercel.app/value-viewer.html
+- Configuration reference: https://app-inspect-doc.vercel.app/configuration.html
+- Network notifications: https://app-inspect-doc.vercel.app/notifications.html
+- Security model: https://app-inspect-doc.vercel.app/security.html
+- QA checklist: https://app-inspect-doc.vercel.app/qa-checklist.html
+- Privacy policy: https://app-inspect-doc.vercel.app/privacy.html
 
-Two independent layers ensure inspection code never runs in production:
-1. Compile-time: the `appinspect-no-op` artifact is a pass-through stub with no UI, storage, or capture logic.
-2. Runtime: even if the full SDK ships accidentally, it detects non-debuggable builds and self-disables completely.
-
-## Integration (Gradle)
+## Installation
 
 ```kotlin
 dependencies {
@@ -27,31 +42,140 @@ dependencies {
 }
 ```
 
-AppInspect auto-initializes via AndroidX Startup. No Application class changes needed for basic usage.
+AppInspect auto-initialises through AndroidX Startup, so no `Application` class change
+is required for the default setup. Call `AppInspect.install(application, configuration)`
+to configure it instead.
 
-## Requirements
+Network capture is opt-in and requires one line on the OkHttp builder, added last:
 
-- Minimum: Android API 24 (Android 7.0)
-- ANR + native crash detection: Android API 30 (Android 11+)
-- Network capture: requires OkHttp
+```kotlin
+val client = OkHttpClient.Builder()
+    .addAppInspectInterceptor()   // last
+    .build()
+```
 
-## Pricing
+Last matters for two reasons: a `SHORT_CIRCUIT` mock skips every interceptor
+registered after AppInspect's, and last is where the request looks the way it goes
+out. The extension also installs a network-level interceptor so recorded events carry
+the final wire request headers, including an `Authorization` header added downstream.
 
-Free. No license fee. No paid tier. Published on Maven Central at no cost.
+`AppInspect.install()`, `AppInspect.open()` and the long-press trigger helpers do not
+exist in `appinspect-no-op`, so keep those calls in a debug-only source set. The
+interceptor line is designed to compile in every variant.
 
-## Links
+## Opening the inspector
 
-- Documentation: https://app-inspect-doc.vercel.app/
-- Docs / Integration guide: https://app-inspect-doc.vercel.app/docs.html
-- Security model: https://app-inspect-doc.vercel.app/security.html
-- Maven Central: https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview
-- GitHub: https://github.com/Suryansh1720001
-- Privacy policy: https://app-inspect-doc.vercel.app/privacy.html
+Shake gesture (`shakeToOpenEnabled`, default threshold 2.7 g total accelerometer
+magnitude), launcher shortcut (`launcherShortcutEnabled`), long press on a View
+(`AppInspect.attachLongPressTrigger`) or a composable
+(`Modifier.appInspectLongPressTrigger`), tapping a network notification, or
+`AppInspect.open(context)`. By default the inspector opens in its own task, so it gets
+a separate Recents card and supports split-screen, while still running in the host
+process.
 
-## Author
+## Panels
 
-Suryansh Prajapati — https://github.com/Suryansh1720001 — https://www.linkedin.com/in/itssuryansh/
+Five bottom-bar panels — Network, Mocks, Storage, Work, Crashes — navigated by tap or
+swipe. Runtime is a top-bar icon button rather than a tab. Any panel can open a large
+value in a shared full-screen JSON tree viewer.
 
-## License
+- Network: filters and search across endpoints, headers, bodies and cURL; wire request
+  headers; JSON/XML formatting; long-press quick actions; export as `.txt` (with cURL)
+  or `.har` (HAR 1.2); live notifications; default retention 300 events.
+- Mocks: replace a live response. Rules come from `assets/appinspect/mocks.json` or
+  from the panel; runtime rules win. `SHORT_CIRCUIT` never touches the network,
+  `OVERRIDE` lets the real call complete then replaces status/headers/body and keeps
+  the original status in `X-AppInspect-Mock-Original-Status`. Matching on method, URL
+  substring with `*` wildcards, query parameters and a request-body substring — all
+  filters on the outgoing request, which is never modified. Also artificial delay and
+  `IO_EXCEPTION` / `SOCKET_TIMEOUT` failure simulation. First match wins, ordered by
+  runtime priority then bundled priority. Mocking requires five gates to pass: build
+  tier, `allowResponseMocking`, the tri-state device switch, `"mockingEnabled"` in the
+  file, and the rule's own `enabled` flag.
+- Storage: SharedPreferences (read and write, with read-only decrypted
+  `EncryptedSharedPreferences`), Jetpack DataStore (read only, custom protobuf
+  parser), SQLite and Room (schema, paged rows, structured editing, optional SQL
+  console). Search is debounced and runs off the main thread.
+- WorkManager: every persisted work spec from the app and any library, with state,
+  constraints, attempts, backoff, input/output/progress data, last stop reason
+  (WorkManager 2.9+) and periodic/expedited details. Read only by design.
+- Crashes and ANRs: uncaught exceptions captured on all threads and written
+  synchronously before the process dies, chaining to any existing handler such as
+  Crashlytics; ANRs and native crashes read from `ApplicationExitInfo` on Android 11+
+  and reported on the next launch, including the OS ANR thread dump. 50 most recent
+  records persist.
+- Runtime: app, environment, device and session metadata, plus host-supplied custom
+  metadata.
+- Value viewer: JSON tree with collapse/expand, child counts, line-number gutter,
+  auto-detected escaped JSON strings opened as real subtrees, raw view, and content
+  search that stays responsive on multi-hundred-kilobyte payloads.
 
-Free to use. Published on Maven Central.
+## Configuration
+
+`AppInspectConfiguration` groups: `enablement`, `entryPoints`, `panels`, `powerTools`,
+`retention`, `environment`, `initialMetadata`, `redaction`, `branding`.
+
+- `enablement`: `allowedBuildTiers` (debug only by default), `allowInNonDebugBuilds`,
+  `allowInProductionBuilds`. Production requires both flags shipped as true in the APK.
+- `entryPoints`: `shakeToOpenEnabled`, `shakeThresholdGravity`, `shakeCooldownMillis`,
+  `launcherShortcutEnabled`, `autoOpenOnLongPressTrigger`, `networkNotificationsEnabled`,
+  `openInSeparateTask`.
+- `panels`: `networkEnabled`, `mocksEnabled`, `storageEnabled`, `workManagerEnabled`,
+  `crashesEnabled`, `runtimeEnabled`.
+- `powerTools`: `showRawSensitiveValues`, `allowSharedPreferencesEditing`,
+  `allowDatabaseEditing`, `allowSqlConsole`, `allowResponseMocking`.
+- Defaults: raw sensitive values are visible in an enabled build; WorkManager
+  inspection is read only; retention defaults are 300 network events and 50 crashes.
+
+## Network notifications on Android 13+
+
+AppInspect declares `POST_NOTIFICATIONS` but has no Activity, so it cannot prompt for
+the runtime grant. The host app must request it. Without the grant, notifications
+silently never appear. Notifications carry only method, status code, host and path.
+
+## Security model
+
+Release builds are protected by two independent layers.
+
+1. Compile-time: `appinspect-no-op` contains only a pass-through OkHttp interceptor —
+   no UI, no storage, no capture, no crash handler, no manifest entries.
+2. Runtime: even the full module detects `FLAG_DEBUGGABLE == false` and disables
+   itself — no `appinspect_storage.db` on disk, no crash handler, no ANR collector, no
+   sensors or notification channels or launcher shortcut, the interceptor becomes a
+   pass-through, all `open()` calls refused, no mock rules loaded and no mirror file
+   written. Capture and mocking re-check the gate independently.
+
+There is no runtime switch to enable it in production. Additional hardening in every
+build type: no exported components, no network calls of its own, no Logcat output of
+captured data, notifications limited to method/status/host/path, and export sharing
+through a non-exported `FileProvider` scoped to `cacheDir/appinspect_exports/`.
+
+Debug and staging builds intentionally expose real data — auth headers, tokens,
+cookies, database and DataStore contents, decrypted encrypted preferences, stack
+traces. Mock rules are developer-authored configuration and are never redacted, so
+real credentials must not go into a mock body. A committed `mocks.json` belongs in
+`src/debug/assets/`, because assets are not stripped per variant.
+
+## Data handling
+
+The library has no cloud backend and sends nothing anywhere. Captured data lives in
+app-private SQLite on the device and is deleted on clear or uninstall. Export files
+(`.txt`, `.har`, `.json`) are created only when a person taps share, and can contain
+real credentials — including ones attached downstream of AppInspect — so they should be
+redacted before being attached to a ticket.
+
+The documentation website sets no cookies and uses cookie-free Cloudflare Web
+Analytics. Google Fonts is loaded from `fonts.googleapis.com`.
+
+## Comparison
+
+Unlike a desktop proxy (Charles, Proxyman) or Android Studio's inspectors, AppInspect
+needs no certificate, no Wi-Fi configuration, no desktop client and no adb connection.
+It only sees traffic from an `OkHttpClient` the host instrumented — not WebView traffic
+or other HTTP stacks — but it works on any tester's device with no setup, and it can
+show storage, background work and crash state that a proxy cannot.
+
+## Maintainer
+
+Suryansh Prajapati — https://github.com/Suryansh1720001 —
+https://www.linkedin.com/in/itssuryansh/

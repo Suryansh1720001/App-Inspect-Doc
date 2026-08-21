@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introduction | AppInspect docs</title>
-    <meta name="description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <title>Crashes and ANRs | AppInspect docs</title>
+    <meta name="description" content="How AppInspect captures uncaught exceptions, and how it reports ANRs and native crashes on Android 11+ using ApplicationExitInfo.">
     <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <link rel="canonical" href="https://app-inspect-doc.vercel.app/docs.html">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/crashes.html">
 
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://app-inspect-doc.vercel.app/docs.html">
-    <meta property="og:title" content="Introduction — AppInspect docs">
-    <meta property="og:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/crashes.html">
+    <meta property="og:title" content="Crashes and ANRs — AppInspect docs">
+    <meta property="og:description" content="How AppInspect captures uncaught exceptions, and how it reports ANRs and native crashes on Android 11+ using ApplicationExitInfo.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Introduction — AppInspect docs">
-    <meta name="twitter:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta name="twitter:title" content="Crashes and ANRs — AppInspect docs">
+    <meta name="twitter:description" content="How AppInspect captures uncaught exceptions, and how it reports ANRs and native crashes on Android 11+ using ApplicationExitInfo.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -109,160 +109,94 @@
             </details>
 
             <article class="prose">
-                <span class="eyebrow">Getting started</span>
-                <h1>Introduction</h1>
+                <span class="eyebrow">Panels</span>
+                <h1>Crashes and ANRs</h1>
                 <p class="lede">
-                    AppInspect is an Android library that adds a full-screen inspector to your own
-                    app. You add it as a Gradle dependency to your debug and internal builds; anyone
-                    holding the phone can then open it and see the network calls the app just made,
-                    what is stored on the device, which background jobs ran, and the last crash or
-                    ANR &mdash; without a laptop, a proxy, or a cable.
+                    A tester says "it closed". Nobody was attached over adb, Logcat is gone, and the
+                    crash reporter's dashboard will show it tomorrow at best. This panel keeps the last
+                    50 crashes on the device, with the full stack trace, ready to share as a file.
                 </p>
 
-                <div class="chip-row">
-                    <span class="chip"><strong>Android 7.0+</strong> &nbsp;API 24</span>
-                    <span class="chip"><strong>Maven Central</strong></span>
-                    <span class="chip"><strong>Kotlin</strong> &nbsp;Compose UI</span>
-                    <span class="chip"><strong>Free</strong></span>
-                </div>
-
-                <h2 id="the-idea">The idea</h2>
+                <h2 id="uncaught">Uncaught exceptions</h2>
                 <p>
-                    Nearly every Android team eventually builds an internal debug screen: a list of
-                    recent API calls, a way to look at SharedPreferences, a button that dumps the last
-                    crash. It is useful, it is never anyone's priority, and it gets rewritten in the
-                    next app.
+                    AppInspect installs a crash handler that captures uncaught exceptions on every thread,
+                    then <strong>chains to whatever handler was already there</strong> &mdash; Crashlytics,
+                    Sentry, your own. It does not replace your crash reporter and does not stop it from
+                    seeing the crash. Both get it.
                 </p>
                 <p>
-                    AppInspect is that screen, packaged as a dependency and kept out of your codebase.
-                    Because it lives inside the app rather than outside it, the person who found the
-                    bug is the person who can capture the evidence &mdash; on the build that actually
-                    failed, at the moment it failed.
-                </p>
-
-                <h2 id="what-you-get">What is inside the inspector</h2>
-                <p>
-                    The inspector opens as its own full screen. Five panels sit along the bottom bar
-                    and you move between them by tapping or swiping. Runtime is one tap away in the top
-                    bar, and any panel can hand a large value to a shared full-screen viewer. Each of
-                    them has its own page here.
-                </p>
-
-                <div class="card-grid">
-                    <a class="doc-card" href="network.html">
-                        <strong>Network</strong>
-                        <span>Captured OkHttp calls, filters and search, wire headers, cURL / TXT / HAR export.</span>
-                    </a>
-                    <a class="doc-card" href="mocks.html">
-                        <strong>Mocks</strong>
-                        <span>Replace a live response with your own status, body, delay or simulated failure.</span>
-                    </a>
-                    <a class="doc-card" href="storage.html">
-                        <strong>Storage</strong>
-                        <span>SharedPreferences, DataStore, SQLite and Room &mdash; read, search, and edit.</span>
-                    </a>
-                    <a class="doc-card" href="workmanager.html">
-                        <strong>WorkManager</strong>
-                        <span>Every persisted work spec with state, constraints, attempts and payloads.</span>
-                    </a>
-                    <a class="doc-card" href="crashes.html">
-                        <strong>Crashes and ANRs</strong>
-                        <span>Uncaught exceptions, plus ANRs and native crashes on Android 11+.</span>
-                    </a>
-                    <a class="doc-card" href="runtime.html">
-                        <strong>Runtime</strong>
-                        <span>App, device, environment and session metadata, ready to copy into a ticket.</span>
-                    </a>
-                    <a class="doc-card" href="value-viewer.html">
-                        <strong>Value viewer</strong>
-                        <span>One JSON tree for any oversized value, shared by every panel.</span>
-                    </a>
-                </div>
-
-                <h2 id="how-it-differs">How this differs from a proxy</h2>
-                <p>
-                    A desktop proxy such as Charles or Proxyman sees traffic from the outside. That is
-                    powerful, and it costs you a certificate on every test device, a Wi-Fi
-                    configuration, a machine on the same network, and a developer to run it. Android
-                    Studio's own inspectors need the device attached over adb.
+                    The record is written to disk <strong>synchronously, before the process dies</strong>.
+                    That is the only way it can be there on the next launch, and it is why the panel is
+                    useful at all.
                 </p>
                 <p>
-                    AppInspect trades breadth for reach. It only sees what your app hands to the
-                    <code>OkHttpClient</code> you instrumented &mdash; not WebView traffic, not another
-                    HTTP stack, not other apps. In exchange, it works on any tester's phone with no
-                    setup at all, and it can see things a proxy cannot: which coroutine wrote that
-                    preference, what WorkManager did overnight, the stack trace of the crash that
-                    happened before anyone could attach a debugger.
+                    Each record holds the exception type, the message, the thread name, and the complete
+                    stack trace.
+                </p>
+
+                <h2 id="anr">ANRs and native crashes</h2>
+                <p>
+                    An ANR cannot be caught by a Java handler, and neither can a crash in native code
+                    &mdash; by definition, nothing in your process is in a position to report it. So
+                    AppInspect uses a different mechanism: on <strong>Android 11 and newer</strong> it
+                    reads the OS's own <code>ApplicationExitInfo</code> records on the next launch and
+                    turns them into crash entries.
                 </p>
                 <p>
-                    They are not exclusive. Plenty of teams keep the proxy for deep protocol work and
-                    use AppInspect for everything a tester needs during a normal test pass.
+                    Two consequences follow from that design:
                 </p>
-
-                <h2 id="how-it-is-built">How it is put together</h2>
+                <ul>
+                    <li><strong>Reported one launch late.</strong> An ANR appears the next time the app starts, not while it is hanging. There is no way around that, and it is still far better than nothing.</li>
+                    <li><strong>Zero runtime cost.</strong> Nothing polls, no watchdog thread runs, no main-thread heartbeat is checked. The OS already recorded it; AppInspect just reads the record.</li>
+                </ul>
                 <p>
-                    The library is published as several artifacts, but you normally depend on just one
-                    umbrella module for your debug builds and one stub for release. The rest are
-                    transitive.
+                    For an ANR the OS also supplies its <strong>thread dump</strong>, which is included.
+                    That dump is the actual evidence for a main-thread block &mdash; it shows what every
+                    thread was doing at the moment the system gave up.
+                </p>
+                <p>
+                    On Android 10 and older, uncaught exceptions are still captured; ANR and native crash
+                    reporting simply is not available, because the OS API it depends on does not exist.
                 </p>
 
-                <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr><th>Artifact</th><th>What it is for</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>appinspect</code></td><td>The umbrella dependency. Pulls in the UI, storage, network capture, WorkManager and crash modules, and auto-initialises. This is the one you add to debug, staging and internal-test builds.</td></tr>
-                            <tr><td><code>appinspect-no-op</code></td><td>The release stub. Mirrors only the OkHttp API surface so shared client code compiles, and does nothing at runtime.</td></tr>
-                            <tr><td><code>appinspect-api</code></td><td>Public contracts &mdash; <code>AppInspectConfiguration</code>, mock rule models, entry points. Comes in transitively.</td></tr>
-                            <tr><td><code>appinspect-ui</code></td><td>The inspector activity and its Compose screens.</td></tr>
-                            <tr><td><code>appinspect-network-okhttp</code>, <code>appinspect-storage</code>, <code>appinspect-insights-storage</code>, <code>appinspect-workmanager</code>, <code>appinspect-core</code></td><td>The capture and inspection implementations behind each panel.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <h2 id="retention">How much is kept</h2>
+                <p>
+                    The <strong>50 most recent</strong> records are persisted in AppInspect's app-private
+                    SQLite database and survive restarts and reinstalls of the app's process. When the cap
+                    is reached the oldest are dropped. <strong>Clear</strong> inside the panel removes
+                    them all.
+                </p>
+                <p>
+                    In release builds none of this happens: the handler is never installed, the exit-info
+                    collector never starts, and the bookkeeping file it uses is never written. See the
+                    <a href="security.html">security model</a>.
+                </p>
 
-                <div class="note">
-                    <span class="note-title">On versions</span>
+                <h2 id="sharing">Getting a crash into a ticket</h2>
+                <p>
+                    Copy or share an individual report, or export all of the currently filtered crashes as
+                    a <code>.txt</code> through the Android share sheet. A tester can do this themselves,
+                    which is the point &mdash; the stack trace arrives with the bug report instead of being
+                    reconstructed from a description of a white screen.
+                </p>
+
+                <div class="warn">
+                    <span class="note-title">A stack trace is source-adjacent</span>
                     <p>
-                        Snippets in these docs use <code>&lt;latest-version&gt;</code> rather than a
-                        pinned number, so nothing here goes stale. Check
-                        <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">the versions page on Maven Central</a>
-                        for the current release. These pages describe 0.7.0.
+                        Crash and ANR reports name your packages, classes, methods and line numbers.
+                        Treat a shared report the way you would treat a code excerpt, and do not paste one
+                        into a public channel. The <a href="qa-checklist.html">QA checklist</a> has the
+                        rest of the export hygiene.
                     </p>
                 </div>
 
-                <h2 id="production">It does not ship to your users</h2>
-                <p>
-                    This is the first question most teams ask, so it is worth answering here rather
-                    than at the end. Two independent things keep the inspector out of production.
-                </p>
-                <p>
-                    The recommended setup puts <code>appinspect-no-op</code> in your release variant,
-                    so the inspector's code is never compiled into the production APK. And if the full
-                    module ever ends up in a release build by mistake, it checks
-                    <code>FLAG_DEBUGGABLE</code> at runtime and switches itself off completely &mdash;
-                    no database on disk, no crash handler, no capture, every <code>open()</code>
-                    refused.
-                </p>
-                <p>
-                    The <a href="security.html">security model</a> page covers both layers, what debug
-                    builds deliberately do expose, and the extra gates around response mocking.
-                </p>
-
-                <h2 id="next">Where to go next</h2>
-                <div class="card-grid">
-                    <a class="doc-card" href="install.html">
-                        <strong>Install &rarr;</strong>
-                        <span>Gradle dependencies per variant, and the one OkHttp line that turns on network capture.</span>
-                    </a>
-                    <a class="doc-card" href="open-inspector.html">
-                        <strong>Opening the inspector &rarr;</strong>
-                        <span>Shake, launcher shortcut, long press, notification tap, or your own debug menu.</span>
-                    </a>
-                    <a class="doc-card" href="configuration.html">
-                        <strong>Configuration &rarr;</strong>
-                        <span>Decide what a tester can see and change before you hand the build over.</span>
-                    </a>
+                <div class="note">
+                    <span class="note-title">Hiding the panel</span>
+                    <p>
+                        <code>AppInspectPanels(crashesEnabled = false)</code> removes the Crashes tab
+                        &mdash; useful for a build going to an audience that should not be reading stack
+                        traces. See the <a href="configuration.html#panels">configuration reference</a>.
+                    </p>
                 </div>
                 <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
                 <p class="doc-feedback" data-feedback-line></p>

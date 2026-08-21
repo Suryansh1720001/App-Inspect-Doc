@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opening the inspector | AppInspect docs</title>
+    <meta name="description" content="Every way to open the AppInspect inspector: shake gesture, launcher shortcut, long press, notification tap, or AppInspect.open(context).">
+    <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/open-inspector.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/open-inspector.html">
+    <meta property="og:title" content="Opening the inspector — AppInspect docs">
+    <meta property="og:description" content="Every way to open the AppInspect inspector: shake gesture, launcher shortcut, long press, notification tap, or AppInspect.open(context).">
+    <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Opening the inspector — AppInspect docs">
+    <meta name="twitter:description" content="Every way to open the AppInspect inspector: shake gesture, launcher shortcut, long press, notification tap, or AppInspect.open(context).">
+    <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem("appinspect-theme");
+                if (stored) {
+                    document.documentElement.setAttribute("data-theme", stored);
+                }
+            } catch (error) {
+                /* no persisted preference available */
+            }
+        })();
+    </script>
+
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body class="docs">
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="topbar">
+        <button class="topbar-menu" type="button" aria-expanded="false" aria-controls="docs-sidebar" aria-label="Show documentation navigation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <a class="brand" href="index.html">
+            <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+            <span class="brand-name">AppInspect</span>
+            <span class="brand-version">0.7.0</span>
+        </a>
+        <span class="topbar-spacer"></span>
+        <button class="search-trigger" type="button" data-search-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <span>Search the docs</span>
+            <kbd>&#8984;K</kbd>
+        </button>
+        <nav class="topbar-nav" aria-label="Primary">
+            <a href="index.html">Home</a>
+            <a class="wide-only" href="docs.html">Docs</a>
+            <a class="wide-only" href="index.html#support">Support</a>
+        </nav>
+        <div class="topbar-tools">
+            <a class="icon-button" href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer" aria-label="AppInspect on Maven Central">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+            </a>
+            <a class="icon-button" href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.34c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.24.54.72.54 1.45l-.01 2.15c0 .21.14.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+            </a>
+            <button class="icon-button" type="button" data-theme-toggle aria-label="Switch between light and dark theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+
+    <div class="docs-shell">
+        <aside class="docs-sidebar" id="docs-sidebar">
+            <nav id="docs-nav" aria-label="Documentation"></nav>
+            <div class="nav-aside">
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/></svg>
+                    Released versions
+                </a>
+                <a href="index.html#faq">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 17h.01"/></svg>
+                    FAQ
+                </a>
+                <a href="index.html#support">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 8a4 4 0 0 1 7 2.7C19 15.6 12 20 12 20Z"/></svg>
+                    Support the project
+                </a>
+            </div>
+        </aside>
+
+        <main class="docs-main" id="content">
+            <details class="toc-inline">
+                <summary>On this page</summary>
+                <div data-toc></div>
+            </details>
+
+            <article class="prose">
+                <span class="eyebrow">Getting started</span>
+                <h1>Opening the inspector</h1>
+                <p class="lede">
+                    The inspector is a full screen inside your app, and there are six ways to reach it.
+                    Which one matters more than it sounds: a tester who cannot open the tool will not
+                    use it, and a gesture that fires by accident during a demo is worse than no gesture
+                    at all.
+                </p>
+
+                <h2 id="ways-in">The ways in</h2>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Entry point</th><th>Turned on by</th><th>Best for</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Shake the device</strong></td>
+                                <td><code>shakeToOpenEnabled</code></td>
+                                <td>Testers on physical devices. Nothing to find on screen.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Launcher shortcut</strong></td>
+                                <td><code>launcherShortcutEnabled</code></td>
+                                <td>Opening the inspector before the app itself, or on an emulator where shaking is awkward.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Long press a view</strong></td>
+                                <td><code>autoOpenOnLongPressTrigger</code> plus a trigger you attach</td>
+                                <td>A deliberate, discoverable gesture on a screen you choose &mdash; a logo, a version label.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tap a network notification</strong></td>
+                                <td><code>networkNotificationsEnabled</code></td>
+                                <td>Jumping straight to the call you just watched go past. See <a href="notifications.html">Network notifications</a>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong><code>AppInspect.open(context)</code></strong></td>
+                                <td>Always available</td>
+                                <td>Wiring the inspector into a debug menu you already have.</td>
+                            </tr>
+                            <tr>
+                                <td><strong><code>AppInspectActivity</code></strong></td>
+                                <td>Always available</td>
+                                <td>Starting the activity yourself when you need control over the intent.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="shake">Shake to open</h2>
+                <p>
+                    Shake detection watches the total accelerometer magnitude, gravity included &mdash;
+                    the same approach as Square's Seismic. At rest that reads about 1&nbsp;g, and
+                    ordinary handling such as picking the phone up stays around 1.0&ndash;1.5&nbsp;g, so
+                    only a deliberate shake crosses the default threshold of 2.7&nbsp;g.
+                </p>
+                <p>
+                    A single spike is not enough: the threshold has to be crossed by at least two
+                    samples inside a 500&nbsp;ms window. Cheaper or older accelerometers occasionally
+                    report one wild value, and that lone sample is ignored, while a real shake produces
+                    several.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">AppInspectEntryPoints</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">AppInspectEntryPoints(
+    shakeToOpenEnabled = true,
+    shakeThresholdGravity = 2.7f,   // total g-force, gravity included
+    shakeCooldownMillis = 1_500L,   // ignore repeats for this long after opening
+)</code></pre>
+                </div>
+
+                <p>
+                    Lower the threshold to about 2.3&nbsp;g if your testers report that shaking never
+                    works; raise it if the inspector keeps appearing in someone's pocket. Values below
+                    roughly 1.5&nbsp;g are floored, because at that point normal movement would trigger
+                    it constantly.
+                </p>
+
+                <h2 id="shortcut">Launcher shortcut</h2>
+                <p>
+                    With <code>launcherShortcutEnabled</code>, AppInspect registers a dynamic shortcut
+                    on your app icon. Long-press the icon on the home screen and the inspector is one
+                    tap away, without launching into the app first. This is usually the easiest entry
+                    point to explain to a non-developer, and the most reliable on an emulator.
+                </p>
+
+                <h2 id="long-press">Long press a view</h2>
+                <p>
+                    A long-press trigger is the option to reach for when you want the gesture to be
+                    predictable. You attach it to a specific view or composable &mdash; a version number
+                    in the settings screen is a common choice &mdash; so nobody opens the inspector by
+                    accident, and anyone who knows the trick can open it instantly.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">Views</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">val handle = AppInspect.attachLongPressTrigger(versionLabel)
+
+// Later, if the view outlives the trigger
+handle.unregister()</code></pre>
+                </div>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">Compose</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">val handle = rememberAppInspectLongPressTriggerHandle()
+
+Text(
+    text = "v${BuildConfig.VERSION_NAME}",
+    modifier = Modifier.appInspectLongPressTrigger(handle),
+)</code></pre>
+                </div>
+
+                <p>
+                    An accepted long press opens the inspector automatically as long as
+                    <code>autoOpenOnLongPressTrigger</code> is on. Turn that off and the trigger still
+                    reports the gesture, which lets you show your own confirmation first.
+                </p>
+
+                <h2 id="from-code">From your own debug menu</h2>
+                <p>
+                    If your app already has an internal debug screen, add one row to it:
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">Anywhere with a Context</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">AppInspect.open(context)</code></pre>
+                </div>
+
+                <p>
+                    The call is refused when the library is disabled, so it is safe to leave in place
+                    &mdash; but remember that <code>AppInspect.open()</code> does not exist in
+                    <code>appinspect-no-op</code>, so keep the call in a debug-only source set. The
+                    <a href="install.html#guard-calls">install page</a> explains which parts of the API
+                    are safe in shared code.
+                </p>
+
+                <h2 id="own-task">It opens in its own Recents card</h2>
+                <p>
+                    By default the inspector opens in a <strong>separate task</strong>. That means it
+                    appears as its own card in Recents, next to your app, and the two can sit side by
+                    side in split-screen &mdash; genuinely useful when you want to watch calls arrive
+                    while tapping through a flow.
+                </p>
+                <p>
+                    It still runs in your app's process, so nothing is lost by doing this: a task is a
+                    back-stack and Recents grouping, not a separate process. Every panel works exactly
+                    the same.
+                </p>
+                <p>
+                    If you would rather it appeared stacked on top of the current screen, set
+                    <code>openInSeparateTask = false</code>. No manifest change is needed either way
+                    &mdash; the activity and its task affinity are merged in from the library's manifest.
+                </p>
+
+                <h2 id="moving-around">Moving around once it is open</h2>
+                <p>
+                    Five panels sit on the bottom bar: <a href="network.html">Network</a>,
+                    <a href="mocks.html">Mocks</a>, <a href="storage.html">Storage</a>,
+                    <a href="workmanager.html">Work</a> and <a href="crashes.html">Crashes</a>. Tap
+                    them or swipe left and right across the content &mdash; the bar and the swipe stay in
+                    sync.
+                </p>
+                <p>
+                    <a href="runtime.html">Runtime</a> is deliberately not on the bottom bar. It is
+                    reference data you consult occasionally rather than a workflow you switch between,
+                    so it lives behind a circular icon button in the top bar, just left of the close
+                    button, badged with the number of sections it has. Tapping it opens Runtime as its
+                    own full screen.
+                </p>
+                <p>
+                    Any panel can hand an oversized value to the shared
+                    <a href="value-viewer.html">value viewer</a> &mdash; a response body, a preference
+                    holding a large JSON blob, a database cell.
+                </p>
+
+                <div class="note">
+                    <span class="note-title">Hiding entry points</span>
+                    <p>
+                        Every entry point can be switched off independently, which is how you hand a
+                        build to a wider audience without advertising that the inspector is there. The
+                        <a href="configuration.html#entry-points">configuration reference</a> lists all
+                        of them in one place.
+                    </p>
+                </div>
+                <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
+                <p class="doc-feedback" data-feedback-line></p>
+            </article>
+        </main>
+
+        <aside class="docs-toc">
+            <p class="toc-title">On this page</p>
+            <nav data-toc aria-label="On this page"></nav>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-about">
+                <a class="brand" href="index.html">
+                    <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+                    <span class="brand-name">AppInspect</span>
+                </a>
+                <p>
+                    An Android in-app inspector for debug and QA builds. Network traffic and response
+                    mocking, storage, background work, crashes and ANRs, runtime metadata &mdash; all
+                    on the device, with nothing sent anywhere.
+                </p>
+                <p class="footer-legal">&copy; 2026 Suryansh Prajapati</p>
+            </div>
+
+            <nav aria-label="Documentation">
+                <span class="footer-group-title">Docs</span>
+                <a href="docs.html">Introduction</a>
+                <a href="install.html">Install</a>
+                <a href="open-inspector.html">Opening the inspector</a>
+                <a href="configuration.html">Configuration</a>
+            </nav>
+
+            <nav aria-label="Panels">
+                <span class="footer-group-title">Panels</span>
+                <a href="network.html">Network</a>
+                <a href="mocks.html">Mocks</a>
+                <a href="storage.html">Storage</a>
+                <a href="workmanager.html">WorkManager</a>
+                <a href="crashes.html">Crashes and ANRs</a>
+            </nav>
+
+            <nav aria-label="More">
+                <span class="footer-group-title">More</span>
+                <a href="security.html">Security model</a>
+                <a href="qa-checklist.html">QA checklist</a>
+                <a href="privacy.html">Privacy policy</a>
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>
+                <a href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://www.linkedin.com/in/itssuryansh/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <span data-contact-slot></span>
+            </nav>
+        </div>
+    </footer>
+
+    <div class="search-dialog" id="search-dialog" role="dialog" aria-modal="true" aria-label="Search the documentation" hidden>
+        <div class="search-scrim"></div>
+        <div class="search-box">
+            <div class="search-field">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+            </div>
+            <ul class="search-results"></ul>
+            <p class="search-empty" hidden>No page matches that.</p>
+            <div class="search-foot">
+                <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move</span>
+                <span><kbd>Enter</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="docs.js"></script>
+    <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
+</body>
+</html>

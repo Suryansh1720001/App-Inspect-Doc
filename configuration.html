@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration reference | AppInspect docs</title>
+    <meta name="description" content="Every lever in AppInspectConfiguration: enablement, entry points, panels, power tools, retention and redaction — and when to change them.">
+    <meta name="theme-color" content="#145f5b" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/configuration.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/configuration.html">
+    <meta property="og:title" content="Configuration reference — AppInspect docs">
+    <meta property="og:description" content="Every lever in AppInspectConfiguration: enablement, entry points, panels, power tools, retention and redaction — and when to change them.">
+    <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Configuration reference — AppInspect docs">
+    <meta name="twitter:description" content="Every lever in AppInspectConfiguration: enablement, entry points, panels, power tools, retention and redaction — and when to change them.">
+    <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem("appinspect-theme");
+                if (stored) {
+                    document.documentElement.setAttribute("data-theme", stored);
+                }
+            } catch (error) {
+                /* no persisted preference available */
+            }
+        })();
+    </script>
+
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body class="docs">
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="topbar">
+        <button class="topbar-menu" type="button" aria-expanded="false" aria-controls="docs-sidebar" aria-label="Show documentation navigation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <a class="brand" href="index.html">
+            <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+            <span class="brand-name">AppInspect</span>
+            <span class="brand-version">0.7.0</span>
+        </a>
+        <span class="topbar-spacer"></span>
+        <button class="search-trigger" type="button" data-search-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <span>Search the docs</span>
+            <kbd>&#8984;K</kbd>
+        </button>
+        <nav class="topbar-nav" aria-label="Primary">
+            <a href="index.html">Home</a>
+            <a class="wide-only" href="docs.html">Docs</a>
+            <a class="wide-only" href="index.html#support">Support</a>
+        </nav>
+        <div class="topbar-tools">
+            <a class="icon-button" href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer" aria-label="AppInspect on Maven Central">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+            </a>
+            <a class="icon-button" href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.34c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.24.54.72.54 1.45l-.01 2.15c0 .21.14.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+            </a>
+            <button class="icon-button" type="button" data-theme-toggle aria-label="Switch between light and dark theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+
+    <div class="docs-shell">
+        <aside class="docs-sidebar" id="docs-sidebar">
+            <nav id="docs-nav" aria-label="Documentation"></nav>
+            <div class="nav-aside">
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/></svg>
+                    Released versions
+                </a>
+                <a href="index.html#faq">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 17h.01"/></svg>
+                    FAQ
+                </a>
+                <a href="index.html#support">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 8a4 4 0 0 1 7 2.7C19 15.6 12 20 12 20Z"/></svg>
+                    Support the project
+                </a>
+            </div>
+        </aside>
+
+        <main class="docs-main" id="content">
+            <details class="toc-inline">
+                <summary>On this page</summary>
+                <div data-toc></div>
+            </details>
+
+            <article class="prose">
+                <span class="eyebrow">Configuration</span>
+                <h1>Configuration reference</h1>
+                <p class="lede">
+                    The defaults assume a developer holding the phone: everything visible, everything
+                    editable. That is the right default for a debug build and the wrong one for a build
+                    you hand to twenty external testers. This page is the single list of what you can
+                    change and what each switch actually does.
+                </p>
+
+                <h2 id="where">Where the configuration goes</h2>
+                <p>
+                    With no configuration at all, AppInspect initialises itself through AndroidX Startup
+                    and uses the defaults. To change anything, call <code>install()</code> from your
+                    <code>Application</code> instead:
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">DebugApplication.kt (debug source set)</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">AppInspect.install(
+    application = this,
+    configuration = AppInspectConfiguration(
+        enablement = AppInspectEnablement(/* … */),
+        entryPoints = AppInspectEntryPoints(/* … */),
+        panels = AppInspectPanels(/* … */),
+        powerTools = AppInspectPowerTools(/* … */),
+    ),
+)</code></pre>
+                </div>
+
+                <p>
+                    Keep the call in a debug-only source set: it does not exist in
+                    <code>appinspect-no-op</code>. See <a href="install.html#guard-calls">install</a>.
+                    <code>AppInspect.initialize(configuration)</code> is the older entry point and still
+                    works, but prefer <code>install()</code>.
+                </p>
+                <p>
+                    <code>AppInspectConfiguration</code> is a group of small objects rather than one flat
+                    list of flags: <code>enablement</code>, <code>entryPoints</code>,
+                    <code>panels</code>, <code>powerTools</code>, <code>retention</code>,
+                    <code>environment</code>, <code>initialMetadata</code>, <code>redaction</code> and
+                    <code>branding</code>. Each group below covers one of them.
+                </p>
+
+                <h2 id="enablement">Enablement &mdash; whether it runs at all</h2>
+                <p>
+                    This is the outermost gate, and it is checked independently of which artifact you
+                    depended on. It is why the runtime self-disable described in the
+                    <a href="security.html">security model</a> works.
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>allowedBuildTiers<span class="dt-default">default: DEBUG only</span></dt>
+                        <dd>
+                            Which build tiers may run the inspector. A <code>LinkedHashSet</code> of
+                            <code>AppInspectBuildTier</code> values, so
+                            <code>linkedSetOf(AppInspectBuildTier.DEBUG)</code> is the default shape.
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>allowInNonDebugBuilds<span class="dt-default">default: false</span></dt>
+                        <dd>
+                            Required before the library will run in a build where
+                            <code>FLAG_DEBUGGABLE</code> is not set &mdash; a release-signed staging build,
+                            for example.
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>allowInProductionBuilds<span class="dt-default">default: false</span></dt>
+                        <dd>
+                            A second, separate opt-in for production. Both this <em>and</em>
+                            <code>allowInNonDebugBuilds</code> have to be shipped as <code>true</code> in
+                            the APK before the inspector can run for real users. There is no way to flip
+                            either at runtime.
+                        </dd>
+                    </div>
+                </dl>
+
+                <div class="warn">
+                    <span class="note-title">If you enable a non-debuggable build</span>
+                    <p>
+                        Turn response mocking off in the same commit
+                        (<code>allowResponseMocking = false</code>). A shared staging build that can
+                        rewrite live traffic is a support incident waiting to happen.
+                    </p>
+                </div>
+
+                <h2 id="entry-points">Entry points &mdash; how it opens</h2>
+                <p>
+                    Each of these can be switched off independently, which is how you hand over a build
+                    without advertising that the inspector exists.
+                    <a href="open-inspector.html">Opening the inspector</a> covers the behaviour of each
+                    one.
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>shakeToOpenEnabled<span class="dt-default">default: true</span></dt>
+                        <dd>Open on a deliberate shake.</dd>
+                    </div>
+                    <div>
+                        <dt>shakeThresholdGravity<span class="dt-default">default: 2.7f</span></dt>
+                        <dd>Total accelerometer magnitude, gravity included, that counts as a shake. Lower for a lighter shake; values below about 1.5&nbsp;g are floored.</dd>
+                    </div>
+                    <div>
+                        <dt>shakeCooldownMillis<span class="dt-default">default: 1500</span></dt>
+                        <dd>How long shakes are ignored after one is accepted.</dd>
+                    </div>
+                    <div>
+                        <dt>launcherShortcutEnabled<span class="dt-default">default: true</span></dt>
+                        <dd>Register a dynamic launcher shortcut that opens the inspector from the home screen.</dd>
+                    </div>
+                    <div>
+                        <dt>autoOpenOnLongPressTrigger<span class="dt-default">default: true</span></dt>
+                        <dd>Whether an accepted long-press trigger opens the inspector immediately, or only reports the gesture so you can confirm it yourself.</dd>
+                    </div>
+                    <div>
+                        <dt>networkNotificationsEnabled<span class="dt-default">default: true</span></dt>
+                        <dd>Post a notification per captured call. Worth turning off when lock-screen visibility is a concern, or when the build goes to testers who would find it noisy. See <a href="notifications.html">Network notifications</a>.</dd>
+                    </div>
+                    <div>
+                        <dt>openInSeparateTask<span class="dt-default">default: true</span></dt>
+                        <dd>Open the inspector in its own task, so it gets a separate Recents card and can be used in split-screen next to your app. Set to <code>false</code> to open it stacked in the current task.</dd>
+                    </div>
+                </dl>
+
+                <h2 id="panels">Panels &mdash; what appears</h2>
+                <p>
+                    All default to <code>true</code>. Hiding a panel removes it from the UI; it does not
+                    by itself remove the underlying capability, which is what the power tools below are
+                    for.
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>networkEnabled</dt>
+                        <dd>The <a href="network.html">Network</a> tab.</dd>
+                    </div>
+                    <div>
+                        <dt>mocksEnabled</dt>
+                        <dd>The <a href="mocks.html">Mocks</a> tab. Visibility only &mdash; whether a rule can actually replace a response is <code>allowResponseMocking</code>. A build can therefore show the panel but be unable to mock, or hide the panel while a committed <code>mocks.json</code> keeps working.</dd>
+                    </div>
+                    <div>
+                        <dt>storageEnabled</dt>
+                        <dd>The <a href="storage.html">Storage</a> tab.</dd>
+                    </div>
+                    <div>
+                        <dt>workManagerEnabled</dt>
+                        <dd>The <a href="workmanager.html">Work</a> tab.</dd>
+                    </div>
+                    <div>
+                        <dt>crashesEnabled</dt>
+                        <dd>The <a href="crashes.html">Crashes</a> tab. Turn it off for an audience that should not be reading stack traces.</dd>
+                    </div>
+                    <div>
+                        <dt>runtimeEnabled</dt>
+                        <dd>The <a href="runtime.html">Runtime</a> button in the top bar &mdash; Runtime is not a bottom-bar tab.</dd>
+                    </div>
+                </dl>
+
+                <h2 id="power-tools">Power tools &mdash; what can be seen and changed</h2>
+                <p>
+                    These are the switches that matter when the build leaves your desk. All default to
+                    <code>true</code>, because the default audience is a developer debugging their own
+                    app.
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>showRawSensitiveValues<span class="dt-default">default: true</span></dt>
+                        <dd>
+                            When <code>false</code>, configured headers, query parameters, body fields,
+                            cookies and metadata keys are masked or removed <strong>before they are
+                            stored</strong> &mdash; not merely hidden in the UI. Which keys count as
+                            sensitive comes from the <code>redaction</code> group.
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>allowSharedPreferencesEditing<span class="dt-default">default: true</span></dt>
+                        <dd>Write access to SharedPreferences. Off means the panel is a reader.</dd>
+                    </div>
+                    <div>
+                        <dt>allowDatabaseEditing<span class="dt-default">default: true</span></dt>
+                        <dd>Structured row editing in host databases.</dd>
+                    </div>
+                    <div>
+                        <dt>allowSqlConsole<span class="dt-default">default: true</span></dt>
+                        <dd>The free-form SQL console.</dd>
+                    </div>
+                    <div>
+                        <dt>allowResponseMocking<span class="dt-default">default: true</span></dt>
+                        <dd>
+                            The master capability for <a href="mocks.html">response mocking</a>. When
+                            <code>false</code>, no rule can replace a response no matter what
+                            <code>mocks.json</code> or the in-app switch says, and the
+                            <code>adb</code>-pullable mirror file is never written.
+                        </dd>
+                    </div>
+                </dl>
+
+                <h2 id="retention">Retention &mdash; how much is kept</h2>
+                <p>
+                    Captured events live in AppInspect's own app-private database with a cap; the oldest
+                    are dropped once it is reached. The defaults are <strong>300 network events</strong>
+                    and <strong>50 crashes</strong>. Raise them if you are chasing something intermittent
+                    over a long session, lower them if you would rather keep less of it around.
+                </p>
+
+                <h2 id="environment">Environment and metadata</h2>
+                <p>
+                    <code>environment</code> and <code>initialMetadata</code> are how your own details get
+                    into the <a href="runtime.html">Runtime</a> panel &mdash; which backend this build points
+                    at, which release train it belongs to, which flag cohort the session is in. They are
+                    displayed as-is and never leave the device.
+                </p>
+
+                <h2 id="redaction">Redaction</h2>
+                <p>
+                    The <code>redaction</code> group defines which keys are treated as sensitive when
+                    <code>showRawSensitiveValues</code> is <code>false</code> &mdash; header names, query
+                    parameters, body fields and metadata keys. Extend it with anything your own API uses
+                    that is not a standard credential header.
+                </p>
+
+                <div class="note">
+                    <span class="note-title">Redaction does not apply to mock rules</span>
+                    <p>
+                        Rules are configuration a developer wrote, so they are stored exactly as written,
+                        in the internal database, in your <code>mocks.json</code> and in the mirror file.
+                        Keep real credentials out of mock response bodies.
+                    </p>
+                </div>
+
+                <h2 id="profiles">Two profiles worth copying</h2>
+                <h3 id="profile-developer">A developer's own build</h3>
+                <p>
+                    This is the default, and there is nothing to write. Everything visible, everything
+                    editable, mocking available, notifications on.
+                </p>
+
+                <h3 id="profile-qa">A build for a wider QA or business audience</h3>
+                <p>
+                    Read-only, quieter, and unable to rewrite traffic &mdash; while still capturing
+                    everything needed for a good bug report.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">A controlled QA profile</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">AppInspect.install(
+    application = this,
+    configuration = AppInspectConfiguration(
+        enablement = AppInspectEnablement(
+            allowedBuildTiers = linkedSetOf(AppInspectBuildTier.DEBUG),
+        ),
+        entryPoints = AppInspectEntryPoints(
+            shakeToOpenEnabled = true,
+            launcherShortcutEnabled = false,
+            networkNotificationsEnabled = false,
+        ),
+        panels = AppInspectPanels(
+            crashesEnabled = true,
+            mocksEnabled = false,
+        ),
+        powerTools = AppInspectPowerTools(
+            showRawSensitiveValues = false,
+            allowSharedPreferencesEditing = false,
+            allowDatabaseEditing = false,
+            allowSqlConsole = false,
+            allowResponseMocking = false,
+        ),
+    ),
+)</code></pre>
+                </div>
+
+                <h2 id="defaults">Defaults at a glance</h2>
+                <ul>
+                    <li>Raw sensitive values <strong>are</strong> visible in an enabled build.</li>
+                    <li>Build-tier gating decides whether the library runs at all, regardless of configuration.</li>
+                    <li>Production is opt-in and off, and needs two separate flags shipped in the APK.</li>
+                    <li>WorkManager inspection is read only and cannot be made writable.</li>
+                    <li>SharedPreferences and host database editing are on, and configurable.</li>
+                </ul>
+                <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
+                <p class="doc-feedback" data-feedback-line></p>
+            </article>
+        </main>
+
+        <aside class="docs-toc">
+            <p class="toc-title">On this page</p>
+            <nav data-toc aria-label="On this page"></nav>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-about">
+                <a class="brand" href="index.html">
+                    <img src="fevicon/favicon-180.png" alt="" width="28" height="28">
+                    <span class="brand-name">AppInspect</span>
+                </a>
+                <p>
+                    An Android in-app inspector for debug and QA builds. Network traffic and response
+                    mocking, storage, background work, crashes and ANRs, runtime metadata &mdash; all
+                    on the device, with nothing sent anywhere.
+                </p>
+                <p class="footer-legal">&copy; 2026 Suryansh Prajapati</p>
+            </div>
+
+            <nav aria-label="Documentation">
+                <span class="footer-group-title">Docs</span>
+                <a href="docs.html">Introduction</a>
+                <a href="install.html">Install</a>
+                <a href="open-inspector.html">Opening the inspector</a>
+                <a href="configuration.html">Configuration</a>
+            </nav>
+
+            <nav aria-label="Panels">
+                <span class="footer-group-title">Panels</span>
+                <a href="network.html">Network</a>
+                <a href="mocks.html">Mocks</a>
+                <a href="storage.html">Storage</a>
+                <a href="workmanager.html">WorkManager</a>
+                <a href="crashes.html">Crashes and ANRs</a>
+            </nav>
+
+            <nav aria-label="More">
+                <span class="footer-group-title">More</span>
+                <a href="security.html">Security model</a>
+                <a href="qa-checklist.html">QA checklist</a>
+                <a href="privacy.html">Privacy policy</a>
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>
+                <a href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://www.linkedin.com/in/itssuryansh/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <span data-contact-slot></span>
+            </nav>
+        </div>
+    </footer>
+
+    <div class="search-dialog" id="search-dialog" role="dialog" aria-modal="true" aria-label="Search the documentation" hidden>
+        <div class="search-scrim"></div>
+        <div class="search-box">
+            <div class="search-field">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+            </div>
+            <ul class="search-results"></ul>
+            <p class="search-empty" hidden>No page matches that.</p>
+            <div class="search-foot">
+                <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move</span>
+                <span><kbd>Enter</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="docs.js"></script>
+    <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
+</body>
+</html>
