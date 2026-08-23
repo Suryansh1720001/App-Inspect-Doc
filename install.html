@@ -111,17 +111,25 @@
                 <span class="eyebrow">Getting started</span>
                 <h1>Install</h1>
                 <p class="lede">
-                    Two dependency lines get you a working inspector. A third line on your
-                    <code>OkHttpClient</code> turns on network capture. Everything after that is
-                    optional.
+                    Two dependency lines get you a working inspector, with every feature on and no
+                    configuration to write. A third line on your <code>OkHttpClient</code> turns on
+                    network capture. Everything after that is optional.
                 </p>
 
                 <h2 id="requirements">Before you start</h2>
-                <ul>
-                    <li><strong>minSdk 24</strong> (Android 7.0). ANR and native crash reporting additionally need Android 11, because they read the OS <code>ApplicationExitInfo</code> API.</li>
-                    <li><strong>OkHttp</strong>, if you want the Network and Mocks panels. Storage, WorkManager, Crashes and Runtime work without it.</li>
-                    <li><strong>Build variants you can target separately</strong> &mdash; at minimum <code>debug</code> and <code>release</code>. If you have a staging or internal-test variant, so much the better.</li>
-                </ul>
+                <p>
+                    Three things, and most projects already have all of them:
+                    <strong>minSdk 24</strong>, <strong>AndroidX</strong>, and
+                    <strong>build variants you can target separately</strong> &mdash; at minimum
+                    <code>debug</code> and <code>release</code>. OkHttp is needed only for the Network and
+                    Mocks panels; everything else works without it.
+                </p>
+                <p>
+                    You do <em>not</em> need Compose, Kotlin, a DI framework, an
+                    <code>Application</code> subclass or a single manifest change. If you are checking
+                    whether it will fit an existing app, that list is on
+                    <a href="compatibility.html">compatibility</a>.
+                </p>
 
                 <h2 id="repository">Step 1 &mdash; resolve from Maven Central</h2>
                 <p>
@@ -168,15 +176,20 @@
 
                 <p>
                     That is enough to have a working inspector. AppInspect initialises itself through
-                    AndroidX Startup when the process starts, so there is nothing to add to your
-                    <code>Application</code> class for the default setup.
+                    AndroidX Startup when the process starts, and <strong>everything is on by
+                    default</strong> &mdash; every panel, the shake gesture, the launcher shortcut, crash
+                    capture, notifications and the log tail. There is nothing to add to your
+                    <code>Application</code> class and no configuration to write.
                 </p>
 
                 <h3 id="custom-variants">If you have more than two variants</h3>
                 <p>
                     Gradle only generates <code>debugImplementation</code> and
                     <code>releaseImplementation</code> automatically. For your own variants, add the
-                    configuration by name:
+                    configuration by name and give the build type
+                    <code>matchingFallbacks</code> &mdash; AppInspect publishes only <code>debug</code>
+                    and <code>release</code> variants, so without it Gradle cannot resolve the dependency
+                    at all:
                 </p>
 
                 <div class="snippet">
@@ -184,7 +197,16 @@
                         <span class="snippet-file">app/build.gradle.kts</span>
                         <button class="copy-button" type="button">Copy</button>
                     </div>
-<pre><code data-lang="kotlin">dependencies {
+<pre><code data-lang="kotlin">android {
+    buildTypes {
+        create("staging") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release", "debug")
+        }
+    }
+}
+
+dependencies {
     val group = "io.github.suryansh1720001.appinspect"
     val inspector = "$group:appinspect:&lt;latest-version&gt;"
 
@@ -196,14 +218,15 @@
 }</code></pre>
                 </div>
 
-                <div class="note">
-                    <span class="note-title">A staging build is not automatically enabled</span>
+                <div class="warn">
+                    <span class="note-title">Adding the artifact is not the same as letting it run</span>
                     <p>
-                        Adding the artifact to a variant is not the same as letting it run there. The
-                        library also checks the build tier at runtime, and anything that is not
-                        debuggable stays off until you opt in explicitly. See
-                        <a href="configuration.html#enablement">enablement</a> if your staging build is
-                        signed as a release build.
+                        The library checks the build itself, and a variant that is
+                        <strong>not debuggable</strong> stays completely off until you opt in &mdash; which
+                        is deliberately not something host code can do. A variant like the one above
+                        inherits <code>isDebuggable = false</code> from <code>release</code>, so it needs
+                        one more line. That, and every other build shape, is on
+                        <a href="environments.html">builds and environments</a>.
                     </p>
                 </div>
 
@@ -282,16 +305,15 @@
                 <p>
                     If the inspector opens but Network is empty, the interceptor is not on the client
                     that made the call &mdash; a second <code>OkHttpClient</code> built somewhere else is
-                    the usual culprit. If nothing opens at all, the build is probably not debuggable;
-                    check <a href="configuration.html#enablement">enablement</a>.
+                    the usual culprit. If nothing opens at all, the build is almost certainly not
+                    debuggable: see <a href="environments.html">builds and environments</a>.
                 </p>
 
-                <h2 id="host-controlled">Optional &mdash; take over the setup yourself</h2>
+                <h2 id="host-controlled">Optional &mdash; change a default</h2>
                 <p>
-                    Auto-initialisation uses the default configuration. Call
-                    <code>AppInspect.install()</code> from your <code>Application</code> instead when
-                    you want to change something &mdash; which panels appear, what testers can edit,
-                    which build tiers are allowed.
+                    Auto-initialisation uses the defaults, and it has already happened by the time your
+                    <code>Application.onCreate()</code> runs. To adjust something &mdash; hide a panel,
+                    make storage read-only, silence notifications &mdash; change only that:
                 </p>
 
                 <div class="snippet">
@@ -299,28 +321,27 @@
                         <span class="snippet-file">DebugApplication.kt (debug source set)</span>
                         <button class="copy-button" type="button">Copy</button>
                     </div>
-<pre><code data-lang="kotlin">AppInspect.install(
-    application = this,
-    configuration = AppInspectConfiguration(
-        entryPoints = AppInspectEntryPoints(shakeToOpenEnabled = true),
-        panels = AppInspectPanels(mocksEnabled = true),
-    ),
-)</code></pre>
+<pre><code data-lang="kotlin">AppInspect.updateConfiguration { configuration ->
+    configuration.copy(
+        panels = AppInspectPanels(mocksEnabled = false),
+    )
+}</code></pre>
                 </div>
 
                 <p>
                     Every field is documented on the
-                    <a href="configuration.html">configuration reference</a> page.
-                    <code>AppInspect.initialize(configuration)</code> still works and is kept for
-                    compatibility, but prefer <code>install()</code>.
+                    <a href="configuration.html">configuration reference</a>, along with why
+                    <code>updateConfiguration</code> is the safer of the two entry points:
+                    <code>AppInspect.install()</code> replaces the configuration wholesale, which throws
+                    away the build-tier enablement AppInspect worked out for the variant.
                 </p>
 
                 <h2 id="guard-calls">One thing to guard by variant</h2>
                 <p>
                     <code>appinspect-no-op</code> deliberately mirrors only the OkHttp API surface.
-                    <code>AppInspect.install()</code>, <code>AppInspect.open()</code> and the
-                    long-press trigger helpers do not exist there, so calling them from shared code
-                    breaks the release build.
+                    <code>AppInspect.install()</code>, <code>updateConfiguration()</code>,
+                    <code>open()</code> and the long-press trigger helpers do not exist there, so calling
+                    them from shared code breaks the release build.
                 </p>
                 <p>
                     Keep those calls in a debug-only source set, or behind your own
@@ -367,6 +388,7 @@
                 <span class="footer-group-title">Docs</span>
                 <a href="docs.html">Introduction</a>
                 <a href="install.html">Install</a>
+                <a href="environments.html">Builds and environments</a>
                 <a href="open-inspector.html">Opening the inspector</a>
                 <a href="configuration.html">Configuration</a>
             </nav>
@@ -378,6 +400,7 @@
                 <a href="storage.html">Storage</a>
                 <a href="workmanager.html">WorkManager</a>
                 <a href="crashes.html">Crashes and ANRs</a>
+                <a href="logs.html">Logcat</a>
             </nav>
 
             <nav aria-label="More">
@@ -399,7 +422,7 @@
         <div class="search-box">
             <div class="search-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+                <input type="search" placeholder="Search pages — mocks, logcat, staging builds, ANR…" autocomplete="off" spellcheck="false" aria-label="Search query">
             </div>
             <ul class="search-results"></ul>
             <p class="search-empty" hidden>No page matches that.</p>

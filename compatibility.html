@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introduction | AppInspect docs</title>
-    <meta name="description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <title>Compatibility | AppInspect docs</title>
+    <meta name="description" content="What AppInspect needs from your project: minSdk 24, AndroidX, no Compose or Kotlin requirement, optional OkHttp / WorkManager integrations, and what does less on older devices.">
     <meta name="theme-color" content="#fdfbf5" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <link rel="canonical" href="https://app-inspect-doc.vercel.app/docs.html">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/compatibility.html">
 
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://app-inspect-doc.vercel.app/docs.html">
-    <meta property="og:title" content="Introduction — AppInspect docs">
-    <meta property="og:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/compatibility.html">
+    <meta property="og:title" content="Compatibility — AppInspect docs">
+    <meta property="og:description" content="What AppInspect needs from your project: minSdk 24, AndroidX, no Compose or Kotlin requirement, optional OkHttp / WorkManager integrations, and what does less on older devices.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Introduction — AppInspect docs">
-    <meta name="twitter:description" content="What AppInspect is, what it replaces, and how its pieces fit together — an Android in-app inspector for debug and QA builds.">
+    <meta name="twitter:title" content="Compatibility — AppInspect docs">
+    <meta name="twitter:description" content="What AppInspect needs from your project: minSdk 24, AndroidX, no Compose or Kotlin requirement, optional OkHttp / WorkManager integrations, and what does less on older devices.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -109,173 +109,162 @@
 
             <article class="prose">
                 <span class="eyebrow">Getting started</span>
-                <h1>Introduction</h1>
+                <h1>Compatibility</h1>
                 <p class="lede">
-                    AppInspect is an Android library that adds a full-screen inspector to your own
-                    app. You add it as a Gradle dependency to your debug and internal builds; anyone
-                    holding the phone can then open it and see the network calls the app just made,
-                    what is stored on the device, which background jobs ran, the log it is writing right
-                    now, and the last crash or ANR &mdash; without a laptop, a proxy, or a cable.
+                    AppInspect is meant to drop into an app that already exists, without changing how
+                    that app is built. No Compose, no Kotlin, no dependency injection, no
+                    <code>Application</code> subclass and no manifest edits are required. This page is
+                    the honest list of what it does need, and what quietly does less on older devices.
                 </p>
 
-                <div class="chip-row">
-                    <span class="chip"><strong>Android 7.0+</strong> &nbsp;API 24</span>
-                    <span class="chip"><strong>Maven Central</strong></span>
-                    <span class="chip"><strong>Kotlin</strong> &nbsp;Compose UI</span>
-                    <span class="chip"><strong>Free</strong></span>
+                <h2 id="requirements">What it needs from your project</h2>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Requirement</th><th>Value</th><th>Notes</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>minSdk</strong></td><td><strong>24</strong> (Android 7.0)</td><td>Features above this <a href="#api-levels">degrade silently</a>, never crash.</td></tr>
+                            <tr><td><strong>AndroidX</strong></td><td>Required</td><td><code>android.useAndroidX=true</code>. Legacy Support Library apps are not supported.</td></tr>
+                            <tr><td><strong>Compose in your app</strong></td><td>Not required</td><td><a href="#compose">Why</a> &mdash; the UI is already compiled into the published AAR.</td></tr>
+                            <tr><td><strong>Kotlin in your app</strong></td><td>Not required</td><td>Java-only hosts work; <a href="#java">the syntax is just longer</a>.</td></tr>
+                            <tr><td><strong>Java / JVM target</strong></td><td>11 bytecode</td><td>Consumed normally by apps targeting Java 8 or 11+.</td></tr>
+                            <tr><td><strong>Kotlin compiler</strong></td><td>Built with 2.0.21</td><td>A host on a much older Kotlin plugin may see <em>&ldquo;compiled with an incompatible version of Kotlin&rdquo;</em>; upgrading the plugin is the fix.</td></tr>
+                            <tr><td><strong>AGP</strong></td><td>Built with 8.6.0</td><td>Much older AGP may not accept the published Gradle module metadata.</td></tr>
+                            <tr><td><strong>DI framework</strong></td><td>None</td><td>No Hilt, Dagger, Koin or <code>ServiceLoader</code> requirement.</td></tr>
+                            <tr><td><strong><code>Application</code> subclass</strong></td><td>Not required</td><td>Auto-init runs from AndroidX Startup. You only need one to <a href="configuration.html">configure</a>.</td></tr>
+                            <tr><td><strong>Manifest changes</strong></td><td>None</td><td>The activity, file provider and Startup entry are merged in from the library.</td></tr>
+                            <tr><td><strong>Permissions to declare</strong></td><td>None</td><td><code>POST_NOTIFICATIONS</code> is declared by the library, but <a href="notifications.html">your app must request it</a> on Android 13+.</td></tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <h2 id="the-idea">The idea</h2>
+                <h2 id="compose">You do not need Compose</h2>
                 <p>
-                    Nearly every Android team eventually builds an internal debug screen: a list of
-                    recent API calls, a way to look at SharedPreferences, a button that dumps the last
-                    crash. It is useful, it is never anyone's priority, and it gets rewritten in the
-                    next app.
+                    The inspector's screens are Compose, but that is an implementation detail of the
+                    <em>library</em>, already compiled into the AAR you resolve. A View and XML app, a
+                    Fragment-based app, or an app with <code>buildFeatures { compose = false }</code> gets
+                    the full inspector unchanged: you never enable the Compose compiler, never set
+                    <code>composeOptions</code>, and never write a composable.
                 </p>
                 <p>
-                    AppInspect is that screen, packaged as a dependency and kept out of your codebase.
-                    Because it lives inside the app rather than outside it, the person who found the
-                    bug is the person who can capture the evidence &mdash; on the build that actually
-                    failed, at the moment it failed.
-                </p>
-
-                <h2 id="what-you-get">What is inside the inspector</h2>
-                <p>
-                    The inspector opens as its own full screen. Five panels sit along the bottom bar and
-                    you move between them by tapping or swiping; Runtime and Logcat are one tap away in
-                    the top bar, and any panel can hand an oversized value to a shared viewer. Each has
-                    its own page here, because knowing that a panel exists is not the same as knowing how
-                    it behaves when the value is 200&nbsp;KB, encrypted, or missing entirely.
-                </p>
-
-                <div class="card-grid">
-                    <a class="doc-card" href="network.html">
-                        <strong>Network</strong>
-                        <span>Captured OkHttp calls, filters and search, wire headers, cURL / TXT / HAR export.</span>
-                    </a>
-                    <a class="doc-card" href="mocks.html">
-                        <strong>Mocks</strong>
-                        <span>Replace a live response with your own status, body, delay or simulated failure.</span>
-                    </a>
-                    <a class="doc-card" href="storage.html">
-                        <strong>Storage</strong>
-                        <span>SharedPreferences, DataStore, SQLite and Room &mdash; read, search, and edit.</span>
-                    </a>
-                    <a class="doc-card" href="workmanager.html">
-                        <strong>WorkManager</strong>
-                        <span>Every persisted work spec with state, constraints, attempts and payloads.</span>
-                    </a>
-                    <a class="doc-card" href="crashes.html">
-                        <strong>Crashes and ANRs</strong>
-                        <span>Uncaught exceptions, plus ANRs and native crashes on Android 11+.</span>
-                    </a>
-                    <a class="doc-card" href="runtime.html">
-                        <strong>Runtime</strong>
-                        <span>App, device, environment and session metadata, ready to copy into a ticket.</span>
-                    </a>
-                    <a class="doc-card" href="logs.html">
-                        <strong>Logcat</strong>
-                        <span>A live, filterable tail of your app's own log output &mdash; no cable, no permission, nothing written to disk.</span>
-                    </a>
-                    <a class="doc-card" href="value-viewer.html">
-                        <strong>Value viewer</strong>
-                        <span>One JSON tree for any oversized value, shared by every panel.</span>
-                    </a>
-                </div>
-
-                <h2 id="how-it-differs">How this differs from a proxy</h2>
-                <p>
-                    A desktop proxy such as Charles or Proxyman sees traffic from the outside. That is
-                    powerful, and it costs you a certificate on every test device, a Wi-Fi
-                    configuration, a machine on the same network, and a developer to run it. Android
-                    Studio's own inspectors need the device attached over adb.
-                </p>
-                <p>
-                    AppInspect trades breadth for reach. It only sees what your app hands to the
-                    <code>OkHttpClient</code> you instrumented &mdash; not WebView traffic, not another
-                    HTTP stack, not other apps. In exchange, it works on any tester's phone with no
-                    setup at all, and it can see things a proxy cannot: which coroutine wrote that
-                    preference, what WorkManager did overnight, the stack trace of the crash that
-                    happened before anyone could attach a debugger.
-                </p>
-                <p>
-                    They are not exclusive. Plenty of teams keep the proxy for deep protocol work and
-                    use AppInspect for everything a tester needs during a normal test pass.
-                </p>
-
-                <h2 id="how-it-is-built">How it is put together</h2>
-                <p>
-                    The library is published as several artifacts, but you normally depend on just one
-                    umbrella module for your debug builds and one stub for release. The rest are
-                    transitive.
+                    The only thing Compose availability changes is which long-press trigger helper you
+                    can use. Every other entry point &mdash; shake, launcher shortcut, notification tap,
+                    <code>AppInspect.open(context)</code> &mdash; is the same either way.
                 </p>
 
                 <div class="table-scroll">
                     <table>
                         <thead>
-                            <tr><th>Artifact</th><th>What it is for</th></tr>
+                            <tr><th>Your UI</th><th>Long-press trigger</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td><code>appinspect</code></td><td>The umbrella dependency. Pulls in the UI, storage, network capture, WorkManager and crash modules, and auto-initialises. This is the one you add to debug, staging and internal-test builds.</td></tr>
-                            <tr><td><code>appinspect-no-op</code></td><td>The release stub. Mirrors only the OkHttp API surface so shared client code compiles, and does nothing at runtime.</td></tr>
-                            <tr><td><code>appinspect-api</code></td><td>Public contracts &mdash; <code>AppInspectConfiguration</code>, mock rule models, entry points. Comes in transitively.</td></tr>
-                            <tr><td><code>appinspect-ui</code></td><td>The inspector activity and its Compose screens.</td></tr>
-                            <tr><td><code>appinspect-network-okhttp</code>, <code>appinspect-storage</code>, <code>appinspect-insights-storage</code>, <code>appinspect-workmanager</code>, <code>appinspect-logs</code>, <code>appinspect-core</code></td><td>The capture and inspection implementations behind each panel.</td></tr>
+                            <tr><td>Compose</td><td><code>Modifier.appInspectLongPressTrigger(handle)</code></td></tr>
+                            <tr><td>Views / XML</td><td><code>AppInspect.attachLongPressTrigger(view)</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    The trade-off is APK size, and only in the variants AppInspect ships in: a non-Compose
+                    app picks up the Compose runtime, Foundation, Material 3 and the extended icon set
+                    transitively. That lands in your debug and staging builds, never in release when you
+                    use the no-op artifact.
+                </p>
+
+                <h2 id="java">Java-only hosts</h2>
+                <p>
+                    Everything works. <code>AppInspect</code> is a Kotlin <code>object</code>, so the
+                    calls go through <code>INSTANCE</code>, and the Kotlin extension on the OkHttp builder
+                    is not available &mdash; add the two interceptors directly instead, in this order.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">Java</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">AppInspect.INSTANCE.open(context);
+AppInspect.INSTANCE.registerMetadata("tenant", "internal");
+
+// Application interceptor first, network interceptor second
+new OkHttpClient.Builder()
+    .addInterceptor(new AppInspectOkHttpInterceptor())
+    .addNetworkInterceptor(new AppInspectOkHttpWireHeaderInterceptor())
+    .build();</code></pre>
+                </div>
+
+                <p>
+                    The second interceptor is what makes captured events carry the
+                    <a href="install.html#wire-headers">final wire headers</a>. Omit it and the panel
+                    shows the request as your code built it, not as it was sent.
+                    <code>addAppInspectInterceptor()</code> installs both for Kotlin callers.
+                </p>
+
+                <h2 id="optional">Three optional integrations, and why they are optional</h2>
+                <p>
+                    OkHttp, WorkManager and <code>androidx.security-crypto</code> are declared
+                    <code>compileOnly</code>. AppInspect therefore never forces a version onto your app
+                    and never adds a library you were not already using.
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Library</th><th>If your app has it</th><th>If it does not</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>OkHttp</strong> (4.x+)</td><td><a href="network.html">Network capture</a> and <a href="mocks.html">mocking</a> work. Your version wins.</td><td>Every other panel works; the interceptor class is simply never loaded.</td></tr>
+                            <tr><td><strong>WorkManager</strong></td><td>The <a href="workmanager.html">Work</a> panel reads work specs and decodes their <code>Data</code> blobs.</td><td>The panel is empty &mdash; there is no work database to read.</td></tr>
+                            <tr><td><strong>androidx.security-crypto</strong></td><td><code>EncryptedSharedPreferences</code> files are decrypted for read-only <a href="storage.html">inspection</a>.</td><td>Those files show as opaque. Ordinary preferences are unaffected.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    This matters more than it looks. Had these been ordinary <code>implementation</code>
+                    dependencies, adding AppInspect could have raised the OkHttp version your app
+                    resolves to &mdash; so the builds you test would run a <strong>different HTTP stack
+                    than release</strong>, and a networking bug could appear or disappear depending on
+                    whether the inspector was present. <code>appinspect-no-op</code> follows the same rule
+                    and declares no runtime dependency beyond the Kotlin standard library.
+                </p>
+                <p>
+                    If you are still on OkHttp 3.x, upgrade to 4.x before adding network capture; the
+                    interceptor is compiled against the 4.x API. The other panels do not care either way.
+                </p>
+
+                <h2 id="api-levels">What does less on older devices</h2>
+                <p>
+                    Nothing here throws or logs an error. The feature is simply absent, and the rest of
+                    the inspector is unaffected.
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Feature</th><th>Needs</th><th>Below that</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Panels, network, storage, crashes, Logcat, shake, <code>open()</code></td><td>API 24</td><td>&mdash;</td></tr>
+                            <tr><td>Launcher shortcut</td><td>API 25</td><td>Not published; other entry points unaffected.</td></tr>
+                            <tr><td>Notification channel</td><td>API 26</td><td>Channel creation is skipped; notifications still post, as they did before channels existed.</td></tr>
+                            <tr><td>ANR and native crash detection</td><td>API 30</td><td>JVM crashes are still captured by the crash handler. <code>ApplicationExitInfo</code> is the OS API this relies on.</td></tr>
+                            <tr><td><code>POST_NOTIFICATIONS</code> runtime grant</td><td>API 33</td><td>Notifications post without a runtime grant.</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="note">
-                    <span class="note-title">On versions</span>
+                    <span class="note-title">One host action, on Android 13 and newer</span>
                     <p>
-                        Snippets in these docs use <code>&lt;latest-version&gt;</code> rather than a
-                        pinned number, so nothing here goes stale. Check
-                        <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">the versions page on Maven Central</a>
-                        for the current release. These pages track the latest published version, so if
-                        something here does not match the artifact you resolved, check that you
-                        are on the newest one.
+                        AppInspect declares <code>POST_NOTIFICATIONS</code> but cannot request it &mdash;
+                        it has no Activity of its own. If your app never asks, per-request notifications
+                        silently never appear and everything else works normally. Ask for it wherever it
+                        fits your UX, or set <code>networkNotificationsEnabled = false</code> and forget
+                        about it. See <a href="notifications.html">Network notifications</a>.
                     </p>
-                </div>
-
-                <h2 id="production">It does not ship to your users</h2>
-                <p>
-                    This is the first question most teams ask, so it is worth answering here rather
-                    than at the end. Two independent things keep the inspector out of production.
-                </p>
-                <p>
-                    The recommended setup puts <code>appinspect-no-op</code> in your release variant,
-                    so the inspector's code is never compiled into the production APK. And if the full
-                    module ever ends up in a release build by mistake, it checks
-                    <code>FLAG_DEBUGGABLE</code> at runtime and switches itself off completely &mdash;
-                    no database on disk, no crash handler, no capture, every <code>open()</code>
-                    refused.
-                </p>
-                <p>
-                    The <a href="security.html">security model</a> page covers both layers, what debug
-                    builds deliberately do expose, and the extra gates around response mocking.
-                    <a href="environments.html">Builds and environments</a> is the practical companion to
-                    it: which of your variants actually run the inspector, and what a staging build has
-                    to do to be one of them.
-                </p>
-
-                <h2 id="next">Where to go next</h2>
-                <div class="card-grid">
-                    <a class="doc-card" href="install.html">
-                        <strong>Install &rarr;</strong>
-                        <span>Gradle dependencies per variant, and the one OkHttp line that turns on network capture.</span>
-                    </a>
-                    <a class="doc-card" href="environments.html">
-                        <strong>Builds and environments &rarr;</strong>
-                        <span>Whether it runs in your staging, QA or UAT variant &mdash; and the one line that decides it.</span>
-                    </a>
-                    <a class="doc-card" href="compatibility.html">
-                        <strong>Compatibility &rarr;</strong>
-                        <span>Will it fit the app you already have? No Compose, no Kotlin, no manifest changes.</span>
-                    </a>
-                    <a class="doc-card" href="configuration.html">
-                        <strong>Configuration &rarr;</strong>
-                        <span>Decide what a tester can see and change before you hand the build over.</span>
-                    </a>
                 </div>
                 <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
                 <p class="doc-feedback" data-feedback-line></p>

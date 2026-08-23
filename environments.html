@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builds and environments | AppInspect docs</title>
+    <meta name="description" content="Where AppInspect runs and where it refuses to: the three build tiers, the staging opt-in resource, custom variants, R8, and what happens if the full library reaches a release build.">
+    <meta name="theme-color" content="#fdfbf5" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/environments.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/environments.html">
+    <meta property="og:title" content="Builds and environments — AppInspect docs">
+    <meta property="og:description" content="Where AppInspect runs and where it refuses to: the three build tiers, the staging opt-in resource, custom variants, R8, and what happens if the full library reaches a release build.">
+    <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Builds and environments — AppInspect docs">
+    <meta name="twitter:description" content="Where AppInspect runs and where it refuses to: the three build tiers, the staging opt-in resource, custom variants, R8, and what happens if the full library reaches a release build.">
+    <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem("appinspect-theme");
+                if (stored) {
+                    document.documentElement.setAttribute("data-theme", stored);
+                }
+            } catch (error) {
+                /* no persisted preference available */
+            }
+        })();
+    </script>
+
+    <link rel="icon" href="fevicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="fevicon/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="fevicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="fevicon/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="fevicon/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body class="docs">
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="topbar">
+        <button class="topbar-menu" type="button" aria-expanded="false" aria-controls="docs-sidebar" aria-label="Show documentation navigation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <a class="brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-name">AppInspect</span>
+        </a>
+        <span class="topbar-spacer"></span>
+        <button class="search-trigger" type="button" data-search-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <span>Search the docs</span>
+            <kbd>&#8984;K</kbd>
+        </button>
+        <nav class="topbar-nav" aria-label="Primary">
+            <a href="index.html">Home</a>
+            <a class="wide-only" href="docs.html">Docs</a>
+            <a class="wide-only" href="index.html#support">Support</a>
+        </nav>
+        <div class="topbar-tools">
+            <a class="icon-button" href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer" aria-label="AppInspect on Maven Central">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+            </a>
+            <a class="icon-button" href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+                <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38l-.01-1.34c-2.23.49-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.24.54.72.54 1.45l-.01 2.15c0 .21.14.46.55.38A8 8 0 0 0 8 0Z"/></svg>
+            </a>
+            <button class="icon-button" type="button" data-theme-toggle aria-label="Switch between light and dark theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.6M12 19.4V22M2 12h2.6M19.4 12H22M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+
+    <div class="docs-shell">
+        <aside class="docs-sidebar" id="docs-sidebar">
+            <nav id="docs-nav" aria-label="Documentation"></nav>
+            <div class="nav-aside">
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/></svg>
+                    Released versions
+                </a>
+                <a href="index.html#faq">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 17h.01"/></svg>
+                    FAQ
+                </a>
+                <a href="index.html#support">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 8a4 4 0 0 1 7 2.7C19 15.6 12 20 12 20Z"/></svg>
+                    Support the project
+                </a>
+            </div>
+        </aside>
+
+        <main class="docs-main" id="content">
+            <details class="toc-inline">
+                <summary>On this page</summary>
+                <div data-toc></div>
+            </details>
+
+            <article class="prose">
+                <span class="eyebrow">Getting started</span>
+                <h1>Builds and environments</h1>
+                <p class="lede">
+                    AppInspect never sees your Gradle variant names. <code>staging</code>,
+                    <code>qa</code>, <code>uat</code>, <code>preprod</code>, <code>nightly</code> &mdash;
+                    all the same to the library. It decides whether to run from two inputs only, which
+                    is why the answer to &ldquo;will it work in my environment?&rdquo; is short once you
+                    know what they are.
+                </p>
+
+                <h2 id="tiers">Two inputs, three tiers</h2>
+                <p>
+                    The first input is <code>FLAG_DEBUGGABLE</code>, which the Android Gradle plugin sets
+                    from your build type's <code>isDebuggable</code>. The second is
+                    <code>appinspect_enabled_in_non_debuggable_build</code>, a boolean resource you may
+                    declare for one variant. Together they resolve to a tier.
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th><code>FLAG_DEBUGGABLE</code></th><th>Opt-in resource</th><th>Tier</th><th>What happens</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>set</td><td>not read</td><td><code>DEBUG</code></td><td>Everything enabled.</td></tr>
+                            <tr><td>clear</td><td><code>true</code></td><td><code>STAGING</code></td><td>Everything enabled.</td></tr>
+                            <tr><td>clear</td><td><code>false</code> or absent <em>(the default)</em></td><td><code>PRODUCTION</code></td><td><strong>Everything disabled.</strong> Nothing captured, nothing written, no way in.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Note what the third row means in practice: the safe outcome is the one you get by
+                    doing nothing. A build has to be told to run the inspector, never told to stop.
+                </p>
+
+                <h2 id="scenarios">Your setup, and what happens in it</h2>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Your setup</th><th>Tier</th><th>Result</th><th>What you have to do</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>debugImplementation</code> of the full library</td>
+                                <td><code>DEBUG</code></td>
+                                <td>Works fully</td>
+                                <td><strong>Nothing.</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Custom variant, <code>isDebuggable = true</code></td>
+                                <td><code>DEBUG</code></td>
+                                <td>Works fully</td>
+                                <td><strong>Nothing.</strong> The resource is never even read.</td>
+                            </tr>
+                            <tr>
+                                <td>Custom variant, <code>isDebuggable = false</code></td>
+                                <td><code>PRODUCTION</code></td>
+                                <td>Dead &mdash; the inspector will not open</td>
+                                <td>Add <a href="#opt-in">the opt-in resource</a>, or make the variant debuggable.</td>
+                            </tr>
+                            <tr>
+                                <td>The same, plus the opt-in resource</td>
+                                <td><code>STAGING</code></td>
+                                <td>Works fully</td>
+                                <td>Done.</td>
+                            </tr>
+                            <tr>
+                                <td><code>releaseImplementation</code> of <code>appinspect-no-op</code></td>
+                                <td>&mdash;</td>
+                                <td>Inert by design; no inspection code in the APK</td>
+                                <td><strong>Nothing.</strong> This is the recommended release setup.</td>
+                            </tr>
+                            <tr>
+                                <td>Full library in <code>release</code> by mistake, no flags</td>
+                                <td><code>PRODUCTION</code></td>
+                                <td>Inert. Nothing breaks and nothing is captured</td>
+                                <td>Still switch release to the no-op.</td>
+                            </tr>
+                            <tr>
+                                <td>Full library in <code>release</code> <strong>with the flag set</strong></td>
+                                <td><code>STAGING</code></td>
+                                <td><strong>It runs, in production</strong></td>
+                                <td>Don't. See <a href="#production">the one way to shoot yourself</a>.</td>
+                            </tr>
+                            <tr>
+                                <td>Product flavours rather than build types</td>
+                                <td>Follows the resolved variant's <code>isDebuggable</code></td>
+                                <td>Works</td>
+                                <td>Put the resource in <code>src/&lt;flavour&gt;/res/</code>.</td>
+                            </tr>
+                            <tr>
+                                <td>A minified, R8'd, resource-shrunk non-debug variant</td>
+                                <td>As above</td>
+                                <td>Works fully</td>
+                                <td><strong>Nothing</strong> &mdash; see <a href="#minify">minification</a>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="decision">The only decision you have to make</h2>
+                <p>
+                    Is your non-debug variant <code>isDebuggable</code>? Open the build type and look,
+                    remembering that <code>initWith</code> copies the value it inherits:
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">app/build.gradle.kts</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">create("staging") {
+    initWith(getByName("release"))   // inherits isDebuggable = false
+    isDebuggable = true              // ← if this line is here, you are done
+}</code></pre>
+                </div>
+
+                <p>
+                    That pattern is common: teams inherit minification and signing from
+                    <code>release</code>, then turn debuggability back on so the build stays attachable
+                    to a debugger and to Studio's profilers. If your variant looks like that, AppInspect
+                    already works there with no configuration and nothing on this page applies to you.
+                </p>
+
+                <h2 id="opt-in">Turning it on in a non-debuggable build</h2>
+                <p>
+                    Only if <code>isDebuggable</code> stays <code>false</code> do you need the opt-in.
+                    Two equivalent ways &mdash; pick whichever fits how your project is organised.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">A &mdash; one line in the build type, any variant name</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">create("uat") {
+    initWith(getByName("release"))
+    matchingFallbacks += listOf("release", "debug")
+    resValue("bool", "appinspect_enabled_in_non_debuggable_build", "true")
+    resValue("string", "appinspect_environment_name", "uat")   // optional label
+}</code></pre>
+                </div>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">B &mdash; app/src/uat/res/values/appinspect.xml</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="xml">&lt;resources&gt;
+    &lt;bool name="appinspect_enabled_in_non_debuggable_build"&gt;true&lt;/bool&gt;
+&lt;/resources&gt;</code></pre>
+                </div>
+
+                <p>
+                    Either one resolves that variant to <code>STAGING</code> with every feature enabled
+                    and <strong>no host code at all</strong>.
+                    <code>appinspect_environment_name</code> is optional and only labels the environment
+                    in the <a href="runtime.html">Runtime</a> panel &mdash; useful precisely because the
+                    library cannot see that you called the variant <code>uat</code>.
+                </p>
+
+                <div class="note">
+                    <span class="note-title">matchingFallbacks is not an AppInspect thing</span>
+                    <p>
+                        Any custom build type needs it, because AppInspect publishes only
+                        <code>debug</code> and <code>release</code> variants. Leave it out and Gradle
+                        fails with <em>&ldquo;No matching variant of
+                        io.github.suryansh1720001.appinspect:appinspect was found&rdquo;</em> before the
+                        library gets a say in anything.
+                    </p>
+                </div>
+
+                <h3 id="why-resource">Why a resource and not a configuration flag</h3>
+                <p>
+                    Two constraints, and nothing else satisfies both. <strong>Timing:</strong> AppInspect
+                    installs itself from AndroidX Startup, which runs in a <code>ContentProvider</code>
+                    before your <code>Application.onCreate()</code> &mdash; anything written in Kotlin
+                    arrives after the enablement decision has been made, but a resource is readable at
+                    that moment. <strong>Non-leakage:</strong> Android never merges one variant's
+                    resources into another, so a value declared in <code>uat</code> is physically absent
+                    from the release APK, which then gets the library's <code>false</code> default. A
+                    <code>BuildConfig</code> field or a manifest placeholder cannot promise that.
+                </p>
+                <p>
+                    It also cannot be inferred. At runtime a non-debuggable staging build and a release
+                    build are byte-for-byte identical, and the fact that you scoped the dependency to
+                    <code>uatImplementation</code> is Gradle information that does not survive into the
+                    APK.
+                </p>
+
+                <h2 id="release-testing">If you need to test on a release-like build</h2>
+                <p>
+                    This comes up on every team: something only reproduces in a signed, minified,
+                    production-shaped build, and you want the inspector there for an afternoon. Do it
+                    with a variant, not with your release build.
+                </p>
+                <ol>
+                    <li>Create a variant that <code>initWith(release)</code>, so it keeps release's minification, shrinking and signing config, and give it <code>matchingFallbacks</code>.</li>
+                    <li>Either set <code>isDebuggable = true</code> on it, or add the opt-in resource to it. Both give you the full inspector; the resource keeps the build non-debuggable, which is closer to production.</li>
+                    <li>Point the dependency at that variant: <code>add("stagingImplementation", …)</code>. Leave <code>release</code> on the no-op.</li>
+                    <li>Turn mocking off for that build &mdash; <code>allowResponseMocking = false</code> &mdash; if it will ever point at production data. A build that can rewrite live responses is a support incident waiting to happen.</li>
+                </ol>
+                <p>
+                    What you must not do is put the flag in <code>release</code> itself or in
+                    <code>src/main/res/</code>, which applies to every variant. That is the one path
+                    that ends with the inspector in front of real users.
+                </p>
+
+                <h2 id="production">The one way to shoot yourself</h2>
+                <p>
+                    Write the opt-in into your <code>release</code> build type, or into
+                    <code>src/main/res/</code>, while the full library is on the release classpath, and
+                    the inspector <strong>will</strong> run in production. That is intentional and
+                    unavoidable: it is an explicit instruction, in your own build script, in a line a
+                    reviewer can see &mdash; exactly the trust level of typing
+                    <code>implementation</code> instead of <code>debugImplementation</code>. No library
+                    can defend against its owner deliberately enabling it.
+                </p>
+                <p>
+                    Two rules make it unreachable in practice. <strong>Never</strong> put the resource in
+                    <code>src/main/res/</code> &mdash; use a build-type <code>resValue</code> or a variant
+                    source set. And <strong>keep <code>releaseImplementation(appinspect-no-op)</code></strong>:
+                    then there is no inspection code in the APK for any flag to enable, whatever the
+                    flag says.
+                </p>
+                <p>
+                    If it does happen, everything becomes active at once &mdash; capture writes real user
+                    traffic including <code>Authorization</code> headers to the device, the crash handler
+                    installs, the launcher shortcut publishes, notifications post, Logcat capture becomes
+                    reachable, and response mocking can serve canned data to real users. The
+                    <a href="security.html#deliberate">security model</a> spells out what to switch off
+                    first, and note that the resource still cannot reach the
+                    <code>PRODUCTION</code> tier: that additionally requires
+                    <code>allowInProductionBuilds = true</code>, which is host Kotlin code that will not
+                    even compile against the no-op.
+                </p>
+
+                <h2 id="minify">Minification, R8 and resource shrinking</h2>
+                <p>
+                    <strong>You add nothing.</strong> AppInspect ships its own
+                    <code>consumerProguardFiles</code>, which Gradle applies to your app automatically,
+                    so a variant created with <code>initWith(getByName("release"))</code> inherits
+                    <code>isMinifyEnabled</code> and <code>isShrinkResources</code> and works unchanged.
+                </p>
+                <p>
+                    The rules exist because the API layer reaches its storage, core and UI modules
+                    through <code>Class.forName</code> &mdash; that is what lets any one of them be absent.
+                    Every lookup has a graceful fallback, which is exactly why the keep rules ship with
+                    the library rather than being left to you: a missing rule would not crash, it would
+                    degrade quietly. The storage bridge going missing would drop you onto an in-memory
+                    repository, so capture still works but nothing survives a restart; the core bridge
+                    going missing would empty the Runtime panel's App, Device and Session sections. Both
+                    read as feature bugs rather than build-configuration bugs.
+                </p>
+                <p>
+                    The opt-in flag survives the <em>resource</em> shrinker too, because it is read as a
+                    typed <code>R.bool</code> reference the shrinker can see rather than through
+                    <code>Resources.getIdentifier</code>, which would have needed a
+                    <code>tools:keep</code> rule in your app.
+                </p>
+
+                <h2 id="config-relationship">Where configuration fits</h2>
+                <p>
+                    Everything above is build-time and decides <em>whether</em> AppInspect runs.
+                    Everything on the <a href="configuration.html">configuration reference</a> is
+                    runtime and decides <em>what it does</em> once it is running &mdash; which panels
+                    appear, what a tester can edit, what is masked. The two are independent, with one
+                    connection worth knowing: <code>AppInspect.install()</code> replaces the whole
+                    configuration, which discards the tier AppInspect inferred for the build, including
+                    a staging variant's resource opt-in. Prefer
+                    <a href="configuration.html#where"><code>updateConfiguration</code></a>, which keeps
+                    it.
+                </p>
+                <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
+                <p class="doc-feedback" data-feedback-line></p>
+            </article>
+        </main>
+
+        <aside class="docs-toc">
+            <p class="toc-title">On this page</p>
+            <nav data-toc aria-label="On this page"></nav>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <div class="site-footer-inner">
+            <div class="footer-about">
+                <a class="brand" href="index.html">
+                    <span class="brand-mark" aria-hidden="true"></span>
+                    <span class="brand-name">AppInspect</span>
+                </a>
+                <p>
+                    An Android in-app inspector for debug and QA builds. Network traffic and response
+                    mocking, storage, background work, crashes and ANRs, runtime metadata &mdash; all
+                    on the device, with nothing sent anywhere.
+                </p>
+                <p class="footer-legal">&copy; 2026 Suryansh Prajapati</p>
+            </div>
+
+            <nav aria-label="Documentation">
+                <span class="footer-group-title">Docs</span>
+                <a href="docs.html">Introduction</a>
+                <a href="install.html">Install</a>
+                <a href="environments.html">Builds and environments</a>
+                <a href="open-inspector.html">Opening the inspector</a>
+                <a href="configuration.html">Configuration</a>
+            </nav>
+
+            <nav aria-label="Panels">
+                <span class="footer-group-title">Panels</span>
+                <a href="network.html">Network</a>
+                <a href="mocks.html">Mocks</a>
+                <a href="storage.html">Storage</a>
+                <a href="workmanager.html">WorkManager</a>
+                <a href="crashes.html">Crashes and ANRs</a>
+                <a href="logs.html">Logcat</a>
+            </nav>
+
+            <nav aria-label="More">
+                <span class="footer-group-title">More</span>
+                <a href="security.html">Security model</a>
+                <a href="data-handling.html">Data handling</a>
+                <a href="qa-checklist.html">QA checklist</a>
+                <a href="privacy.html">Privacy policy</a>
+                <a href="https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview" target="_blank" rel="noopener noreferrer">Maven Central</a>
+                <a href="https://github.com/Suryansh1720001" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://www.linkedin.com/in/itssuryansh/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <span data-contact-slot></span>
+            </nav>
+        </div>
+    </footer>
+
+    <div class="search-dialog" id="search-dialog" role="dialog" aria-modal="true" aria-label="Search the documentation" hidden>
+        <div class="search-scrim"></div>
+        <div class="search-box">
+            <div class="search-field">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" placeholder="Search pages — mocks, logcat, staging builds, ANR…" autocomplete="off" spellcheck="false" aria-label="Search query">
+            </div>
+            <ul class="search-results"></ul>
+            <p class="search-empty" hidden>No page matches that.</p>
+            <div class="search-foot">
+                <span><kbd>&uarr;</kbd> <kbd>&darr;</kbd> to move</span>
+                <span><kbd>Enter</kbd> to open</span>
+                <span><kbd>Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="docs.js"></script>
+    <!-- Cloudflare Web Analytics — token is intentionally public, safe to commit -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f2c362a02c54e9a906a77dd868039f7"}'></script>
+</body>
+</html>

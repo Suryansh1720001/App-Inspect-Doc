@@ -117,11 +117,14 @@
                     change and what each switch actually does.
                 </p>
 
-                <h2 id="where">Where the configuration goes</h2>
+                <h2 id="where">Changing something: use updateConfiguration</h2>
                 <p>
-                    With no configuration at all, AppInspect initialises itself through AndroidX Startup
-                    and uses the defaults. To change anything, call <code>install()</code> from your
-                    <code>Application</code> instead:
+                    There is one thing to understand before any of the fields below matter.
+                    <strong>AppInspect has already configured itself</strong> by the time your
+                    <code>Application.onCreate()</code> runs &mdash; it installs from AndroidX Startup,
+                    which runs earlier, and part of what it worked out there is which
+                    <a href="environments.html">build tier</a> this variant is. So any call you make is
+                    a re-configuration, and there are two ways to make one.
                 </p>
 
                 <div class="snippet">
@@ -129,29 +132,50 @@
                         <span class="snippet-file">DebugApplication.kt (debug source set)</span>
                         <button class="copy-button" type="button">Copy</button>
                     </div>
-<pre><code data-lang="kotlin">AppInspect.install(
-    application = this,
-    configuration = AppInspectConfiguration(
-        enablement = AppInspectEnablement(/* … */),
-        entryPoints = AppInspectEntryPoints(/* … */),
-        panels = AppInspectPanels(/* … */),
-        powerTools = AppInspectPowerTools(/* … */),
-    ),
-)</code></pre>
+<pre><code data-lang="kotlin">// Changes only what you name, and keeps everything AppInspect inferred.
+AppInspect.updateConfiguration { configuration ->
+    configuration.copy(
+        panels = AppInspectPanels(mocksEnabled = false),
+        powerTools = AppInspectPowerTools(showRawSensitiveValues = false),
+    )
+}</code></pre>
+                </div>
+
+                <div class="warn">
+                    <span class="note-title"><code>install()</code> replaces the whole configuration</span>
+                    <p>
+                        Passing a fresh <code>AppInspectConfiguration()</code> to
+                        <code>install()</code> discards the enablement and environment AppInspect
+                        inferred &mdash; including a non-debuggable staging variant's
+                        <a href="environments.html#opt-in">resource opt-in</a>, which switches the
+                        inspector back off in exactly the variant that needed it. Use
+                        <code>install()</code> when you deliberately want to own build-tier policy too,
+                        and then set <code>enablement</code> explicitly. Otherwise use
+                        <code>updateConfiguration</code>.
+                    </p>
                 </div>
 
                 <p>
-                    Keep the call in a debug-only source set: it does not exist in
-                    <code>appinspect-no-op</code>. See <a href="install.html#guard-calls">install</a>.
-                    <code>AppInspect.initialize(configuration)</code> is the older entry point and still
-                    works, but prefer <code>install()</code>.
+                    Either call belongs in a debug-only source set, because neither exists in
+                    <code>appinspect-no-op</code> &mdash; see
+                    <a href="install.html#guard-calls">install</a>. Registered metadata, metadata
+                    providers and redaction rules survive an <code>install()</code>, so handles you are
+                    holding stay valid. <code>AppInspect.initialize(configuration)</code> still works and
+                    is kept for compatibility.
                 </p>
                 <p>
                     <code>AppInspectConfiguration</code> is a group of small objects rather than one flat
                     list of flags: <code>enablement</code>, <code>entryPoints</code>,
-                    <code>panels</code>, <code>powerTools</code>, <code>retention</code>,
-                    <code>environment</code>, <code>initialMetadata</code>, <code>redaction</code> and
-                    <code>branding</code>. Each group below covers one of them.
+                    <code>panels</code>, <code>powerTools</code>, <code>logs</code>,
+                    <code>retention</code>, <code>environment</code>, <code>initialMetadata</code>,
+                    <code>redaction</code> and <code>branding</code>. Each group below covers one of
+                    them.
+                </p>
+                <p>
+                    One useful consequence of the ordering: if a configuration change is what
+                    <em>enables</em> AppInspect for the first time, persistence and the default metadata
+                    providers are brought up at that point &mdash; so it gets a real database rather than
+                    the in-memory fallback the disabled install created.
                 </p>
 
                 <h2 id="enablement">Enablement &mdash; whether it runs at all</h2>
@@ -160,6 +184,15 @@
                     depended on. It is why the runtime self-disable described in the
                     <a href="security.html">security model</a> works.
                 </p>
+                <div class="note">
+                    <span class="note-title">You probably do not need these fields</span>
+                    <p>
+                        The normal way to enable a non-debuggable staging or QA build is the
+                        <a href="environments.html#opt-in">opt-in resource</a> &mdash; one line in the
+                        build type, no host code, and it cannot leak into your release variant. These
+                        fields exist for the unusual case where you want to own the policy in Kotlin.
+                    </p>
+                </div>
 
                 <dl>
                     <div>
@@ -184,10 +217,16 @@
                             A second, separate opt-in for production. Both this <em>and</em>
                             <code>allowInNonDebugBuilds</code> have to be shipped as <code>true</code> in
                             the APK before the inspector can run for real users. There is no way to flip
-                            either at runtime.
+                            either at runtime, and the resource opt-in cannot reach this one.
                         </dd>
                     </div>
                 </dl>
+
+                <p>
+                    <code>AppInspect.setEnabled(...)</code> is ANDed with the tier check rather than
+                    substituted for it, so it can turn an <em>enabled</em> build off &mdash; useful for a
+                    kill switch in your own debug menu &mdash; but can never turn a disallowed tier on.
+                </p>
 
                 <div class="warn">
                     <span class="note-title">If you enable a non-debuggable build</span>
@@ -269,6 +308,10 @@
                         <dt>runtimeEnabled</dt>
                         <dd>The <a href="runtime.html">Runtime</a> button in the top bar &mdash; Runtime is not a bottom-bar tab.</dd>
                     </div>
+                    <div>
+                        <dt>logsEnabled</dt>
+                        <dd>The <a href="logs.html">Logcat</a> button in the top bar. Off means the terminal icon disappears and no capture is ever started &mdash; there is no separate capability flag, because reading the log is all the panel does.</dd>
+                    </div>
                 </dl>
 
                 <h2 id="power-tools">Power tools &mdash; what can be seen and changed</h2>
@@ -311,6 +354,32 @@
                     </div>
                 </dl>
 
+                <h2 id="logs">Logs &mdash; how much of the tail is held</h2>
+                <p>
+                    <code>AppInspectLogsConfig</code> bounds memory and nothing else, because
+                    <a href="logs.html">Logcat</a> capture never touches disk and only runs while the
+                    page is open.
+                </p>
+
+                <dl>
+                    <div>
+                        <dt>bufferSize<span class="dt-default">default: 2000</span></dt>
+                        <dd>Entries held in memory before the oldest are evicted; clamped to 100&ndash;20,000. The default costs well under a megabyte. Raise it when you are chasing something that happens minutes before you notice it.</dd>
+                    </div>
+                    <div>
+                        <dt>initialBacklogLines<span class="dt-default">default: 1000</span></dt>
+                        <dd>Lines replayed from Android's own log buffer when the panel opens, so it never starts blank. The device buffer is itself finite, so asking for more than it holds simply returns what is there.</dd>
+                    </div>
+                    <div>
+                        <dt>maxMessageLength<span class="dt-default">default: 8000</span></dt>
+                        <dd>Per-message character cap, so one enormous stack trace or pretty-printed body cannot consume the whole budget. A truncated message says so.</dd>
+                    </div>
+                    <div>
+                        <dt>redactSensitiveValues<span class="dt-default">default: null</span></dt>
+                        <dd><code>null</code> follows <code>showRawSensitiveValues</code>, so a build that already masks sensitive values does not start leaking them through logs. Set it explicitly to pin the behaviour. It is the <em>initial</em> state of the panel's Redact toggle, which stays live and also governs exports.</dd>
+                    </div>
+                </dl>
+
                 <h2 id="retention">Retention &mdash; how much is kept</h2>
                 <p>
                     Captured events live in AppInspect's own app-private database with a cap; the oldest
@@ -334,6 +403,13 @@
                     parameters, body fields and metadata keys. Extend it with anything your own API uses
                     that is not a standard credential header.
                 </p>
+                <p>
+                    The same rules mask <a href="logs.html#redaction">log lines</a>, where they have to
+                    work on unstructured text: a single line can carry a header, a JSON body and a query
+                    string at once, so scopes are ignored there and matching is best-effort on
+                    <code>key=value</code>-shaped text. A value printed with no key beside it cannot be
+                    caught.
+                </p>
 
                 <div class="note">
                     <span class="note-title">Redaction does not apply to mock rules</span>
@@ -348,13 +424,15 @@
                 <h3 id="profile-developer">A developer's own build</h3>
                 <p>
                     This is the default, and there is nothing to write. Everything visible, everything
-                    editable, mocking available, notifications on.
+                    editable, mocking available, notifications on, logs unredacted.
                 </p>
 
-                <h3 id="profile-qa">A build for a wider QA or business audience</h3>
+                <h3 id="profile-qa">A build that leaves your desk</h3>
                 <p>
-                    Read-only, quieter, and unable to rewrite traffic &mdash; while still capturing
-                    everything needed for a good bug report.
+                    Anything going to a wider QA, business or external-tester audience wants the opposite
+                    defaults: read-only, quieter, unable to rewrite traffic, and masking credentials
+                    before they are stored &mdash; while still capturing everything a good bug report
+                    needs.
                 </p>
 
                 <div class="snippet">
@@ -362,21 +440,14 @@
                         <span class="snippet-file">A controlled QA profile</span>
                         <button class="copy-button" type="button">Copy</button>
                     </div>
-<pre><code data-lang="kotlin">AppInspect.install(
-    application = this,
-    configuration = AppInspectConfiguration(
-        enablement = AppInspectEnablement(
-            allowedBuildTiers = linkedSetOf(AppInspectBuildTier.DEBUG),
-        ),
+<pre><code data-lang="kotlin">AppInspect.updateConfiguration { configuration ->
+    configuration.copy(
         entryPoints = AppInspectEntryPoints(
             shakeToOpenEnabled = true,
             launcherShortcutEnabled = false,
             networkNotificationsEnabled = false,
         ),
-        panels = AppInspectPanels(
-            crashesEnabled = true,
-            mocksEnabled = false,
-        ),
+        panels = AppInspectPanels(mocksEnabled = false),
         powerTools = AppInspectPowerTools(
             showRawSensitiveValues = false,
             allowSharedPreferencesEditing = false,
@@ -384,17 +455,28 @@
             allowSqlConsole = false,
             allowResponseMocking = false,
         ),
-    ),
-)</code></pre>
+        logs = AppInspectLogsConfig(redactSensitiveValues = true),
+    )
+}</code></pre>
                 </div>
+
+                <p>
+                    Note what is <em>not</em> in there: nothing about build tiers. Because this uses
+                    <code>updateConfiguration</code>, the same code is correct in a debug build and in a
+                    staging variant that opted in through the
+                    <a href="environments.html#opt-in">resource</a> &mdash; the tier AppInspect worked out
+                    for the build is left alone.
+                </p>
 
                 <h2 id="defaults">Defaults at a glance</h2>
                 <ul>
+                    <li>Everything is on with no configuration at all &mdash; panels, entry points, crash capture, notifications, logs.</li>
                     <li>Raw sensitive values <strong>are</strong> visible in an enabled build.</li>
                     <li>Build-tier gating decides whether the library runs at all, regardless of configuration.</li>
                     <li>Production is opt-in and off, and needs two separate flags shipped in the APK.</li>
                     <li>WorkManager inspection is read only and cannot be made writable.</li>
                     <li>SharedPreferences and host database editing are on, and configurable.</li>
+                    <li>Log capture is in-memory only, on demand, and limited to your own process.</li>
                 </ul>
                 <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
                 <p class="doc-feedback" data-feedback-line></p>
@@ -426,6 +508,7 @@
                 <span class="footer-group-title">Docs</span>
                 <a href="docs.html">Introduction</a>
                 <a href="install.html">Install</a>
+                <a href="environments.html">Builds and environments</a>
                 <a href="open-inspector.html">Opening the inspector</a>
                 <a href="configuration.html">Configuration</a>
             </nav>
@@ -437,6 +520,7 @@
                 <a href="storage.html">Storage</a>
                 <a href="workmanager.html">WorkManager</a>
                 <a href="crashes.html">Crashes and ANRs</a>
+                <a href="logs.html">Logcat</a>
             </nav>
 
             <nav aria-label="More">
@@ -458,7 +542,7 @@
         <div class="search-box">
             <div class="search-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+                <input type="search" placeholder="Search pages — mocks, logcat, staging builds, ANR…" autocomplete="off" spellcheck="false" aria-label="Search query">
             </div>
             <ul class="search-results"></ul>
             <p class="search-empty" hidden>No page matches that.</p>

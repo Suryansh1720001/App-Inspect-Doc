@@ -140,6 +140,19 @@
                     <li><strong>Headings shrink to fit instead of truncating</strong>, which means a long preference key stays readable in full.</li>
                 </ul>
 
+                <h3 id="one-line">One line per row &mdash; swipe sideways for the rest</h3>
+                <p>
+                    A row never wraps. The document pans horizontally as a block while the line numbers
+                    stay pinned in the gutter, so a long URL takes one line instead of five and the keys
+                    above and below it stay where your eye left them. Wrapping is what makes a deep tree
+                    unreadable: the indentation stops lining up and structure disappears.
+                </p>
+                <p>
+                    The exception is a value so long that panning would be worse than wrapping &mdash; an
+                    auth token, a base64 blob. Those wrap instead, sized to the screen, so you can read
+                    them without swiping at all.
+                </p>
+
                 <h3 id="escaped-json">Escaped JSON inside a string</h3>
                 <p>
                     Backends do this constantly: a perfectly good JSON payload arrives as a string field
@@ -226,6 +239,7 @@
                 <span class="footer-group-title">Docs</span>
                 <a href="docs.html">Introduction</a>
                 <a href="install.html">Install</a>
+                <a href="environments.html">Builds and environments</a>
                 <a href="open-inspector.html">Opening the inspector</a>
                 <a href="configuration.html">Configuration</a>
             </nav>
@@ -237,6 +251,7 @@
                 <a href="storage.html">Storage</a>
                 <a href="workmanager.html">WorkManager</a>
                 <a href="crashes.html">Crashes and ANRs</a>
+                <a href="logs.html">Logcat</a>
             </nav>
 
             <nav aria-label="More">
@@ -258,7 +273,7 @@
         <div class="search-box">
             <div class="search-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+                <input type="search" placeholder="Search pages — mocks, logcat, staging builds, ANR…" autocomplete="off" spellcheck="false" aria-label="Search query">
             </div>
             <ul class="search-results"></ul>
             <p class="search-empty" hidden>No page matches that.</p>

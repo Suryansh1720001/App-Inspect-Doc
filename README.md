@@ -23,8 +23,15 @@ All library claims on the website must match the library repository:
   uncommitted work.
 - When the library changes, sync the website and then update this file.
 
-Last synced with library: **version 0.7.0, library commit `0bda474` plus local
-uncommitted changes (2026-08-21)**.
+Last synced with library: **version 0.7.0, library commit `5346b5d` plus local
+uncommitted changes (2026-08-23)**.
+
+> **Caveat on that sync.** The Logcat panel (`:appinspect-logs`, `AppInspectLogsConfig`,
+> `panels.logsEnabled`) and the `appinspect_enabled_in_non_debuggable_build` resource
+> opt-in were **uncommitted local work** in the library repo when this pass was written.
+> They are documented here because the site carries no version number and describes the
+> current library, but if a reader resolves an older artifact from Maven Central those two
+> features may not be in it. Confirm they are published before treating this as settled.
 
 ## Architecture
 
@@ -33,7 +40,7 @@ kinds of page:
 
 1. **`index.html`** — the marketing landing page. Its own layout (`.landing`), styled
    entirely by `styles.css`.
-2. **Fifteen documentation pages** — each one a real HTML file with a three-column
+2. **Nineteen documentation pages** — each one a real HTML file with a three-column
    docs shell (`.docs`): page nav on the left, the article in the middle, "On this
    page" on the right.
 
@@ -58,7 +65,11 @@ existing docs page), then add an entry to `NAV` in `docs.js` and a `<url>` to
 **The chrome is duplicated per page** — `<head>`, top bar, footer and the search
 dialog are real HTML on every page, deliberately, so the site works without JS and
 crawls properly. A change to the top bar or footer therefore has to be applied to
-`index.html` plus the fifteen docs pages.
+`index.html` plus the nineteen docs pages. The practical way to do that is a throwaway
+Python pass over `glob("*.html")` that replaces the exact old block with the new one and
+reports which files changed; a new page is easiest to create the same way, by taking an
+existing docs page and swapping its `<article>` plus the four head fields that name the
+page (`<title>`, description, canonical, og/twitter).
 
 ### Contact address — one place
 
@@ -77,7 +88,9 @@ If the address changes, update `docs.js` *and* `privacy.html`.
 |---|---|
 | `index.html` | Landing page: hero + phone mockup, how it works, feature cards, audiences, release safety, quick start, FAQ, CTA, maintainer, support |
 | `docs.html` | Docs home — **Introduction** (keeps the historical `/docs.html` URL) |
-| `install.html` | Gradle setup, OkHttp interceptor, verification, host-controlled `install()` |
+| `install.html` | Gradle setup per variant, `matchingFallbacks`, OkHttp interceptor, verification, `updateConfiguration` |
+| `environments.html` | The three build tiers, the scenario table, the staging opt-in resource, release-like testing, R8 |
+| `compatibility.html` | minSdk/AndroidX, why Compose and Kotlin are not required, Java hosts, the three `compileOnly` integrations, API-level degradation |
 | `open-inspector.html` | Every entry point, shake tuning, own-task behaviour, moving between panels |
 | `network.html` | Network panel |
 | `mocks.html` | Response mocking |
@@ -85,6 +98,7 @@ If the address changes, update `docs.js` *and* `privacy.html`.
 | `workmanager.html` | WorkManager panel |
 | `crashes.html` | Crashes and ANRs panel |
 | `runtime.html` | Runtime panel |
+| `logs.html` | Logcat panel — the on-device log tail |
 | `value-viewer.html` | Shared value viewer |
 | `configuration.html` | Configuration reference |
 | `notifications.html` | Network notifications + Android 13 permission |
@@ -113,11 +127,11 @@ Show what it does before how to install it; deep-dive content lives in the docs.
 |---|---|---|---|
 | 1 | Hero | — | Pitch, two CTAs, trust line, and the interactive phone mockup (see below) |
 | 2 | How it works | — | Three steps: add a dependency, open it on the device, evidence leaves as a file |
-| 3 | What you can inspect | `#features` | Seven cards, each linking to its docs page |
+| 3 | What you can inspect | `#features` | Eight cards, each linking to its docs page |
 | 4 | Who it is for | — | Two panels: developers/testers, and companies/platform teams |
 | 5 | Release safety | — | The "this must never ship" objection, answered, links to `security.html`. Uses `.band-split` |
 | 6 | Quick start | `#quick-start` | `.band-split` intro + links, then a **full-width** Gradle snippet |
-| 7 | FAQ | `#faq` | 13 questions, mirrored by the JSON-LD `FAQPage` schema. Uses `.band-split` |
+| 7 | FAQ | `#faq` | 16 questions, mirrored by the JSON-LD `FAQPage` schema. Uses `.band-split` |
 | 8 | CTA | — | Install / Maven Central |
 | 9 | Maintainer | `#developer` | Suryansh Prajapati, GitHub + LinkedIn |
 | 10 | Support | `#support` | Tier cards → UPI QR modal |
@@ -127,10 +141,18 @@ Show what it does before how to install it; deep-dive content lives in the docs.
 The mockup is a working tab interface, not a picture — it doubles as the feature tour,
 so it is the main path from the landing page into the panel docs.
 
-- **Six panels**, all in the markup: five `role="tab"` buttons on the bottom bar
-  (Network, Mocks, Storage, Work, Crashes) plus the **Runtime pill in the top bar**,
-  which is how Runtime actually opens in the app. Arrow keys move along the bottom bar,
-  mirroring the swipe gesture.
+- **Seven panels**, all in the markup: five `role="tab"` buttons on the bottom bar
+  (Network, Mocks, Storage, Work, Crashes) plus two **top-bar buttons** — the worded
+  **Runtime pill** and the icon-only **Logcat button** (`.phone-pill-icon`) — which is how
+  both actually open in the app. Arrow keys and swipes move along the bottom bar only, as
+  in the app; the two top-bar buttons are click targets.
+- **Only one of the two top-bar buttons can be worded.** The bar is a width budget: at a
+  280px frame it holds roughly 240px of content, and `RUNTIME` + a second worded pill +
+  the close glyph leaves nothing for the title. Logcat is therefore an icon (a terminal
+  glyph, with an `aria-label`, which also matches the real app), the subtitle reads
+  "AppInspect · debug" rather than "debug build", and `.phone-bar-title` /
+  `.phone-bar-sub` both truncate rather than wrap — a wrapped title would push the panel
+  content down by a whole line.
 - **Wiring**, all data attributes, handled by the `[data-mock]` block in `script.js`:
 
   | Attribute | On | Purpose |
@@ -144,6 +166,12 @@ so it is the main path from the landing page into the panel docs.
 
 - **Adding a panel** means adding one `[data-mock-view]` block and one tab button with
   those five attributes. No JS change.
+- **The Logcat view is a terminal, so it does not reuse `.phone-card`.** Its rows are
+  `.phone-log` — monospace, one line, ellipsised, with a coloured **left stripe** for the
+  level instead of a badge. Only warnings and above tint the message text (`.l-w`,
+  `.l-e`); `.l-i` and `.l-d` keep neutral text and colour only the stripe, which is what
+  the real panel does and what keeps colour meaningful when you scan. The level chips are
+  `.phone-chiprow`. All of it uses `--p-*` tokens, like every other phone rule.
 - **The phone has its own colour scale** (`--p-bg`, `--p-card`, `--p-ok-bg`, …) declared
   locally on `.phone-screen`, because a device screen has its own semantics: badge
   tints, status colours, a nav bar. **It follows the site theme** — light values are the
@@ -211,8 +239,10 @@ window changes each tick instead of looping four identical rows.
 
 Defined by `NAV` in `docs.js`. Groups and pages:
 
-- **Getting started** — Introduction, Install, Opening the inspector
-- **Panels** — Network, Mocks, Storage, WorkManager, Crashes and ANRs, Runtime, Value viewer
+- **Getting started** — Introduction, Install, Builds and environments, Compatibility,
+  Opening the inspector
+- **Panels** — Network, Mocks, Storage, WorkManager, Crashes and ANRs, Runtime, Logcat,
+  Value viewer
 - **Configuration** — Configuration reference, Network notifications
 - **Safety and privacy** — Security model, Data handling, QA checklist, Privacy policy
 
@@ -223,13 +253,16 @@ Other pages may summarise a topic in a line or two **with a link**, never re-exp
 | Topic | Canonical home |
 |---|---|
 | Gradle setup, variants, the OkHttp interceptor, why it goes last, wire headers | `install.html` |
+| Build tiers, the scenario table, `isDebuggable`, the opt-in resource, `matchingFallbacks`, testing on a release-like build, R8 / consumer rules | `environments.html` |
+| Host requirements: minSdk, AndroidX, Compose/Kotlin not required, Java hosts, the `compileOnly` integrations, API-level degradation | `compatibility.html` |
 | Entry points (shake, shortcut, long press, notification tap, `open()`), own-task behaviour, panel navigation | `open-inspector.html` |
 | Per-panel behaviour | that panel's own page |
 | The shared JSON tree viewer | `value-viewer.html` |
 | How mocking works: sources, modes, matching, `mocks.json` shape, rule actions, priority, the five gates, `adb pull` | `mocks.html` |
-| Every configuration field and its default; the two ready-made profiles | `configuration.html` |
+| Every configuration field and its default; `updateConfiguration` vs `install`; the two ready-made profiles | `configuration.html` |
+| Logcat capture: filters, pause/follow-tail, the memory budget, the permission and storage model, log redaction | `logs.html` |
 | `POST_NOTIFICATIONS` on Android 13+ | `notifications.html` |
-| Release safety (both layers), hardening, what debug builds expose, mocking's security posture | `security.html` |
+| Release safety (both layers), the no-op artifact audit, the whole-library capability audit, hardening, what debug builds expose, mocking's security posture, deliberately enabling it in production | `security.html` |
 | What the library stores on a device, retention, encryption, the mirror file, exports, backups, deletion, Play Data Safety answers | `data-handling.html` |
 | Export credential hygiene for humans | `qa-checklist.html` |
 | **The website's** own data practices — cookies, analytics, hosting, `localStorage` | `privacy.html` |
@@ -238,7 +271,16 @@ Note the split on mocking: **how it works and how to switch it on** is `mocks.ht
 (including the gate table, because that is what you consult when a rule will not
 fire); **why the design is safe** — rules are not redacted, the mirror file is
 external storage, `src/debug/assets`, `allowResponseMocking = false` on non-debuggable
-builds — is `security.html#mocking`.
+builds — is `security.html#mocking`. `mocks.html#in-release` keeps only the two-sentence
+version of "and in a release build?" and links to `environments.html`.
+
+And the split between `environments.html` and `security.html`, which is the one most
+likely to blur: **environments is the build-configuration page** — tiers, variants,
+`isDebuggable`, the opt-in resource, R8, "how do I run this in UAT" — written for someone
+editing `build.gradle.kts`. **Security is the assurance page** — why the guarantees hold,
+what is in the release artifact, what the library cannot do in any build — written for
+someone deciding whether to allow it. Each links to the other once rather than repeating
+the tier table.
 
 ### Privacy vs. data handling — keep these separate
 
@@ -439,6 +481,40 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 - LinkedIn: <https://www.linkedin.com/in/itssuryansh/>
 
 ## Changelog
+
+- **2026-08-23 (library sync: Logcat, environments, compatibility)** — Synced with the
+  library after a large round of changes, and answered the two questions the site could
+  not previously answer. **New `logs.html`** documents the **Logcat panel** — the new
+  `:appinspect-logs` module — a live tail of the host app's own log output, reachable from
+  a terminal icon in the top bar. The page leads with why it exists (logcat is the first
+  thing a developer reaches for and the last thing a tester can get to), then the three
+  properties that make it cheap: no permission, no storage, no idle cost. **New
+  `environments.html`** is the page the docs were missing most: two inputs, three tiers, a
+  nine-row scenario table, the one decision that matters (`isDebuggable`), the
+  `appinspect_enabled_in_non_debuggable_build` opt-in with both ways to declare it,
+  `matchingFallbacks`, how to test on a release-like build, the one way to shoot yourself,
+  and why R8 needs nothing from you. **New `compatibility.html`** answers "will it fit my
+  app": minSdk 24 and AndroidX are the only hard requirements, Compose and Kotlin are
+  **not** required, Java hosts work, and OkHttp / WorkManager / security-crypto are
+  `compileOnly` so the tested build never runs a different HTTP stack than release. Also:
+  `configuration.html` now leads with **`updateConfiguration` rather than `install`**,
+  because `install()` replaces the configuration wholesale and silently discards a staging
+  variant's resource opt-in — the single most expensive mistake in the new API — and gained
+  the `logs` group and `logsEnabled`; `security.html` gained the **no-op artifact audit**
+  (8 KB, four classes, no `android.*` reference, and a CI task that fails the build if a
+  component, permission, resource or unexpected class appears in the artifact) and a
+  **whole-library capability audit**, which is the strongest material the library has for a security
+  review and was not on the site at all; `data-handling.html` records that log lines are
+  the one thing never persisted; `qa-checklist.html` covers logcat exports, which can carry
+  an `Authorization` header that no other panel would show. The landing page gained a
+  **Logcat feature card (eight, not seven)**, a **working Logcat panel in the phone
+  mockup**, the 8 KB claim in the release-safety band, and three FAQ entries (staging
+  builds, Compose/Kotlin, logcat without a cable) mirrored into the JSON-LD. The features
+  heading was rewritten from "Seven surfaces, each with its own page in the docs" to
+  "Eight surfaces, one for each question a bug tends to raise", which says what the
+  panels are *for* and then explains why each gets a page. Copy across the landing page
+  was tightened rather than extended, and "everything is on by default, no configuration
+  required" is now said once in each place a reader lands.
 
 - **2026-08-21 (cut design rationale)** — Removed the explanation of *why* Runtime is not
   a bottom-bar tab. It appeared in three user-facing places — a whole `<h2>` section on

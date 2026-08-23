@@ -118,10 +118,9 @@
 
                 <h2 id="short-version">The short version</h2>
                 <ul>
-                    <li><strong>Two independent layers</strong> keep the inspector out of production. Either one alone would be sufficient.</li>
-                    <li><strong>No network calls of its own.</strong> The library observes the traffic your app makes and sends nothing anywhere. Zero telemetry, no account, no backend &mdash; <a href="data-handling.html">data handling</a> has the detail.</li>
-                    <li><strong>No logging.</strong> Captured payloads, headers and crash traces are never written to Logcat.</li>
-                    <li><strong>Nothing is exported.</strong> No component of the library is reachable from another app.</li>
+                    <li><strong>Two independent layers</strong> keep the inspector out of production, and either one alone would be sufficient. The release artifact's inertness is <a href="#audit">checked by CI on every build</a> rather than asserted in a document.</li>
+                    <li><strong>No network calls of its own.</strong> The library observes the traffic your app makes and sends nothing anywhere &mdash; zero telemetry, no account, no backend. That is a property of what the source can express, not a setting. See <a href="data-handling.html">data handling</a>.</li>
+                    <li><strong>Nothing gets in and nothing leaks out sideways.</strong> No component is reachable from another app, and the library never writes captured payloads, headers or traces to Logcat.</li>
                     <li><strong>Debug builds are open on purpose.</strong> That is the trade, and it is configurable.</li>
                 </ul>
 
@@ -142,15 +141,62 @@
 
                 <p>
                     <code>appinspect-no-op</code> contains a pass-through OkHttp interceptor and nothing
-                    else. No inspector UI, no storage, no network capture, no crash handler, no manifest
-                    entries, no permissions. Inspection code is <strong>absent</strong> from the release
-                    APK &mdash; not disabled, not dead-code-eliminated, absent.
+                    else. Inspection code is <strong>absent</strong> from the release APK &mdash; not
+                    disabled, not dead-code-eliminated, absent.
                 </p>
                 <p>
                     It exists so that shared code compiles: your <code>OkHttpClient</code> builder can
                     call <code>.addAppInspectInterceptor()</code> in every variant without a
                     <code>BuildConfig.DEBUG</code> branch. In release, that call returns the builder
                     unchanged.
+                </p>
+
+                <h3 id="audit">What actually ships, in full</h3>
+                <p>
+                    This is not a summary. With
+                    <code>releaseImplementation("…:appinspect-no-op:&lt;latest-version&gt;")</code> and no
+                    flags set, the following is the <strong>entire</strong> contents of what reaches your
+                    production APK &mdash; about <strong>8&nbsp;KB</strong>.
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>AAR entry</th><th>Contents</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>AndroidManifest.xml</code></td><td>A manifest and a <code>&lt;uses-sdk&gt;</code>. <strong>No <code>&lt;application&gt;</code> block</strong>, so no activity, service, receiver or provider &mdash; and <strong>no permissions</strong>.</td></tr>
+                            <tr><td><code>classes.jar</code></td><td>Four classes: the two interceptors, the extension function, and one config data class.</td></tr>
+                            <tr><td><code>R.txt</code></td><td>Empty.</td></tr>
+                            <tr><td>&mdash;</td><td>No <code>res/</code>, no <code>assets/</code>, no <code>jni/</code>, no native libraries.</td></tr>
+                            <tr><td>POM</td><td>One dependency: <code>kotlin-stdlib</code>.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Disassembling every method in those four classes gives their complete set of external
+                    references: OkHttp's <code>Interceptor.Chain</code> (only <code>request()</code> and
+                    <code>proceed()</code>), Kotlin's null-check intrinsics,
+                    <code>Object</code>/<code>String</code>, and its own config class.
+                    <strong>Not one <code>android.*</code> API is referenced</strong> &mdash; there is no
+                    <code>Context</code>, no file handle, no database, no sensor, no reflection, and no
+                    means of obtaining any of them. The whole interceptor body is
+                    <code>return chain.proceed(chain.request())</code>.
+                </p>
+                <p>
+                    So in a release build with the no-op, these are not &ldquo;disabled&rdquo; &mdash;
+                    they are <strong>absent</strong>: network capture, response mocking, the inspector UI,
+                    SQLite storage, preferences and DataStore access, the crash handler, ANR collection,
+                    WorkManager reading, logcat capture, notifications, the shake listener, the launcher
+                    shortcut, and export. There is no code present that could do any of them.
+                </p>
+                <p>
+                    <strong>And it is enforced by CI, not by review.</strong> A build task opens the
+                    assembled artifact and fails if the manifest gains any component or permission, if
+                    any resource, asset or native payload appears, or if <em>any</em> class outside the
+                    interceptor stubs turns up. That is the part worth telling a security reviewer: the
+                    claim is checked on every build of the library, not asserted in a document.
                 </p>
 
                 <h2 id="layer-2">Layer 2 &mdash; and if it ships anyway, it refuses to run</h2>
@@ -168,6 +214,7 @@
                     <li>never creates <code>appinspect_storage.db</code> on disk &mdash; it falls back to an in-memory store, so your app's storage footprint is unaffected;</li>
                     <li>never installs the crash handler and never starts the ANR and native-crash collector, and never writes the <code>appinspect_internal_state</code> bookkeeping file either;</li>
                     <li>never registers lifecycle callbacks, sensors, notification channels or the launcher shortcut;</li>
+                    <li>never spawns a <code>logcat</code> process &mdash; the <a href="logs.html">Logcat</a> page is only reachable from an inspector that refuses to open;</li>
                     <li>turns the OkHttp interceptor into a pure pass-through, while <code>captureNetworkEvent</code> and <code>captureCrashEvent</code> independently re-check the gate and drop silently;</li>
                     <li>refuses every <code>open()</code> call;</li>
                     <li>loads no mock rules, runs no mock branch, and never writes the <code>adb</code>-pullable mirror file &mdash; and deletes a mirror that an earlier enabled install left behind.</li>
@@ -176,6 +223,11 @@
                     That last point is worth noticing: the gate is not one check at startup. Capture,
                     mocking and opening each re-verify it independently, so there is no single flag to
                     flip.
+                </p>
+                <p>
+                    How a build resolves to a tier &mdash; and how a legitimate non-debuggable staging
+                    build opts in without any of this reaching your release variant &mdash; is on
+                    <a href="environments.html">builds and environments</a>.
                 </p>
 
                 <h2 id="production">There is no runtime switch for production</h2>
@@ -186,6 +238,61 @@
                     <code>allowInProductionBuilds = true</code> in the configuration compiled into the
                     APK &mdash; two separate, deliberate opt-ins that only exist for teams with an unusual
                     internal-distribution setup.
+                </p>
+
+                <h3 id="deliberate">If you turn it on in production anyway</h3>
+                <p>
+                    A library cannot defend against its owner deliberately enabling it, and the site
+                    would be dishonest if it pretended otherwise. Shipping the full library with the
+                    <a href="environments.html#production">opt-in resource in your release build</a> will
+                    run the inspector for real users. It is an explicit line in your own build script,
+                    reviewable in a diff &mdash; the same trust level as writing
+                    <code>implementation</code> instead of <code>debugImplementation</code>.
+                </p>
+                <p>
+                    If you do it even briefly &mdash; a few minutes of testing against production
+                    &mdash; understand that it is <em>everything</em>, not a sample: capture writes real
+                    user traffic including <code>Authorization</code> headers to the device, the crash
+                    handler installs, the launcher shortcut publishes, notifications post, Logcat capture
+                    becomes reachable, and <strong>response mocking can serve canned data to real
+                    users</strong>. Before you try it, set
+                    <code>allowResponseMocking = false</code> and keep <code>mocks.json</code> out of
+                    <code>src/main/assets/</code> &mdash; and note that a device override persisted by an
+                    earlier enabled build on the same <code>applicationId</code> can turn mocking on even
+                    with no <code>mocks.json</code> present at all.
+                    <code>allowResponseMocking = false</code> short-circuits ahead of that override, the
+                    file flag and every rule, which is why it is the one switch to reach for.
+                </p>
+
+                <h2 id="capabilities">What the library cannot do, in any build</h2>
+                <p>
+                    The two layers above are about <em>where</em> the inspector runs. This is a different
+                    kind of assurance: some things are not features that can be switched on, because the
+                    capability is not in the source at all. These hold in every build tier, including
+                    debug.
+                </p>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Looked for</th><th>Found</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>java.net.URL</code>, <code>HttpURLConnection</code>, <code>Socket</code>, <code>OkHttpClient()</code>, <code>newCall</code></td><td><strong>None.</strong> The library cannot open a connection of its own. Zero telemetry by construction rather than by policy.</td></tr>
+                            <tr><td><code>DexClassLoader</code>, <code>System.loadLibrary</code>, <code>createPackageContext</code></td><td><strong>None.</strong> No dynamic code loading, no native code, no reaching into other packages.</td></tr>
+                            <tr><td><code>Log.*</code>, <code>println</code>, <code>System.out</code></td><td><strong>None.</strong> The library never writes a line to logcat &mdash; which is why it can read the log without polluting it.</td></tr>
+                            <tr><td><code>Runtime.getRuntime</code>, <code>ProcessBuilder</code></td><td><strong>One:</strong> the logcat tail, scoped to the app's own pid and needing no permission. It is constructed only by the Logcat page, so a disabled build never spawns it, and it is absent entirely under the no-op.</td></tr>
+                            <tr><td>Reflection over <em>your</em> classes</td><td><strong>None.</strong> The only <code>Class.forName</code> calls name AppInspect's own modules. No annotation, classpath or <code>ServiceLoader</code> scanning.</td></tr>
+                            <tr><td>Exported components</td><td><strong>None.</strong> All three components in the full library are <code>exported="false"</code>; the no-op has none at all. There are no services or receivers anywhere, so there is no IPC surface even in debug.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    The one place the library writes outside app-private storage is the mock rule mirror,
+                    and that is gated on the build tier &mdash; a build that cannot mock does not merely
+                    skip the write, it <strong>deletes</strong> a file an earlier enabled install left
+                    behind, because the external files directory survives an app upgrade.
                 </p>
 
                 <h2 id="hardening">Hardening in every build type</h2>
@@ -203,9 +310,9 @@
                 <h2 id="debug-builds">Debug builds are open, on purpose</h2>
                 <p>
                     Inside an enabled build, the inspector shows real data. Auth headers, tokens, cookies,
-                    database contents, DataStore values, decrypted <code>EncryptedSharedPreferences</code>
-                    and full crash stack traces are all visible. That is not an oversight &mdash; a
-                    debugging tool that hides the value you are debugging is useless.
+                    database contents, DataStore values, decrypted <code>EncryptedSharedPreferences</code>,
+                    full crash stack traces and the app's own log output are all visible. That is not an
+                    oversight &mdash; a debugging tool that hides the value you are debugging is useless.
                 </p>
                 <p>
                     What follows from that:
@@ -214,7 +321,8 @@
                     <li>Request headers are read <a href="install.html#wire-headers">off the wire</a>, so they include credentials attached downstream of AppInspect &mdash; a host auth interceptor, an <code>Authenticator</code> retry, the cookie jar &mdash; not only the headers your calling code set.</li>
                     <li>Captured data is persisted in app-private SQLite with retention caps (300 network events, 50 crashes by default).</li>
                     <li>Enabled builds should go to trusted development, QA and internal-test audiences only.</li>
-                    <li>For a wider audience, reduce what is visible and editable with the levers on the <a href="configuration.html#power-tools">configuration reference</a>. <code>showRawSensitiveValues = false</code> masks configured sensitive values <em>before storage</em>, not just in the UI.</li>
+                    <li>The <a href="logs.html#redaction">Logcat</a> panel is the easiest one to underestimate: OkHttp's own <code>HttpLoggingInterceptor</code> prints <code>Authorization</code> headers straight to logcat, so a log tail can carry a token even when every other panel is clean. Its Redact toggle covers both the view and the export.</li>
+                    <li>For a wider audience, reduce what is visible and editable with the levers on the <a href="configuration.html#power-tools">configuration reference</a>. <code>showRawSensitiveValues = false</code> masks configured sensitive values <em>before storage</em>, not just in the UI &mdash; and log redaction follows it by default.</li>
                 </ul>
 
                 <h2 id="mocking">Response mocking has extra gates</h2>
@@ -285,6 +393,7 @@
                             <tr><td>Can it run in production?</td><td>Not unless two separate opt-ins are compiled into the APK, and the recommended setup does not compile the code in at all.</td></tr>
                             <tr><td>What data leaves the device?</td><td>Only files a person explicitly shares, through the Android share sheet. See <a href="data-handling.html">data handling</a>.</td></tr>
                             <tr><td>Can another app read what it captured?</td><td>No. Storage is app-private, no component is exported, and export files are served through a scoped, non-exported <code>FileProvider</code>.</td></tr>
+                            <tr><td>How do we verify that ourselves?</td><td>Unzip the release AAR: <a href="#audit">four classes, no manifest components, no permissions, no resources</a>. The library's own CI fails if that changes.</td></tr>
                             <tr><td>What is the residual risk?</td><td>Shared exports. They contain real credentials by design &mdash; that is a process control, and the <a href="qa-checklist.html">QA checklist</a> is the process.</td></tr>
                         </tbody>
                     </table>
@@ -319,6 +428,7 @@
                 <span class="footer-group-title">Docs</span>
                 <a href="docs.html">Introduction</a>
                 <a href="install.html">Install</a>
+                <a href="environments.html">Builds and environments</a>
                 <a href="open-inspector.html">Opening the inspector</a>
                 <a href="configuration.html">Configuration</a>
             </nav>
@@ -330,6 +440,7 @@
                 <a href="storage.html">Storage</a>
                 <a href="workmanager.html">WorkManager</a>
                 <a href="crashes.html">Crashes and ANRs</a>
+                <a href="logs.html">Logcat</a>
             </nav>
 
             <nav aria-label="More">
@@ -351,7 +462,7 @@
         <div class="search-box">
             <div class="search-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+                <input type="search" placeholder="Search pages — mocks, logcat, staging builds, ANR…" autocomplete="off" spellcheck="false" aria-label="Search query">
             </div>
             <ul class="search-results"></ul>
             <p class="search-empty" hidden>No page matches that.</p>

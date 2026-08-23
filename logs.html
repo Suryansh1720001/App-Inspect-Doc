@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crashes and ANRs | AppInspect docs</title>
-    <meta name="description" content="How AppInspect captures uncaught exceptions, and how it reports ANRs and native crashes on Android 11+ using ApplicationExitInfo.">
+    <title>Logcat | AppInspect docs</title>
+    <meta name="description" content="A live, filterable tail of your app's own logcat output on the device: no permission, no storage, no idle cost, with redaction before you share it.">
     <meta name="theme-color" content="#fdfbf5" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <link rel="canonical" href="https://app-inspect-doc.vercel.app/crashes.html">
+    <link rel="canonical" href="https://app-inspect-doc.vercel.app/logs.html">
 
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://app-inspect-doc.vercel.app/crashes.html">
-    <meta property="og:title" content="Crashes and ANRs — AppInspect docs">
-    <meta property="og:description" content="How AppInspect captures uncaught exceptions, and how it reports ANRs and native crashes on Android 11+ using ApplicationExitInfo.">
+    <meta property="og:url" content="https://app-inspect-doc.vercel.app/logs.html">
+    <meta property="og:title" content="Logcat — AppInspect docs">
+    <meta property="og:description" content="A live, filterable tail of your app's own logcat output on the device: no permission, no storage, no idle cost, with redaction before you share it.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Crashes and ANRs — AppInspect docs">
-    <meta name="twitter:description" content="How AppInspect captures uncaught exceptions, and how it reports ANRs and native crashes on Android 11+ using ApplicationExitInfo.">
+    <meta name="twitter:title" content="Logcat — AppInspect docs">
+    <meta name="twitter:description" content="A live, filterable tail of your app's own logcat output on the device: no permission, no storage, no idle cost, with redaction before you share it.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -109,94 +109,160 @@
 
             <article class="prose">
                 <span class="eyebrow">Panels</span>
-                <h1>Crashes and ANRs</h1>
+                <h1>Logcat</h1>
                 <p class="lede">
-                    A tester says "it closed". Nobody was attached over adb, Logcat is gone, and the
-                    crash reporter's dashboard will show it tomorrow at best. This panel keeps the last
-                    50 crashes on the device, with the full stack trace, ready to share as a file.
+                    A live terminal tail of your app's own log output, on the device, with no cable and
+                    no <code>adb</code>. It shows everything written with <code>Log.v</code> through
+                    <code>Log.wtf</code> &mdash; by your code and by every library in the same process, so
+                    OkHttp, Firebase, WorkManager and framework messages all appear. It opens from the
+                    terminal icon in the top bar.
                 </p>
 
-                <h2 id="uncaught">Uncaught exceptions</h2>
+                <h2 id="why">Why it is a panel at all</h2>
                 <p>
-                    AppInspect installs a crash handler that captures uncaught exceptions on every thread,
-                    then <strong>chains to whatever handler was already there</strong> &mdash; Crashlytics,
-                    Sentry, your own. It does not replace your crash reporter and does not stop it from
-                    seeing the crash. Both get it.
-                </p>
-                <p>
-                    The record is written to disk <strong>synchronously, before the process dies</strong>.
-                    That is the only way it can be there on the next launch, and it is why the panel is
-                    useful at all.
-                </p>
-                <p>
-                    Each record holds the exception type, the message, the thread name, and the complete
-                    stack trace.
+                    Logcat is normally the first thing a developer reaches for and the last thing a
+                    tester can get to. The moment the phone is not plugged into your machine, the most
+                    detailed record of what just happened is unreachable &mdash; so the bug report says
+                    &ldquo;it froze&rdquo; instead of carrying the exception that caused it. This panel
+                    closes that gap: the person holding the device can read the log, filter it, and share
+                    the relevant lines as a file.
                 </p>
 
-                <h2 id="anr">ANRs and native crashes</h2>
+                <h2 id="reading">Reading the tail</h2>
                 <p>
-                    An ANR cannot be caught by a Java handler, and neither can a crash in native code
-                    &mdash; by definition, nothing in your process is in a position to report it. So
-                    AppInspect uses a different mechanism: on <strong>Android 11 and newer</strong> it
-                    reads the OS's own <code>ApplicationExitInfo</code> records on the next launch and
-                    turns them into crash entries.
-                </p>
-                <p>
-                    Two consequences follow from that design:
+                    The rendering is deliberately terminal-like: monospace, one line per record, a
+                    coloured level stripe down the left edge, and the level colours you already know from
+                    Android Studio. Warnings and above tint the whole message; everything below stays
+                    neutral, so colour keeps its value for scanning instead of becoming decoration.
                 </p>
                 <ul>
-                    <li><strong>Reported one launch late.</strong> An ANR appears the next time the app starts, not while it is hanging. There is no way around that, and it is still far better than nothing.</li>
-                    <li><strong>Zero runtime cost.</strong> Nothing polls, no watchdog thread runs, no main-thread heartbeat is checked. The OS already recorded it; AppInspect just reads the record.</li>
+                    <li><strong>Filters</strong> &mdash; level chips (V/D/I/W/E/A), a tag picker, and free-text search across message and tag, with a <code>.*</code> toggle for regular expressions. Matches are highlighted inline.</li>
+                    <li><strong>Pause</strong> freezes the view while capture continues underneath, so a burst cannot scroll a stack trace away while you are reading it.</li>
+                    <li><strong>Follow tail</strong> auto-scrolls, yields the moment you drag away from the bottom, and re-arms when you return; a button jumps you back.</li>
+                    <li><strong>Wrap</strong> and <strong>Redact</strong> live in the status bar, which also reports how much of the buffer is in use and how many entries retention has evicted.</li>
                 </ul>
                 <p>
-                    For an ANR the OS also supplies its <strong>thread dump</strong>, which is included.
-                    That dump is the actual evidence for a main-thread block &mdash; it shows what every
-                    thread was doing at the moment the system gave up.
-                </p>
-                <p>
-                    On Android 10 and older, uncaught exceptions are still captured; ANR and native crash
-                    reporting simply is not available, because the OS API it depends on does not exist.
+                    Tap a line to expand a folded stack trace &mdash; wrapped continuation lines are
+                    parsed back into the record they belong to, rather than arriving as loose lines. Long
+                    press to copy one, and share the visible, filtered lines as a <code>.txt</code> in
+                    logcat's own layout.
                 </p>
 
-                <h2 id="retention">How much is kept</h2>
+                <h2 id="cost">No permission, no storage, no idle cost</h2>
                 <p>
-                    The <strong>50 most recent</strong> records are persisted in AppInspect's app-private
-                    SQLite database and survive restarts and reinstalls of the app's process. When the cap
-                    is reached the oldest are dropped. <strong>Clear</strong> inside the panel removes
-                    them all.
-                </p>
-                <p>
-                    In release builds none of this happens: the handler is never installed, the exit-info
-                    collector never starts, and the bookkeeping file it uses is never written. See the
-                    <a href="security.html">security model</a>.
+                    Three properties worth stating plainly, because together they are the reason this
+                    panel is cheap enough to leave switched on.
                 </p>
 
-                <h2 id="sharing">Getting a crash into a ticket</h2>
-                <p>
-                    Copy or share an individual report, or export all of the currently filtered crashes as
-                    a <code>.txt</code> through the Android share sheet. A tester can do this themselves,
-                    which is the point &mdash; the stack trace arrives with the bug report instead of being
-                    reconstructed from a description of a white screen.
-                </p>
-
-                <div class="warn">
-                    <span class="note-title">A stack trace is source-adjacent</span>
-                    <p>
-                        Crash and ANR reports name your packages, classes, methods and line numbers.
-                        Treat a shared report the way you would treat a code excerpt, and do not paste one
-                        into a public channel. The <a href="qa-checklist.html">QA checklist</a> has the
-                        rest of the export hygiene.
-                    </p>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th>Property</th><th>How</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>No permission</strong></td>
+                                <td><code>READ_LOGS</code> has not been grantable to ordinary apps since Android 4.1, so capture is constrained to this process's own pid &mdash; the only log Android lets an app read. Another app's output is never visible, by construction.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>No storage</strong></td>
+                                <td>Entries live in a bounded in-memory ring buffer and nowhere else &mdash; no file, no row in <code>appinspect_storage.db</code>, nothing to back up or clean up. A chatty app out-logs its own network traffic by orders of magnitude; persisting that would grow the database without limit.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>No idle cost</strong></td>
+                                <td>Capture is on demand. No reader thread and no <code>logcat</code> process exist until the page is opened, and both are torn down when it closes.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+
+                <p>
+                    Scroll-back still works despite the on-demand model, because Android's own log buffer
+                    supplies it: opening the page replays the most recent lines and then keeps streaming.
+                    The buffer is discarded when the process dies, which is the right lifetime for a live
+                    tail.
+                </p>
 
                 <div class="note">
-                    <span class="note-title">Hiding the panel</span>
+                    <span class="note-title">If a device refuses <code>--pid</code></span>
                     <p>
-                        <code>AppInspectPanels(crashesEnabled = false)</code> removes the Crashes tab
-                        &mdash; useful for a build going to an audience that should not be reading stack
-                        traces. See the <a href="configuration.html#panels">configuration reference</a>.
+                        A few vendor ROMs ship a <code>logcat</code> that rejects pid filtering. Capture
+                        escalates rather than giving up: it drops to an unfiltered command and filters by
+                        pid in-process, discarding lines that belong to anything else. If no variant
+                        produces output at all, the panel says logcat is unreadable on this device
+                        &mdash; rather than showing an empty list that looks like &ldquo;no logs&rdquo;.
                     </p>
                 </div>
+
+                <h2 id="redaction">Redaction, and why it matters more here</h2>
+                <p>
+                    Log lines are the most likely place for a secret to appear even when every other
+                    panel is clean, because logging libraries print things you did not choose:
+                    OkHttp's own <code>HttpLoggingInterceptor</code> writes <code>Authorization</code>
+                    headers straight to logcat.
+                </p>
+                <p>
+                    The panel's <strong>Redact</strong> toggle masks sensitive values using the same
+                    <a href="configuration.html#redaction">redaction rules</a> as the rest of the
+                    library, and it governs the export as well &mdash; the export header records which
+                    mode produced the file. Masking happens at render and export time rather than at
+                    capture, so the toggle works in both directions without re-reading the device buffer,
+                    which could not recover the original anyway.
+                </p>
+                <p>
+                    Because free text has no structure, matching is best-effort: it recognises
+                    <code>"key":"value"</code>, <code>key=value</code> and <code>key: value</code> shapes,
+                    and cannot catch a value printed with no key beside it. Treat a Logcat export exactly
+                    like a network export &mdash; the <a href="qa-checklist.html">QA checklist</a> applies
+                    unchanged.
+                </p>
+
+                <h2 id="config">Sizing and switching it off</h2>
+                <p>
+                    The defaults suit an app that logs normally. Raise the buffer if you are chasing
+                    something that happens minutes before you notice it; the cost is only RAM, since
+                    nothing is written to disk.
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">AppInspectLogsConfig</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">AppInspectLogsConfig(
+    bufferSize = 2_000,             // entries kept in memory; clamped to 100..20,000
+    initialBacklogLines = 1_000,    // lines replayed from the device log on open
+    maxMessageLength = 8_000,       // per-message character cap
+    redactSensitiveValues = null,   // null follows powerTools.showRawSensitiveValues
+)</code></pre>
+                </div>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr><th><code>bufferSize</code></th><th>Roughly</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>2,000 <em>(default)</em></td><td>0.4&ndash;0.8 MB</td></tr>
+                            <tr><td>5,000</td><td>1&ndash;2 MB</td></tr>
+                            <tr><td>20,000 <em>(maximum)</em></td><td>4&ndash;8 MB</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    <code>maxMessageLength</code> caps a single message so one enormous stack trace or
+                    pretty-printed response body cannot consume the whole budget on its own; a cut
+                    message says so. To remove the panel entirely, set
+                    <code>AppInspectPanels(logsEnabled = false)</code> &mdash; the terminal icon
+                    disappears and no capture is ever started.
+                </p>
+                <p>
+                    In a build where the library is disabled, none of this exists: the page is only
+                    reachable from an inspector that refuses to open, so no <code>logcat</code> process
+                    is ever spawned. Under <code>appinspect-no-op</code> the capture code is not in the
+                    APK at all &mdash; see the <a href="security.html">security model</a>.
+                </p>
                 <nav class="page-nav" id="page-nav" aria-label="Previous and next page"></nav>
                 <p class="doc-feedback" data-feedback-line></p>
             </article>

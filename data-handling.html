@@ -133,7 +133,7 @@
                     <li><strong>No network calls of its own.</strong> It observes the traffic your app makes and never originates a request.</li>
                     <li><strong>No telemetry</strong> of any kind &mdash; not usage, not crashes, not "anonymous" statistics about the inspector.</li>
                     <li><strong>No advertising or tracking SDKs</strong> bundled or transitively pulled in.</li>
-                    <li><strong>No Logcat output</strong> of captured payloads, headers or crash traces.</li>
+                    <li><strong>No Logcat output</strong> of captured payloads, headers or crash traces &mdash; and the <a href="logs.html">log tail</a> it reads is your own process's only, which is the only log Android lets an app read.</li>
                     <li><strong>No modification of the requests your app sends.</strong> <a href="mocks.html">Response mocking</a> changes only what your app receives back, on the device; a rule's matching conditions are filters, never transmitted data.</li>
                 </ul>
 
@@ -174,6 +174,11 @@
                                 <td>Read from your app on demand &mdash; <strong>never copied or persisted</strong> by AppInspect</td>
                                 <td>Not stored</td>
                             </tr>
+                            <tr>
+                                <td><strong>Captured log lines</strong><br>the <a href="logs.html">Logcat</a> tail</td>
+                                <td>A bounded in-memory ring buffer &mdash; <strong>never written to disk</strong>, not even to AppInspect's own database</td>
+                                <td>Until the process dies</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -183,6 +188,13 @@
                     <a href="configuration.html#retention">retention</a>. The
                     <a href="storage.html">Storage panel</a> excludes AppInspect's own database and
                     preference files, so the inspector never shows you itself.
+                </p>
+                <p>
+                    The log buffer is the deliberate exception to everything above, and the reason is
+                    volume: a chatty app out-logs its own network traffic by orders of magnitude, so
+                    persisting the tail would grow the database without limit. Keeping it in memory means
+                    there is nothing to back up, nothing to clear, and nothing left after the process
+                    exits &mdash; and it is also why the panel costs nothing until you open it.
                 </p>
 
                 <h3 id="encrypted">Encrypted preferences</h3>
@@ -216,6 +228,7 @@
                 <ul>
                     <li>Network logs as <code>.txt</code> (with cURL commands) or <code>.har</code>.</li>
                     <li>Mock rules as <code>.json</code>.</li>
+                    <li>The visible, filtered <a href="logs.html">Logcat</a> lines as <code>.txt</code>, with a header recording whether redaction was on.</li>
                     <li>Individual crash reports, and runtime summaries, through the Android share sheet.</li>
                 </ul>
                 <p>
@@ -231,9 +244,10 @@
                         A network export contains the same <code>Authorization</code> headers, API keys
                         and cookies the original requests used &mdash; including ones your own code never
                         set, because request headers are recorded
-                        <a href="install.html#wire-headers">as they went out on the wire</a>. Redact
-                        before attaching one anywhere. The
-                        <a href="qa-checklist.html">QA checklist</a> is the procedure.
+                        <a href="install.html#wire-headers">as they went out on the wire</a>. A Logcat
+                        export can carry the same thing from a different direction: logging libraries
+                        print headers you did not choose to print. Redact before attaching either one
+                        anywhere. The <a href="qa-checklist.html">QA checklist</a> is the procedure.
                     </p>
                 </div>
 
@@ -317,6 +331,7 @@
                 <span class="footer-group-title">Docs</span>
                 <a href="docs.html">Introduction</a>
                 <a href="install.html">Install</a>
+                <a href="environments.html">Builds and environments</a>
                 <a href="open-inspector.html">Opening the inspector</a>
                 <a href="configuration.html">Configuration</a>
             </nav>
@@ -328,6 +343,7 @@
                 <a href="storage.html">Storage</a>
                 <a href="workmanager.html">WorkManager</a>
                 <a href="crashes.html">Crashes and ANRs</a>
+                <a href="logs.html">Logcat</a>
             </nav>
 
             <nav aria-label="More">
@@ -349,7 +365,7 @@
         <div class="search-box">
             <div class="search-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+                <input type="search" placeholder="Search pages — mocks, logcat, staging builds, ANR…" autocomplete="off" spellcheck="false" aria-label="Search query">
             </div>
             <ul class="search-results"></ul>
             <p class="search-empty" hidden>No page matches that.</p>

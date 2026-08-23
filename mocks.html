@@ -353,14 +353,27 @@
 
                 <h3 id="editor">In the rule editor</h3>
                 <p>
-                    The editor is split into <strong>Match</strong> (filters on the outgoing request) and
-                    <strong>Response</strong> (what your app receives instead). Nothing in the Match
-                    section is ever sent.
+                    The editor is a bottom sheet with its fields grouped behind a
+                    <strong>Match</strong> / <strong>Response</strong> / <strong>Behavior</strong>
+                    selector: filters on the outgoing request, then what comes back instead, then failure
+                    simulation, delay and priority. Nothing in the Match group is ever sent. The header
+                    and the Cancel/Save bar stay pinned while the section scrolls.
                 </p>
                 <p>
                     Only two fields are marked required: the URL pattern &mdash; unless you supply a query
                     or body condition instead &mdash; and the status code, which disappears for failure
-                    rules. Everything else blank means "matches anything".
+                    rules. Everything else blank means "matches anything", and whatever is stopping Save
+                    is listed next to it, so the reason it is disabled is always on screen.
+                </p>
+                <p>
+                    Two details that save time. <strong>The sheet closes only via &#10005; or
+                    Cancel</strong> &mdash; not by swiping down, tapping outside, or pressing back, since
+                    all three would silently discard a half-written rule. And the common path is a tap
+                    rather than typing: the URL pattern suggests distinct <em>paths</em> from calls this app
+                    has actually made, newest first, so a rule survives an environment switch; status
+                    code, content type and delay suggest the values people type anyway; and the status
+                    field names the code you entered (<code>503</code> &rarr; "Service Unavailable") to
+                    catch a transposed digit.
                 </p>
 
                 <h2 id="priority">When several rules match</h2>
@@ -413,6 +426,25 @@
                     teammate's debug build starts mocking those endpoints on first launch. That is the
                     intent &mdash; it makes a test scenario reproducible and reviewable &mdash; and anyone
                     can take control on their own device without touching the file.
+                </p>
+
+                <h3 id="in-release">And in a release build?</h3>
+                <p>
+                    With the recommended <code>appinspect-no-op</code> release setup, a
+                    <code>mocks.json</code> that made it into the APK is <strong>inert</strong> &mdash;
+                    there is no code in that artifact able to open a file, and every line of mocking logic
+                    lives in a module that is not in the APK at all. The only real concern is that its
+                    endpoint URLs and canned bodies are readable by anyone who unzips the APK, which is
+                    the reason for <code>src/debug/assets/</code>.
+                </p>
+                <p>
+                    If the full library is deliberately enabled in a non-debuggable build, that changes:
+                    the file <em>is</em> read, every gate above defaults to passing, and real users can be
+                    served canned responses. <code>allowResponseMocking = false</code> is the one switch
+                    that closes it, because it short-circuits ahead of the device override, the file flag
+                    and every rule &mdash;
+                    <a href="environments.html#release-testing">testing on a release-like build</a> covers
+                    how to set that up safely.
                 </p>
 
                 <h2 id="adb-pull">Getting device rules back into your project</h2>
@@ -522,6 +554,7 @@ mv mocks.json app/src/debug/assets/appinspect/mocks.json</code></pre>
                 <span class="footer-group-title">Docs</span>
                 <a href="docs.html">Introduction</a>
                 <a href="install.html">Install</a>
+                <a href="environments.html">Builds and environments</a>
                 <a href="open-inspector.html">Opening the inspector</a>
                 <a href="configuration.html">Configuration</a>
             </nav>
@@ -533,6 +566,7 @@ mv mocks.json app/src/debug/assets/appinspect/mocks.json</code></pre>
                 <a href="storage.html">Storage</a>
                 <a href="workmanager.html">WorkManager</a>
                 <a href="crashes.html">Crashes and ANRs</a>
+                <a href="logs.html">Logcat</a>
             </nav>
 
             <nav aria-label="More">
@@ -554,7 +588,7 @@ mv mocks.json app/src/debug/assets/appinspect/mocks.json</code></pre>
         <div class="search-box">
             <div class="search-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+                <input type="search" placeholder="Search pages — mocks, logcat, staging builds, ANR…" autocomplete="off" spellcheck="false" aria-label="Search query">
             </div>
             <ul class="search-results"></ul>
             <p class="search-empty" hidden>No page matches that.</p>

@@ -1166,8 +1166,17 @@ pre.snippet-bare code {
     min-width: 0;
 }
 
-.phone-bar-title {
+/* Both truncate rather than wrap: the bar holds two buttons and a close icon,
+   and a wrapped title would push the panel content down by a whole line. */
+.phone-bar-title,
+.phone-bar-sub {
     display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.phone-bar-title {
     font-size: 0.86rem;
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -1175,7 +1184,6 @@ pre.snippet-bare code {
 }
 
 .phone-bar-sub {
-    display: block;
     margin-top: 1px;
     color: var(--p-dim);
     font-size: 0.6rem;
@@ -1197,6 +1205,18 @@ pre.snippet-bare code {
 .phone-pill:hover,
 .phone-pill.is-on {
     border-color: var(--p-accent);
+}
+
+/* Logcat's top-bar button is icon-only: the bar is a width budget, and a second
+   worded pill leaves no room for the title beside it on a narrow phone. */
+.phone-pill-icon {
+    display: inline-flex;
+    padding: 4px 6px;
+}
+
+.phone-pill-icon svg {
+    width: 12px;
+    height: 12px;
 }
 
 .phone-pill .phone-dot {
@@ -1466,6 +1486,85 @@ pre.snippet-bare code {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+/* Logcat — a terminal, so rows are monospace and carry a level stripe rather
+   than a badge. Warnings and above tint the whole line; anything quieter keeps
+   neutral text, so colour still means something when you scan the list. */
+
+.phone-chiprow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 10px 0 0;
+}
+
+.phone-chiprow span {
+    padding: 3px 7px;
+    border: 1px solid var(--p-line);
+    border-radius: 999px;
+    background: var(--p-field);
+    color: var(--p-dim);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+}
+
+.phone-chiprow span.is-on {
+    border-color: var(--p-pill-line);
+    background: var(--p-pill-bg);
+    color: var(--p-teal);
+}
+
+.phone-chiprow .phone-chip-tag {
+    margin-left: auto;
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.phone-regex {
+    flex: none;
+    color: var(--p-teal);
+    font-family: var(--font-mono);
+    font-weight: 700;
+}
+
+.phone-term {
+    margin-top: 6px;
+}
+
+.phone-log {
+    margin: 0;
+    padding: 4px 6px 4px 8px;
+    border-left: 2px solid var(--p-line);
+    color: var(--p-muted);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    line-height: 1.5;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.phone-log + .phone-log {
+    margin-top: 2px;
+}
+
+.phone-log-t { color: var(--p-dim); }
+.phone-log-g { color: var(--p-blue); }
+
+.phone-log.l-d { border-left-color: var(--p-blue); }
+.phone-log.l-i { border-left-color: var(--p-green); }
+
+.phone-log.l-w {
+    border-left-color: var(--p-amber);
+    color: var(--p-amber);
+}
+
+.phone-log.l-e {
+    border-left-color: var(--p-red);
+    background: var(--p-bad-bg);
+    color: var(--p-red);
 }
 
 /* Master switch row (Mocks) */

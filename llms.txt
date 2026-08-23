@@ -3,8 +3,9 @@
 > AppInspect is a free Android library that adds a full-screen inspector to a host
 > app's own debug and internal builds. It captures OkHttp traffic, can replace any
 > API response with a mock, and shows SharedPreferences, DataStore, SQLite/Room,
-> WorkManager jobs, crashes and ANRs, and runtime metadata — all on the device, with
-> no proxy, no USB cable, no account and no telemetry. A no-op artifact keeps the
+> WorkManager jobs, crashes and ANRs, a live logcat tail, and runtime metadata — all
+> on the device, with no proxy, no USB cable, no account and no telemetry. Everything
+> is on by default and no configuration is required. A no-op artifact keeps the
 > inspection code out of release APKs.
 
 - Artifact group: `io.github.suryansh1720001.appinspect`
@@ -19,6 +20,8 @@
 - Home: https://app-inspect-doc.vercel.app/
 - Introduction: https://app-inspect-doc.vercel.app/docs.html
 - Install: https://app-inspect-doc.vercel.app/install.html
+- Builds and environments: https://app-inspect-doc.vercel.app/environments.html
+- Compatibility: https://app-inspect-doc.vercel.app/compatibility.html
 - Opening the inspector: https://app-inspect-doc.vercel.app/open-inspector.html
 - Network panel: https://app-inspect-doc.vercel.app/network.html
 - Response mocking: https://app-inspect-doc.vercel.app/mocks.html
@@ -26,6 +29,7 @@
 - WorkManager panel: https://app-inspect-doc.vercel.app/workmanager.html
 - Crashes and ANRs: https://app-inspect-doc.vercel.app/crashes.html
 - Runtime panel: https://app-inspect-doc.vercel.app/runtime.html
+- Logcat panel: https://app-inspect-doc.vercel.app/logs.html
 - Value viewer: https://app-inspect-doc.vercel.app/value-viewer.html
 - Configuration reference: https://app-inspect-doc.vercel.app/configuration.html
 - Network notifications: https://app-inspect-doc.vercel.app/notifications.html
@@ -44,8 +48,52 @@ dependencies {
 ```
 
 AppInspect auto-initialises through AndroidX Startup, so no `Application` class change
-is required for the default setup. Call `AppInspect.install(application, configuration)`
-to configure it instead.
+is required and every feature — panels, shake, launcher shortcut, crash capture,
+notifications, logcat — is on by default. To change something, prefer
+`AppInspect.updateConfiguration { … }`, which keeps the build-tier enablement AppInspect
+inferred; `AppInspect.install(application, configuration)` replaces the configuration
+wholesale and discards that inference, including a staging variant's resource opt-in.
+
+## Builds and environments
+
+AppInspect never sees Gradle variant names. It resolves a build to one of three tiers
+from two inputs: `FLAG_DEBUGGABLE` (from the build type's `isDebuggable`), and the
+boolean resource `appinspect_enabled_in_non_debuggable_build`.
+
+- debuggable → `DEBUG` tier, everything enabled, nothing to configure.
+- not debuggable + resource `true` → `STAGING` tier, everything enabled.
+- not debuggable + resource `false`/absent (the default) → `PRODUCTION` tier, everything
+  disabled. The safe outcome is the one you get by doing nothing.
+
+A custom variant (`staging`, `uat`, `qa`, `internalTest`, …) that sets
+`isDebuggable = true` needs no further work. A non-debuggable one opts in with one line —
+`resValue("bool", "appinspect_enabled_in_non_debuggable_build", "true")` in the build
+type, or the same boolean in `src/<variant>/res/values/` — plus `matchingFallbacks`,
+which any custom build type needs because AppInspect publishes only `debug` and
+`release` variants. `appinspect_environment_name` optionally labels the environment in
+the Runtime panel. The opt-in is a resource rather than an API call for two reasons:
+AppInspect installs itself from AndroidX Startup before `Application.onCreate()`, and
+Android never merges one variant's resources into another, so the value is physically
+absent from the release APK.
+
+Minification, R8 and resource shrinking need no host configuration: AppInspect ships its
+own `consumerProguardFiles`. Writing the opt-in resource into the `release` build type or
+`src/main/res/` while the full library is on the release classpath *will* run the
+inspector in production; keeping `releaseImplementation(appinspect-no-op)` makes that
+unreachable.
+
+## Host compatibility
+
+minSdk 24, AndroidX required. Compose is **not** required in the host app (the inspector's
+Compose UI is already compiled into the published AAR); Kotlin is not required either, and
+Java-only hosts call `AppInspect.INSTANCE.…` and add the two interceptors directly. No DI
+framework, no `Application` subclass, no manifest changes and no permissions to declare.
+OkHttp, WorkManager and `androidx.security-crypto` are `compileOnly`, so AppInspect never
+forces a version onto the host app — which matters because raising the host's OkHttp
+version would mean the tested build runs a different HTTP stack than release. Missing
+integrations degrade to an empty or opaque panel rather than failing. By API level:
+launcher shortcut needs 25, notification channels 26, ANR/native crash detection 30,
+and the `POST_NOTIFICATIONS` runtime grant 33.
 
 Network capture is opt-in and requires one line on the OkHttp builder, added last:
 
@@ -77,8 +125,8 @@ process.
 ## Panels
 
 Five bottom-bar panels — Network, Mocks, Storage, Work, Crashes — navigated by tap or
-swipe. Runtime is a top-bar icon button rather than a tab. Any panel can open a large
-value in a shared full-screen JSON tree viewer.
+swipe. Runtime and Logcat are top-bar buttons rather than tabs. Any panel can open a
+large value in a shared full-screen JSON tree viewer.
 
 - Network: filters and search across endpoints, headers, bodies and cURL; wire request
   headers; JSON/XML formatting; long-press quick actions; export as `.txt` (with cURL)
@@ -107,6 +155,14 @@ value in a shared full-screen JSON tree viewer.
   records persist.
 - Runtime: app, environment, device and session metadata, plus host-supplied custom
   metadata.
+- Logcat: a live terminal tail of the app's own log output — every `Log.*` call from the
+  host and from any library in the same process. Level/tag/text/regex filters with inline
+  highlighting, pause, follow-tail, expandable folded stack traces, wrap and redact
+  toggles, and a `.txt` share of the visible lines. No permission is needed (capture is
+  constrained to the app's own pid, the only log Android lets an app read), nothing is
+  written to disk (a bounded in-memory ring buffer, 2,000 entries by default), and there
+  is no idle cost (no thread and no `logcat` process until the page is opened). Scroll-back
+  comes from replaying Android's own log buffer on open.
 - Value viewer: JSON tree with collapse/expand, child counts, line-number gutter,
   auto-detected escaped JSON strings opened as real subtrees, raw view, and content
   search that stays responsive on multi-hundred-kilobyte payloads.
@@ -114,19 +170,25 @@ value in a shared full-screen JSON tree viewer.
 ## Configuration
 
 `AppInspectConfiguration` groups: `enablement`, `entryPoints`, `panels`, `powerTools`,
-`retention`, `environment`, `initialMetadata`, `redaction`, `branding`.
+`logs`, `retention`, `environment`, `initialMetadata`, `redaction`, `branding`.
 
 - `enablement`: `allowedBuildTiers` (debug only by default), `allowInNonDebugBuilds`,
   `allowInProductionBuilds`. Production requires both flags shipped as true in the APK.
+  `setEnabled(...)` is ANDed with the tier check, so it can turn an enabled build off but
+  can never turn a disallowed tier on.
 - `entryPoints`: `shakeToOpenEnabled`, `shakeThresholdGravity`, `shakeCooldownMillis`,
   `launcherShortcutEnabled`, `autoOpenOnLongPressTrigger`, `networkNotificationsEnabled`,
   `openInSeparateTask`.
 - `panels`: `networkEnabled`, `mocksEnabled`, `storageEnabled`, `workManagerEnabled`,
-  `crashesEnabled`, `runtimeEnabled`.
+  `crashesEnabled`, `runtimeEnabled`, `logsEnabled`.
 - `powerTools`: `showRawSensitiveValues`, `allowSharedPreferencesEditing`,
   `allowDatabaseEditing`, `allowSqlConsole`, `allowResponseMocking`.
+- `logs` (`AppInspectLogsConfig`): `bufferSize` (2,000, clamped to 100..20,000),
+  `initialBacklogLines` (1,000), `maxMessageLength` (8,000), `redactSensitiveValues`
+  (`null` follows `powerTools.showRawSensitiveValues`).
 - Defaults: raw sensitive values are visible in an enabled build; WorkManager
-  inspection is read only; retention defaults are 300 network events and 50 crashes.
+  inspection is read only; retention defaults are 300 network events and 50 crashes; log
+  capture is in-memory only, on demand, and constrained to the app's own pid.
 
 ## Network notifications on Android 13+
 
@@ -139,12 +201,27 @@ silently never appear. Notifications carry only method, status code, host and pa
 Release builds are protected by two independent layers.
 
 1. Compile-time: `appinspect-no-op` contains only a pass-through OkHttp interceptor —
-   no UI, no storage, no capture, no crash handler, no manifest entries.
+   no UI, no storage, no capture, no crash handler, no manifest entries. The published
+   artifact is about 8 KB: a manifest with no `<application>` block and no permissions,
+   four classes, an empty `R.txt`, no resources or native code, and `kotlin-stdlib` as its
+   only dependency. Those four classes reference no `android.*` API at all — no `Context`,
+   no file handle, no reflection — and `intercept` is literally
+   `return chain.proceed(chain.request())`. A CI task opens the assembled AAR and fails
+   the build if that ever stops being true.
 2. Runtime: even the full module detects `FLAG_DEBUGGABLE == false` and disables
    itself — no `appinspect_storage.db` on disk, no crash handler, no ANR collector, no
-   sensors or notification channels or launcher shortcut, the interceptor becomes a
-   pass-through, all `open()` calls refused, no mock rules loaded and no mirror file
-   written. Capture and mocking re-check the gate independently.
+   sensors or notification channels or launcher shortcut, no `logcat` process, the
+   interceptor becomes a pass-through, all `open()` calls refused, no mock rules loaded
+   and no mirror file written. Capture and mocking re-check the gate independently.
+
+Two properties hold across the whole library in every build tier, not only the production
+path: it contains no `java.net.URL`, `HttpURLConnection`, `Socket` or `OkHttpClient`
+construction anywhere, so it cannot open a connection of its own (zero telemetry by
+construction rather than by policy); and it never writes a line to logcat. There is no
+dynamic code loading, no native code, no reflection over the host app's classes, and no
+exported components. The single `Runtime.getRuntime` use is the logcat tail
+(`logcat --pid=<own pid>`, which needs no permission), constructed only by the Logcat page
+and therefore never spawned in a disabled build.
 
 There is no runtime switch to enable it in production. Additional hardening in every
 build type: no exported components, no network calls of its own, no Logcat output of
@@ -166,10 +243,12 @@ capped at 300 network events and 50 crashes by default. Storage and WorkManager
 contents are read on demand and never persisted. Mock rules are stored in the same
 database plus an app-scoped external mirror file for `adb pull`, written only on builds
 where mocking is allowed. `EncryptedSharedPreferences` is decrypted in-process for
-read-only viewing and the plaintext is never written anywhere.
+read-only viewing and the plaintext is never written anywhere. Captured log lines are
+never persisted at all — they live in a bounded in-memory ring buffer that dies with the
+process.
 
 Data leaves the device only when a person taps share: `.txt` / `.har` network exports,
-`.json` mock rules, crash reports and runtime summaries. Exports go to
+`.json` mock rules, `.txt` logcat exports, crash reports and runtime summaries. Exports go to
 `cacheDir/appinspect_exports/` through a non-exported `FileProvider` scoped to that
 directory, and they can contain real credentials — including ones attached downstream of
 AppInspect — so they should be redacted before being attached to a ticket. Everything is

@@ -6,24 +6,24 @@
     <title>AppInspect — Android in-app inspector for debug and QA builds</title>
     <meta
         name="description"
-        content="AppInspect is a free Android library that opens a full-screen inspector inside your own app: OkHttp traffic with response mocking, SharedPreferences, DataStore, SQLite, WorkManager, crashes and ANRs. Everything on-device, and a no-op artifact keeps it out of release APKs."
+        content="AppInspect is a free Android library that opens a full-screen inspector inside your own app: OkHttp traffic with response mocking, SharedPreferences, DataStore, SQLite, WorkManager, crashes and ANRs, and a live logcat tail. Two Gradle lines, nothing to configure, everything on-device — and a no-op artifact keeps it out of release APKs."
     >
     <meta name="theme-color" content="#fdfbf5" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="keywords" content="android debugging library, android in-app inspector, network inspector android, in-app debugger android, appinspect, android developer tools, android crash inspector, workmanager inspector, android qa tools, mock api response android, okhttp mock interceptor">
+    <meta name="keywords" content="android debugging library, android in-app inspector, network inspector android, in-app debugger android, appinspect, android developer tools, android crash inspector, workmanager inspector, android qa tools, mock api response android, okhttp mock interceptor, on-device logcat viewer, logcat without adb">
     <link rel="canonical" href="https://app-inspect-doc.vercel.app/">
     <meta name="google-site-verification" content="tbcBjWcu8kriYNS4Iv1_8wPii960Mh67IybPdjYqbKA">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://app-inspect-doc.vercel.app/">
     <meta property="og:title" content="AppInspect — Android in-app inspector">
-    <meta property="og:description" content="Inspect network traffic, mock any API response, and review storage, background work, crashes and ANRs from inside your own Android app. No proxy, no USB cable, no telemetry.">
+    <meta property="og:description" content="Inspect network traffic, mock any API response, and review storage, background work, crashes, ANRs and the live log from inside your own Android app. No proxy, no USB cable, no telemetry.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="AppInspect — Android in-app inspector">
-    <meta name="twitter:description" content="On-device inspector for Android debug builds. Network, mocks, storage, work, crashes, ANRs. Free and open.">
+    <meta name="twitter:description" content="On-device inspector for Android debug builds. Network, mocks, storage, work, crashes, ANRs, logcat. Free and open.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
 
     <script>
@@ -92,10 +92,9 @@
                     <h1>See what your app is really doing &mdash; <em>from inside the app</em>.</h1>
                     <p class="hero-lede">
                         AppInspect is a Gradle dependency that adds a full-screen inspector to your own
-                        debug builds. Open it on the device and you get the OkHttp calls your app just
-                        made, the responses you can replace on the spot, what is in
-                        SharedPreferences and SQLite, which background jobs ran, and the last crash or
-                        ANR &mdash; with no proxy to configure and no cable attached.
+                        debug builds. Open it on the device to read the calls your app just made, replace
+                        any response on the spot, and check storage, background jobs, crashes and the
+                        live log &mdash; no proxy, no cable, and nothing to configure.
                     </p>
                     <div class="hero-actions">
                         <a class="button button-primary" href="docs.html">Read the docs</a>
@@ -119,11 +118,14 @@
                             <div class="phone-bar">
                                 <span class="phone-bar-copy">
                                     <span class="phone-bar-title" data-mock-title>Network</span>
-                                    <span class="phone-bar-sub">AppInspect &middot; debug build</span>
+                                    <span class="phone-bar-sub">AppInspect &middot; debug</span>
                                 </span>
                                 <button class="phone-pill" type="button" data-mock-tab="runtime" data-mock-label="Runtime" data-mock-doc="runtime.html" data-mock-note="App, device, environment and session details — the answers every bug report asks for, in one place.">
                                     RUNTIME
                                     <span class="phone-dot" aria-hidden="true">4</span>
+                                </button>
+                                <button class="phone-pill phone-pill-icon" type="button" aria-label="Logcat" data-mock-tab="logs" data-mock-label="Logcat" data-mock-doc="logs.html" data-mock-note="A live tail of your app's own log output, filtered on the device — no cable, no permission, nothing written to disk.">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 10 2.5 2L7 14M12.5 15H17"/></svg>
                                 </button>
                                 <span class="phone-x" aria-hidden="true">&#10005;</span>
                             </div>
@@ -388,6 +390,36 @@
                                     </div>
                                 </div>
 
+                                <!-- Logcat -->
+                                <div class="phone-view" data-mock-view="logs" role="tabpanel" aria-label="Logcat panel">
+                                    <div class="phone-chiprow" aria-hidden="true">
+                                        <span>V</span>
+                                        <span>D</span>
+                                        <span class="is-on">I</span>
+                                        <span class="is-on">W</span>
+                                        <span class="is-on">E</span>
+                                        <span class="phone-chip-tag">tag: all</span>
+                                    </div>
+                                    <div class="phone-search" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                                        <span>Search message or tag&hellip;</span>
+                                        <span class="phone-regex">.*</span>
+                                    </div>
+                                    <div class="phone-meta">
+                                        <strong>Live tail</strong>
+                                        <span>1,284 of 2,000 in buffer &middot; following</span>
+                                    </div>
+                                    <div class="phone-scroll phone-term">
+                                        <p class="phone-log l-e"><span class="phone-log-t">11:55:13.882</span> <span class="phone-log-g">OkHttp</span> HTTP FAILED: SocketTimeoutException</p>
+                                        <p class="phone-log l-e"><span class="phone-log-t">11:55:13.884</span> <span class="phone-log-g">OrdersRepo</span> load failed &mdash; tap to expand 24 frames</p>
+                                        <p class="phone-log l-w"><span class="phone-log-t">11:55:11.207</span> <span class="phone-log-g">WM-Worker</span> UploadReceiptWorker retry 4 of 5</p>
+                                        <p class="phone-log l-i"><span class="phone-log-t">11:55:09.940</span> <span class="phone-log-g">OkHttp</span> --&gt; GET /api/v1/payments</p>
+                                        <p class="phone-log l-i"><span class="phone-log-t">11:55:09.941</span> <span class="phone-log-g">AppInspect</span> mock served: payments-down</p>
+                                        <p class="phone-log l-d"><span class="phone-log-t">11:55:07.512</span> <span class="phone-log-g">AuthStore</span> token refreshed, exp in 3600s</p>
+                                        <p class="phone-log l-d"><span class="phone-log-t">11:55:02.118</span> <span class="phone-log-g">Choreographer</span> skipped 41 frames</p>
+                                    </div>
+                                </div>
+
                                 <!-- Runtime -->
                                 <div class="phone-view" data-mock-view="runtime" role="tabpanel" aria-label="Runtime panel">
                                     <div class="phone-scroll">
@@ -464,8 +496,9 @@
                         <h3>You add a dependency</h3>
                         <p>
                             One line for debug builds, one for release. AppInspect starts itself through
-                            AndroidX Startup, so there is nothing to add to your <code>Application</code>
-                            class for the basic setup.
+                            AndroidX Startup and every feature is on by default, so there is no
+                            configuration to write and nothing to add to your
+                            <code>Application</code> class.
                         </p>
                     </div>
                     <div class="flow-step">
@@ -495,11 +528,13 @@
             <div class="wrap">
                 <div class="band-head">
                     <span class="eyebrow">What you can inspect</span>
-                    <h2>Seven surfaces, each with its own page in the docs.</h2>
+                    <h2>Eight surfaces, one for each question a bug tends to raise.</h2>
                     <p>
-                        The inspector has five panels along the bottom bar, Runtime one tap away in the
-                        top bar, and a shared value viewer that any of them can open. Pick one to read
-                        how it actually behaves.
+                        Five sit on the bottom bar; Runtime and Logcat are one tap away in the top bar,
+                        and any of them can hand an oversized value to the shared viewer. Each has its
+                        own page in the docs, because knowing a panel exists is not the same as knowing
+                        how it behaves when the payload is 200&nbsp;KB, the file is encrypted, or the
+                        list comes back empty.
                     </p>
                 </div>
 
@@ -570,6 +605,17 @@
                         <span class="feature-more">Runtime panel &rarr;</span>
                     </a>
 
+                    <a class="feature-card" href="logs.html">
+                        <span class="feature-mark">L</span>
+                        <h3>Logcat</h3>
+                        <p>
+                            A live tail of your app's own log, filtered on the device by level, tag or
+                            regex. No cable, no permission, and nothing written to disk &mdash; the
+                            buffer lives in memory and dies with the process.
+                        </p>
+                        <span class="feature-more">Logcat panel &rarr;</span>
+                    </a>
+
                     <a class="feature-card" href="value-viewer.html">
                         <span class="feature-mark">V</span>
                         <h3>Value viewer</h3>
@@ -604,7 +650,7 @@
                         <ul class="tick-list">
                             <li><strong>Answer "what did the API return?"</strong> without a proxy, a certificate, or a developer sitting next to the tester.</li>
                             <li><strong>Force the edge case</strong> &mdash; a 500, an empty list, a timeout, an endpoint that does not exist yet &mdash; with a mock rule instead of a backend change.</li>
-                            <li><strong>Attach a real artifact</strong> to the ticket: a HAR file, a cURL command, a stack trace, an ANR thread dump.</li>
+                            <li><strong>Attach a real artifact</strong> to the ticket: a HAR file, a cURL command, a stack trace, an ANR thread dump, the log lines around the failure.</li>
                             <li><strong>Check the state behind the screen</strong> &mdash; a stale preference, a row that never got written, a job stuck in <code>ENQUEUED</code>.</li>
                         </ul>
                     </div>
@@ -618,7 +664,7 @@
                             app you ship.
                         </p>
                         <ul class="tick-list">
-                            <li><strong>Adopt it like any dependency</strong> from Maven Central &mdash; no vendor account, no server to run, nothing to procure.</li>
+                            <li><strong>Adopt it like any dependency</strong> from Maven Central &mdash; no vendor account, no server to run, nothing to procure. It works in your staging, UAT and internal-test variants too, <a href="environments.html">on one line</a>.</li>
                             <li><strong>Decide what testers can see and change</strong>: mask sensitive values, make storage read-only, hide panels, or block mocking outright.</li>
                             <li><strong>Keep it out of production</strong> with a compile-time no-op artifact, backed by a runtime gate that refuses to run in a non-debuggable build.</li>
                             <li><strong>Nothing leaves the device</strong> &mdash; no telemetry, no network calls of its own, no Logcat output of captured payloads.</li>
@@ -638,18 +684,22 @@
                     </div>
                     <div class="band-body">
                         <p>
-                            It does not, and there are two independent reasons why. The recommended
-                            setup puts a no-op artifact in your release variant, so the inspector's
-                            code is not compiled into the production APK at all.
+                            It does not, for two independent reasons. Your release variant gets a no-op
+                            artifact instead: about <strong>8&nbsp;KB</strong>, four classes, a manifest
+                            with no components and no permissions, and not one reference to an
+                            <code>android.*</code> API. The library's own CI opens that artifact on every
+                            build and fails if a component, a permission, a resource, or any class
+                            beyond those stubs ever appears in it.
                         </p>
                         <p>
-                            And if the full module ever ships by mistake, it detects the
-                            non-debuggable build and switches itself off &mdash; no database, no crash
-                            handler, no capture, every <code>open()</code> refused. Neither layer
-                            depends on the other being in place.
+                            And if the full module ships by mistake anyway, it detects the non-debuggable
+                            build and switches itself off &mdash; no database, no crash handler, no
+                            capture, every <code>open()</code> refused. Neither layer depends on the
+                            other being in place.
                         </p>
                         <div class="button-row">
                             <a class="button button-secondary" href="security.html">Read the security model</a>
+                            <a class="button button-secondary" href="environments.html">Builds and environments</a>
                         </div>
                     </div>
                 </div>
@@ -666,14 +716,15 @@
                     </div>
                     <div class="band-body">
                         <p>
-                            Add the inspector to debug builds and the no-op stub to release builds.
-                            The snippet uses a placeholder instead of a pinned version, so check Maven
+                            Add the inspector to debug builds and the no-op stub to release builds. The
+                            snippet uses a placeholder instead of a pinned version, so check Maven
                             Central for the current one.
                         </p>
                         <p>
-                            That is enough to open the inspector. Network capture needs one more line
-                            on your <code>OkHttpClient</code>, and it has to go last &mdash; the
-                            install page explains why.
+                            That is the whole setup: every panel, the shake gesture, crash capture and
+                            the log tail are on by default. Network capture needs one more line on your
+                            <code>OkHttpClient</code>, and it has to go last &mdash; the install page
+                            explains why.
                         </p>
                         <div class="button-row">
                             <a class="button button-primary" href="install.html">Full install guide</a>
@@ -712,12 +763,27 @@
 
                     <details class="faq-item">
                         <summary>Does AppInspect add any code to my release APK?</summary>
-                        <p>No, provided you use the <code>appinspect-no-op</code> artifact for release builds. It is a pass-through stub with no UI, no storage, no network capture, and no crash handler, so inspection code is absent from the release APK. The <a href="security.html">security model</a> covers the runtime gate that backs this up.</p>
+                        <p>Almost none, provided you use the <code>appinspect-no-op</code> artifact for release builds. That artifact is about 8&nbsp;KB: four classes, a manifest with no components and no permissions, no resources, and no reference to any <code>android.*</code> API — the interceptor body is literally <code>chain.proceed(chain.request())</code>. Inspection code is absent from the release APK, and the library's CI fails the build if that stops being true. The <a href="security.html">security model</a> has the full audit.</p>
                     </details>
 
                     <details class="faq-item">
                         <summary>What can AppInspect inspect?</summary>
-                        <p>OkHttp requests and responses, SharedPreferences (including decrypted <code>EncryptedSharedPreferences</code>), Jetpack DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs and native crashes on Android 11+, and app, device and session metadata.</p>
+                        <p>OkHttp requests and responses, SharedPreferences (including decrypted <code>EncryptedSharedPreferences</code>), Jetpack DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs and native crashes on Android 11+, a live <a href="logs.html">logcat</a> tail of your own process, and app, device and session metadata.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Will it run in our staging, UAT or internal-test build?</summary>
+                        <p>Yes, and usually with no extra work. AppInspect never sees your variant names — it looks at whether the build is debuggable. If your variant sets <code>isDebuggable = true</code>, it already works there. If it stays non-debuggable, one line in the build type opts it in: <code>resValue("bool", "appinspect_enabled_in_non_debuggable_build", "true")</code>. That value cannot leak into your release variant, because Android never merges one variant's resources into another. See <a href="environments.html">builds and environments</a>.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Do we need Compose or Kotlin in our app?</summary>
+                        <p>Neither. The inspector's Compose UI is already compiled into the published artifact, so a View and XML app gets it unchanged without enabling the Compose compiler. Java-only hosts work too. You also do not need a DI framework, an <code>Application</code> subclass, or any manifest change. See <a href="compatibility.html">compatibility</a>.</p>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>Can a tester read logcat without a cable?</summary>
+                        <p>Yes — that is the <a href="logs.html">Logcat</a> panel. It tails your app's own log output on the device, with level, tag, text and regex filters, and shares the filtered lines as a file. No permission is needed because capture is limited to your own process, which is the only log Android lets an app read, and nothing is written to disk: the buffer is in memory and dies with the process.</p>
                     </details>
 
                     <details class="faq-item">
@@ -762,8 +828,7 @@
 
                     <details class="faq-item">
                         <summary>Can I export what AppInspect captured?</summary>
-                        <p>Yes. Network logs export as <code>.txt</code> with cURL commands, or as <code>.har</code> for browser DevTools and Proxyman. Mock rules export as <code>.json</code>. Crash reports and runtime summaries go through the Android share sheet. Exports can contain real credentials — the <a href="data-handling.html">Data handling</a>
-                <a href="qa-checklist.html">QA checklist</a> explains how to handle them.</p>
+                        <p>Yes. Network logs export as <code>.txt</code> with cURL commands, or as <code>.har</code> for browser DevTools and Proxyman. Mock rules export as <code>.json</code>, and the filtered log tail as <code>.txt</code>. Crash reports and runtime summaries go through the Android share sheet. Exports can contain real credentials — <a href="data-handling.html">data handling</a> explains what is in them and the <a href="qa-checklist.html">QA checklist</a> explains how to handle them.</p>
                     </details>
 
                     <details class="faq-item">
@@ -869,6 +934,7 @@
                 <span class="footer-group-title">Docs</span>
                 <a href="docs.html">Introduction</a>
                 <a href="install.html">Install</a>
+                <a href="environments.html">Builds and environments</a>
                 <a href="open-inspector.html">Opening the inspector</a>
                 <a href="configuration.html">Configuration</a>
             </nav>
@@ -880,6 +946,7 @@
                 <a href="storage.html">Storage</a>
                 <a href="workmanager.html">WorkManager</a>
                 <a href="crashes.html">Crashes and ANRs</a>
+                <a href="logs.html">Logcat</a>
             </nav>
 
             <nav aria-label="More">
@@ -916,7 +983,7 @@
         <div class="search-box">
             <div class="search-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="search" placeholder="Search pages — mocks, SQL console, ANR, permissions…" autocomplete="off" spellcheck="false" aria-label="Search query">
+                <input type="search" placeholder="Search pages — mocks, logcat, staging builds, ANR…" autocomplete="off" spellcheck="false" aria-label="Search query">
             </div>
             <ul class="search-results"></ul>
             <p class="search-empty" hidden>No page matches that.</p>
@@ -938,7 +1005,7 @@
       "name": "AppInspect",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Android",
-      "description": "AppInspect is a free Android in-app inspector for developer and QA builds. Inspect OkHttp network traffic, mock API responses, and review storage, WorkManager jobs, crashes, ANRs and runtime metadata — all on-device, with no proxy or USB cable required.",
+      "description": "AppInspect is a free Android in-app inspector for developer and QA builds. Inspect OkHttp network traffic, mock API responses, tail logcat on the device, and review storage, WorkManager jobs, crashes, ANRs and runtime metadata — all on-device, with no proxy or USB cable required.",
       "url": "https://app-inspect-doc.vercel.app/",
       "downloadUrl": "https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
@@ -962,12 +1029,27 @@
         {
           "@type": "Question",
           "name": "Does AppInspect add any code to my release APK?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No, provided you use the appinspect-no-op artifact for release builds. It is a pass-through stub with no UI, no storage, no network capture, and no crash handler, so inspection code is absent from the release APK." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Almost none, provided you use the appinspect-no-op artifact for release builds. That artifact is about 8 KB: four classes, a manifest with no components and no permissions, no resources, and no reference to any android.* API — the interceptor body is literally chain.proceed(chain.request()). Inspection code is absent from the release APK, and the library's CI fails the build if that stops being true." }
         },
         {
           "@type": "Question",
           "name": "What can AppInspect inspect?",
-          "acceptedAnswer": { "@type": "Answer", "text": "OkHttp requests and responses, SharedPreferences including decrypted EncryptedSharedPreferences, Jetpack DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs and native crashes on Android 11+, and app, device and session metadata." }
+          "acceptedAnswer": { "@type": "Answer", "text": "OkHttp requests and responses, SharedPreferences including decrypted EncryptedSharedPreferences, Jetpack DataStore, SQLite and Room databases, WorkManager job queues, uncaught exceptions, ANRs and native crashes on Android 11+, a live logcat tail of the app's own process, and app, device and session metadata." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will AppInspect run in our staging, UAT or internal-test build?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes, and usually with no extra work. AppInspect never sees Gradle variant names — it looks at whether the build is debuggable. A variant that sets isDebuggable = true already works. A non-debuggable variant opts in with one line in the build type: resValue(\"bool\", \"appinspect_enabled_in_non_debuggable_build\", \"true\"). That value cannot leak into the release variant, because Android never merges one variant's resources into another." }
+        },
+        {
+          "@type": "Question",
+          "name": "Do we need Compose or Kotlin in our app to use AppInspect?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Neither. The inspector's Compose UI is already compiled into the published artifact, so a View and XML app gets it unchanged without enabling the Compose compiler, and Java-only hosts work too. No DI framework, no Application subclass and no manifest change is required." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can a tester read logcat without a cable?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Logcat panel tails the app's own log output on the device, with level, tag, text and regex filters, and shares the filtered lines as a file. No permission is needed because capture is limited to the app's own process, which is the only log Android lets an app read, and nothing is written to disk — the buffer is in memory and dies with the process." }
         },
         {
           "@type": "Question",
@@ -1012,7 +1094,7 @@
         {
           "@type": "Question",
           "name": "Can I export what AppInspect captured?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Network logs export as .txt with cURL commands, or as .har for browser DevTools and Proxyman. Mock rules export as .json. Crash reports and runtime summaries go through the Android share sheet. Exports can contain real credentials, so they should be redacted before sharing." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Network logs export as .txt with cURL commands, or as .har for browser DevTools and Proxyman. Mock rules export as .json, and the filtered log tail as .txt. Crash reports and runtime summaries go through the Android share sheet. Exports can contain real credentials, so they should be redacted before sharing." }
         },
         {
           "@type": "Question",

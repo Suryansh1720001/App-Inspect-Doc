@@ -22,7 +22,19 @@
                     url: "install.html",
                     title: "Install",
                     blurb: "Gradle dependencies per build variant and the OkHttp interceptor.",
-                    topics: "gradle maven central dependency debugImplementation releaseImplementation no-op interceptor okhttp setup requirements minSdk"
+                    topics: "gradle maven central dependency debugImplementation releaseImplementation no-op interceptor okhttp setup"
+                },
+                {
+                    url: "environments.html",
+                    title: "Builds and environments",
+                    blurb: "Where it runs, where it refuses to, and how a staging build opts in.",
+                    topics: "environments build tier debug staging release production flag_debuggable isDebuggable appinspect_enabled_in_non_debuggable_build resValue matchingFallbacks custom variant flavour uat qa preprod minify r8 proguard shrink resources scenarios"
+                },
+                {
+                    url: "compatibility.html",
+                    title: "Compatibility",
+                    blurb: "minSdk, AndroidX, and why Compose and Kotlin are not required.",
+                    topics: "compatibility requirements minSdk 24 androidx compose not required java only host okhttp compileOnly workmanager security-crypto agp kotlin version api level degradation apk size"
                 },
                 {
                     url: "open-inspector.html",
@@ -72,6 +84,12 @@
                     topics: "runtime app version build type device model os memory locale session metadata"
                 },
                 {
+                    url: "logs.html",
+                    title: "Logcat",
+                    blurb: "A live, filterable tail of your app's own log output, on the device.",
+                    topics: "logcat logs terminal tail level filter tag regex pause follow tail ring buffer read_logs permission redact export stack trace"
+                },
+                {
                     url: "value-viewer.html",
                     title: "Value viewer",
                     blurb: "The shared full-screen JSON tree used by every panel.",
@@ -86,7 +104,7 @@
                     url: "configuration.html",
                     title: "Configuration reference",
                     blurb: "Every lever in AppInspectConfiguration and when to change it.",
-                    topics: "configuration appinspectconfiguration enablement panels power tools entry points redaction retention showRawSensitiveValues allowResponseMocking build tiers"
+                    topics: "configuration appinspectconfiguration updateConfiguration install enablement panels power tools entry points logs bufferSize redaction retention showRawSensitiveValues allowResponseMocking logsEnabled build tiers setEnabled"
                 },
                 {
                     url: "notifications.html",
