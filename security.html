@@ -192,11 +192,14 @@
                     shortcut, and export. There is no code present that could do any of them.
                 </p>
                 <p>
-                    <strong>And it is enforced by CI, not by review.</strong> A build task opens the
-                    assembled artifact and fails if the manifest gains any component or permission, if
-                    any resource, asset or native payload appears, or if <em>any</em> class outside the
-                    interceptor stubs turns up. That is the part worth telling a security reviewer: the
-                    claim is checked on every build of the library, not asserted in a document.
+                    <strong>And it is enforced by the build, not by review.</strong> A verification task
+                    opens the assembled artifact and fails if the manifest gains any component or
+                    permission, if any resource, asset or native payload appears, or if <em>any</em>
+                    class outside the interceptor stubs turns up. It runs as part of the library's
+                    <code>check</code>, and the Maven Central release task depends on it &mdash; so the
+                    artifact you would ship to production cannot be published without passing. That is
+                    the part worth telling a security reviewer: the claim is verified mechanically on the
+                    one path that matters, not asserted in a document.
                 </p>
 
                 <h2 id="layer-2">Layer 2 &mdash; and if it ships anyway, it refuses to run</h2>

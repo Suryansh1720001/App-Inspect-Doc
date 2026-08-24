@@ -23,15 +23,15 @@ All library claims on the website must match the library repository:
   uncommitted work.
 - When the library changes, sync the website and then update this file.
 
-Last synced with library: **version 0.7.0, library commit `5346b5d` plus local
-uncommitted changes (2026-08-23)**.
+Last synced with library: **version 0.8.0, library commit `5346b5d` plus local
+uncommitted changes (2026-08-24)**.
 
-> **Caveat on that sync.** The Logcat panel (`:appinspect-logs`, `AppInspectLogsConfig`,
-> `panels.logsEnabled`) and the `appinspect_enabled_in_non_debuggable_build` resource
-> opt-in were **uncommitted local work** in the library repo when this pass was written.
-> They are documented here because the site carries no version number and describes the
-> current library, but if a reader resolves an older artifact from Maven Central those two
-> features may not be in it. Confirm they are published before treating this as settled.
+> **The site leads the release, deliberately.** The library is documented from its current
+> code, and the version is then published — so this line names the working-tree version,
+> which may not be on Maven Central yet. That is fine and needs no note on the pages: the
+> site carries no version numbers, and snippets use the `<latest-version>` placeholder, so
+> nothing here goes stale or contradicts the artifact a reader resolves. Do not gate a
+> website update on a Maven Central release.
 
 ## Architecture
 
@@ -481,6 +481,18 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 - LinkedIn: <https://www.linkedin.com/in/itssuryansh/>
 
 ## Changelog
+
+- **2026-08-24 (library re-check: release gating)** — Re-checked the library after a small
+  round of changes. **No site content was stale.** The only edits were build hygiene
+  (Gradle heap raised to 4 GB, a `clean` workaround for macOS `.DS_Store`,
+  `:appinspect-logs` added to the publish list) and a version bump to 0.8.0. No `.kt` file
+  changed, so every feature claim on the site still holds, and the version bump needed no
+  page edit — the site carries no version numbers. One change was worth reflecting: **the
+  no-op inertness check now gates the release**, because
+  `publishAndReleaseWorkspaceArtifactsToMavenCentral` depends on
+  `verifyNoOpArtifactIsInert`. The wording moved from "CI fails the build" to the stronger
+  and now-true "cannot be published to Maven Central without passing" — on `security.html`,
+  the landing release-safety band, the FAQ, its JSON-LD twin, and `llms.txt`.
 
 - **2026-08-23 (library sync: Logcat, environments, compatibility)** — Synced with the
   library after a large round of changes, and answered the two questions the site could

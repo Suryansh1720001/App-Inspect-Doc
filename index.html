@@ -687,9 +687,10 @@
                             It does not, for two independent reasons. Your release variant gets a no-op
                             artifact instead: about <strong>8&nbsp;KB</strong>, four classes, a manifest
                             with no components and no permissions, and not one reference to an
-                            <code>android.*</code> API. The library's own CI opens that artifact on every
-                            build and fails if a component, a permission, a resource, or any class
-                            beyond those stubs ever appears in it.
+                            <code>android.*</code> API. The library's own build opens that artifact and
+                            fails if a component, a permission, a resource, or any class beyond those
+                            stubs ever appears in it &mdash; and it cannot be released to Maven Central
+                            without passing that check.
                         </p>
                         <p>
                             And if the full module ships by mistake anyway, it detects the non-debuggable
@@ -763,7 +764,7 @@
 
                     <details class="faq-item">
                         <summary>Does AppInspect add any code to my release APK?</summary>
-                        <p>Almost none, provided you use the <code>appinspect-no-op</code> artifact for release builds. That artifact is about 8&nbsp;KB: four classes, a manifest with no components and no permissions, no resources, and no reference to any <code>android.*</code> API — the interceptor body is literally <code>chain.proceed(chain.request())</code>. Inspection code is absent from the release APK, and the library's CI fails the build if that stops being true. The <a href="security.html">security model</a> has the full audit.</p>
+                        <p>Almost none, provided you use the <code>appinspect-no-op</code> artifact for release builds. That artifact is about 8&nbsp;KB: four classes, a manifest with no components and no permissions, no resources, and no reference to any <code>android.*</code> API — the interceptor body is literally <code>chain.proceed(chain.request())</code>. Inspection code is absent from the release APK, and the library cannot be published to Maven Central unless a build check confirms that is still true. The <a href="security.html">security model</a> has the full audit.</p>
                     </details>
 
                     <details class="faq-item">
@@ -1029,7 +1030,7 @@
         {
           "@type": "Question",
           "name": "Does AppInspect add any code to my release APK?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Almost none, provided you use the appinspect-no-op artifact for release builds. That artifact is about 8 KB: four classes, a manifest with no components and no permissions, no resources, and no reference to any android.* API — the interceptor body is literally chain.proceed(chain.request()). Inspection code is absent from the release APK, and the library's CI fails the build if that stops being true." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Almost none, provided you use the appinspect-no-op artifact for release builds. That artifact is about 8 KB: four classes, a manifest with no components and no permissions, no resources, and no reference to any android.* API — the interceptor body is literally chain.proceed(chain.request()). Inspection code is absent from the release APK, and the library cannot be published to Maven Central unless a build check confirms that is still true." }
         },
         {
           "@type": "Question",

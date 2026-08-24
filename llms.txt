@@ -206,8 +206,10 @@ Release builds are protected by two independent layers.
    four classes, an empty `R.txt`, no resources or native code, and `kotlin-stdlib` as its
    only dependency. Those four classes reference no `android.*` API at all — no `Context`,
    no file handle, no reflection — and `intercept` is literally
-   `return chain.proceed(chain.request())`. A CI task opens the assembled AAR and fails
-   the build if that ever stops being true.
+   `return chain.proceed(chain.request())`. A verification task opens the assembled AAR and
+   fails on any manifest component, permission, resource, asset, native payload, or class
+   outside the interceptor stubs. It runs as part of `check`, and the Maven Central release
+   task depends on it, so the artifact cannot be published without passing.
 2. Runtime: even the full module detects `FLAG_DEBUGGABLE == false` and disables
    itself — no `appinspect_storage.db` on disk, no crash handler, no ANR collector, no
    sensors or notification channels or launcher shortcut, no `logcat` process, the
