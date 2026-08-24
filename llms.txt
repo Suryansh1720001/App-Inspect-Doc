@@ -14,6 +14,7 @@
 - Minimum Android version: 7.0 (API 24). ANR and native crash reporting need Android 11 (API 30).
 - License cost: free
 - Website: https://app-inspect-doc.vercel.app/
+- Sample app (runnable Android project with the library wired in): https://github.com/Suryansh1720001/AppInspect-Sample-App
 
 ## Pages
 
@@ -53,6 +54,18 @@ notifications, logcat — is on by default. To change something, prefer
 `AppInspect.updateConfiguration { … }`, which keeps the build-tier enablement AppInspect
 inferred; `AppInspect.install(application, configuration)` replaces the configuration
 wholesale and discards that inference, including a staging variant's resource opt-in.
+
+## Sample app
+
+A runnable demonstration project lives at
+https://github.com/Suryansh1720001/AppInspect-Sample-App — a small Kotlin app whose only
+purpose is to show the library working. Clone it, run the debug variant
+(`./gradlew :app:installDebug`), generate some data from the on-screen buttons, then open
+the inspector. It is also the shortest integration reference: the whole wiring is the two
+dependency lines in `app/build.gradle.kts`, `addAppInspectInterceptor()` on the OkHttp
+builder, and a debug-only object holding the `open()` / `updateConfiguration()` calls that
+the no-op artifact does not contain. The clone command is on
+https://app-inspect-doc.vercel.app/install.html#sample-app.
 
 ## Builds and environments
 

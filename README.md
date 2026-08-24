@@ -88,7 +88,7 @@ If the address changes, update `docs.js` *and* `privacy.html`.
 |---|---|
 | `index.html` | Landing page: hero + phone mockup, how it works, feature cards, audiences, release safety, quick start, FAQ, CTA, maintainer, support |
 | `docs.html` | Docs home — **Introduction** (keeps the historical `/docs.html` URL) |
-| `install.html` | Gradle setup per variant, `matchingFallbacks`, OkHttp interceptor, verification, `updateConfiguration` |
+| `install.html` | The sample app, Gradle setup per variant, `matchingFallbacks`, OkHttp interceptor, verification, `updateConfiguration` |
 | `environments.html` | The three build tiers, the scenario table, the staging opt-in resource, release-like testing, R8 |
 | `compatibility.html` | minSdk/AndroidX, why Compose and Kotlin are not required, Java hosts, the three `compileOnly` integrations, API-level degradation |
 | `open-inspector.html` | Every entry point, shake tuning, own-task behaviour, moving between panels |
@@ -131,7 +131,7 @@ Show what it does before how to install it; deep-dive content lives in the docs.
 | 4 | Who it is for | — | Two panels: developers/testers, and companies/platform teams |
 | 5 | Release safety | — | The "this must never ship" objection, answered, links to `security.html`. Uses `.band-split` |
 | 6 | Quick start | `#quick-start` | `.band-split` intro + links, then a **full-width** Gradle snippet |
-| 7 | FAQ | `#faq` | 16 questions, mirrored by the JSON-LD `FAQPage` schema. Uses `.band-split` |
+| 7 | FAQ | `#faq` | 17 questions, mirrored by the JSON-LD `FAQPage` schema. Uses `.band-split` |
 | 8 | CTA | — | Install / Maven Central |
 | 9 | Maintainer | `#developer` | Suryansh Prajapati, GitHub + LinkedIn |
 | 10 | Support | `#support` | Tier cards → UPI QR modal |
@@ -265,6 +265,7 @@ Other pages may summarise a topic in a line or two **with a link**, never re-exp
 | Release safety (both layers), the no-op artifact audit, the whole-library capability audit, hardening, what debug builds expose, mocking's security posture, deliberately enabling it in production | `security.html` |
 | What the library stores on a device, retention, encryption, the mirror file, exports, backups, deletion, Play Data Safety answers | `data-handling.html` |
 | Export credential hygiene for humans | `qa-checklist.html` |
+| The sample app: clone command, what it demonstrates, the three files that wire the library | `install.html#sample-app` |
 | **The website's** own data practices — cookies, analytics, hosting, `localStorage` | `privacy.html` |
 
 Note the split on mocking: **how it works and how to switch it on** is `mocks.html`
@@ -477,10 +478,45 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 
 - Maven Central artifact: <https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview>
 - Maven Central versions: <https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions>
-- GitHub: <https://github.com/Suryansh1720001>
+- Sample app: <https://github.com/Suryansh1720001/AppInspect-Sample-App>
+- GitHub profile: <https://github.com/Suryansh1720001>
 - LinkedIn: <https://www.linkedin.com/in/itssuryansh/>
 
+### Which GitHub link goes where
+
+**The library repository is private and stays private**, so nothing on the site links to
+source. The public GitHub artefact is the **sample app**, and it takes the slot a docs
+site normally gives to "view source":
+
+| Slot | Target |
+|---|---|
+| Top-bar GitHub icon (all 20 pages) | Sample app repo, `aria-label="AppInspect sample app on GitHub"` |
+| Docs sidebar aside (19 docs pages) | Sample app repo, under "Released versions" |
+| Footer **More** column | "Sample app" above Maven Central; the plain "GitHub" link below it is the maintainer profile, next to LinkedIn |
+| Landing **Maintainer** band, JSON-LD `author.url`, `llms.txt` maintainer line | Profile — these are about the person, not the code |
+| `docs.js` `GITHUB_URL` | Profile — it is only the fallback for the feedback line when `CONTACT_EMAIL` is empty |
+
 ## Changelog
+
+- **2026-08-24 (sample app)** — Published
+  [AppInspect-Sample-App](https://github.com/Suryansh1720001/AppInspect-Sample-App) is now
+  linked from the site. It answers the one thing docs cannot: adding the library is two
+  Gradle lines, but a reader still wants to *see* the inspector before wiring it into their
+  own app. **`install.html#sample-app` is the canonical home** — a section directly under
+  the lede with the clone / `installDebug` commands and the three files that make up the
+  whole integration, so it doubles as a worked example of the rest of the page. Everywhere
+  else summarises and links: a `.tip` callout near the top of the Introduction (first use of
+  `.tip` on the site), a paragraph and a third button in the landing page's Quick start
+  band, and a new FAQ entry — 17 now — mirrored into the JSON-LD. Also added to `llms.txt`
+  as a section plus a header link, and to `install.html`'s search `topics` in `docs.js` so
+  "sample", "example" and "demo" find it. **Chrome change: the top-bar GitHub icon now
+  points at the sample app, not the maintainer's profile** (`aria-label` updated to match),
+  and the docs sidebar aside and the footer's More column both gained a "Sample app" link.
+  The library repository is private and stays that way, so the sample app is the only source
+  the site links to; the profile link survives only where it is genuinely about the person —
+  the Maintainer band, the footer's GitHub/LinkedIn pair, the JSON-LD author and the
+  `llms.txt` maintainer line. That split is now recorded under "Which GitHub link goes
+  where". No library facts changed, so nothing was re-synced.
 
 - **2026-08-24 (library re-check: release gating)** — Re-checked the library after a small
   round of changes. **No site content was stale.** The only edits were build hygiene

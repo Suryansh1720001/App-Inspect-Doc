@@ -22,7 +22,7 @@
                     url: "install.html",
                     title: "Install",
                     blurb: "Gradle dependencies per build variant and the OkHttp interceptor.",
-                    topics: "gradle maven central dependency debugImplementation releaseImplementation no-op interceptor okhttp setup"
+                    topics: "gradle maven central dependency debugImplementation releaseImplementation no-op interceptor okhttp setup sample app example project clone git demo runnable try it"
                 },
                 {
                     url: "environments.html",
