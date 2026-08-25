@@ -11,20 +11,29 @@
     <meta name="theme-color" content="#fdfbf5" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="author" content="Suryansh Prajapati">
     <meta name="keywords" content="android debugging library, android in-app inspector, network inspector android, in-app debugger android, appinspect, android developer tools, android crash inspector, workmanager inspector, android qa tools, mock api response android, okhttp mock interceptor, on-device logcat viewer, logcat without adb">
     <link rel="canonical" href="https://app-inspect-doc.vercel.app/">
     <meta name="google-site-verification" content="tbcBjWcu8kriYNS4Iv1_8wPii960Mh67IybPdjYqbKA">
 
+    <meta property="og:site_name" content="AppInspect">
+    <meta property="og:locale" content="en_US">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://app-inspect-doc.vercel.app/">
     <meta property="og:title" content="AppInspect — Android in-app inspector">
     <meta property="og:description" content="Inspect network traffic, mock any API response, and review storage, background work, crashes, ANRs and the live log from inside your own Android app. No proxy, no USB cable, no telemetry.">
-    <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="AppInspect — the Android inspector that lives inside your app. Network, mocks, storage, WorkManager, crashes, ANRs and a live logcat tail, on the device.">
 
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="AppInspect — Android in-app inspector">
     <meta name="twitter:description" content="On-device inspector for Android debug builds. Network, mocks, storage, work, crashes, ANRs, logcat. Free and open.">
-    <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/favicon-180.png">
+    <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/og-image.png">
+    <meta name="twitter:image:alt" content="AppInspect — the Android inspector that lives inside your app.">
 
     <script>
         (function () {
@@ -684,19 +693,28 @@
                     </div>
                     <div class="band-body">
                         <p>
-                            It does not, for two independent reasons. Your release variant gets a no-op
-                            artifact instead: about <strong>8&nbsp;KB</strong>, four classes, a manifest
-                            with no components and no permissions, and not one reference to an
-                            <code>android.*</code> API. The library's own build opens that artifact and
-                            fails if a component, a permission, a resource, or any class beyond those
-                            stubs ever appears in it &mdash; and it cannot be released to Maven Central
-                            without passing that check.
+                            It does not, and you do not have to remember anything for that to stay
+                            true.
                         </p>
                         <p>
-                            And if the full module ships by mistake anyway, it detects the non-debuggable
-                            build and switches itself off &mdash; no database, no crash handler, no
-                            capture, every <code>open()</code> refused. Neither layer depends on the
-                            other being in place.
+                            Release builds never get the inspector. They get a stub of the same name:
+                            about <strong>8&nbsp;KB</strong>, four classes that do nothing, a manifest
+                            with no components and no permissions, and not a single call into an
+                            <code>android.*</code> API. Your code still compiles against it. There is
+                            simply no inspection code in the APK for anyone to switch on.
+                        </p>
+                        <p>
+                            That stub is verified, not just intended. Before a release can go out, the
+                            build opens the packaged artifact and looks inside it. If a component, a
+                            permission, a resource or any unexpected class has crept in, publishing to
+                            Maven Central stops there.
+                        </p>
+                        <p>
+                            The second layer covers the case where the dependency is wired wrongly and
+                            the real library ships anyway. It checks whether the build is debuggable,
+                            and if it is not, it turns itself off &mdash; no database, no crash
+                            handler, nothing captured, and every <code>open()</code> call refused.
+                            Neither layer needs the other in order to work.
                         </p>
                         <div class="button-row">
                             <a class="button button-secondary" href="security.html">Read the security model</a>
@@ -717,22 +735,29 @@
                     </div>
                     <div class="band-body">
                         <p>
-                            Add the inspector to debug builds and the no-op stub to release builds. The
-                            snippet uses a placeholder instead of a pinned version, so check Maven
-                            Central for the current one.
+                            One line adds the inspector to your debug builds, the other puts the empty
+                            stub in release. The version below is a placeholder &mdash; Maven Central
+                            has the current number.
                         </p>
                         <p>
-                            That is the whole setup: every panel, the shake gesture, crash capture and
-                            the log tail are on by default. Network capture needs one more line on your
-                            <code>OkHttpClient</code>, and it has to go last &mdash; the install page
-                            explains why.
+                            That really is the whole setup. There is no initialisation call and no
+                            <code>Application</code> subclass to write: the library starts itself, and
+                            every panel, the shake gesture, crash capture and the log tail are on from
+                            the first run.
                         </p>
                         <p>
-                            Want to see it before you add it? The
+                            Network capture is the one exception, because OkHttp only shows what its
+                            interceptors see. Add AppInspect's interceptor to your client and make it
+                            the last one in the chain &mdash; the
+                            <a href="install.html">install guide</a> has the line and explains why the
+                            order matters.
+                        </p>
+                        <p>
+                            Would you rather see it running before you commit to it? The
                             <a href="https://github.com/Suryansh1720001/AppInspect-Sample-App" target="_blank" rel="noopener noreferrer">sample app</a>
-                            is a runnable Android project with the library already wired in. Clone it,
-                            run the debug build, and the inspector is on your own device in about five
-                            minutes.
+                            is a real Android project with the library already wired in. Clone it, run
+                            the debug build, and you are looking at the inspector on your own device a
+                            few minutes later.
                         </p>
                         <div class="button-row">
                             <a class="button button-primary" href="install.html">Full install guide</a>
@@ -1016,25 +1041,100 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "AppInspect",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Android",
-      "description": "AppInspect is a free Android in-app inspector for developer and QA builds. Inspect OkHttp network traffic, mock API responses, tail logcat on the device, and review storage, WorkManager jobs, crashes, ANRs and runtime metadata — all on-device, with no proxy or USB cable required.",
-      "url": "https://app-inspect-doc.vercel.app/",
-      "downloadUrl": "https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "author": {
-        "@type": "Person",
-        "name": "Suryansh Prajapati",
-        "url": "https://github.com/Suryansh1720001"
-      }
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://app-inspect-doc.vercel.app/#person",
+          "name": "Suryansh Prajapati",
+          "url": "https://github.com/Suryansh1720001",
+          "sameAs": [
+            "https://github.com/Suryansh1720001",
+            "https://www.linkedin.com/in/itssuryansh/"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://app-inspect-doc.vercel.app/#website",
+          "name": "AppInspect documentation",
+          "url": "https://app-inspect-doc.vercel.app/",
+          "inLanguage": "en",
+          "publisher": {
+            "@id": "https://app-inspect-doc.vercel.app/#person"
+          },
+          "description": "Documentation for AppInspect, a free Android library that adds a full-screen inspector to a host app's own debug, QA and internal builds."
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://app-inspect-doc.vercel.app/#software",
+          "name": "AppInspect",
+          "alternateName": "AppInspect Android in-app inspector",
+          "applicationCategory": "DeveloperApplication",
+          "applicationSubCategory": "Android debugging and QA library",
+          "operatingSystem": "Android 7.0 (API 24) and later",
+          "url": "https://app-inspect-doc.vercel.app/",
+          "image": "https://app-inspect-doc.vercel.app/fevicon/og-image.png",
+          "description": "AppInspect is a free Android library that opens a full-screen inspector inside a host app's own debug, staging and QA builds. It captures OkHttp network traffic, replaces any API response with a mock, and shows SharedPreferences, DataStore, SQLite and Room, WorkManager jobs, crashes and ANRs, a live logcat tail and runtime metadata — entirely on the device, with no proxy, no USB cable, no account and no telemetry. A no-op artifact keeps the inspection code out of release APKs.",
+          "softwareRequirements": "Android 7.0 (API 24) or later; AndroidX. Jetpack Compose and Kotlin are not required in the host app. OkHttp, WorkManager and androidx.security-crypto are optional compileOnly integrations.",
+          "featureList": [
+            "OkHttp network traffic capture with search, wire headers and cURL, TXT and HAR export",
+            "Response mocking: short-circuit or override any API response from the device or from a bundled mocks.json",
+            "Storage inspection: SharedPreferences, decrypted EncryptedSharedPreferences, Jetpack DataStore, SQLite and Room",
+            "WorkManager inspection: every persisted work spec with state, constraints, attempts and payloads",
+            "Crash, ANR and native-crash capture, persisted across process death",
+            "Live on-device logcat tail of the app's own process, with no adb cable and no permission",
+            "Runtime, device, environment and session metadata",
+            "Shared full-screen JSON tree viewer for large values"
+          ],
+          "installUrl": "https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview",
+          "downloadUrl": "https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "isAccessibleForFree": true,
+          "author": {
+            "@id": "https://app-inspect-doc.vercel.app/#person"
+          },
+          "publisher": {
+            "@id": "https://app-inspect-doc.vercel.app/#person"
+          },
+          "sameAs": [
+            "https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview",
+            "https://github.com/Suryansh1720001/AppInspect-Sample-App"
+          ]
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://app-inspect-doc.vercel.app/#webpage",
+          "url": "https://app-inspect-doc.vercel.app/",
+          "name": "AppInspect — Android in-app inspector for debug and QA builds",
+          "description": "AppInspect is a free Android library that opens a full-screen inspector inside your own app: OkHttp traffic with response mocking, SharedPreferences, DataStore, SQLite, WorkManager, crashes and ANRs, and a live logcat tail. Two Gradle lines, nothing to configure, everything on-device — and a no-op artifact keeps it out of release APKs.",
+          "inLanguage": "en",
+          "isPartOf": {
+            "@id": "https://app-inspect-doc.vercel.app/#website"
+          },
+          "about": {
+            "@id": "https://app-inspect-doc.vercel.app/#software"
+          },
+          "primaryImageOfPage": "https://app-inspect-doc.vercel.app/fevicon/og-image.png",
+          "datePublished": "2026-04-20",
+          "dateModified": "2026-08-25"
+        }
+      ]
     }
     </script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
+      "@id": "https://app-inspect-doc.vercel.app/#faq",
+      "url": "https://app-inspect-doc.vercel.app/#faq",
+      "inLanguage": "en",
+      "isPartOf": { "@id": "https://app-inspect-doc.vercel.app/#website" },
+      "about": { "@id": "https://app-inspect-doc.vercel.app/#software" },
+      "author": { "@id": "https://app-inspect-doc.vercel.app/#person" },
       "mainEntity": [
         {
           "@type": "Question",

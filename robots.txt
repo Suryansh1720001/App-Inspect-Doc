@@ -1,23 +1,81 @@
+# AppInspect documentation — https://app-inspect-doc.vercel.app/
+#
+# Everything here is public documentation for a free library, and being quoted by an
+# assistant is the point, not a leak. So every crawler is allowed, including the ones
+# that train models and the ones that answer questions live.
+#
+# A plain-text summary of the whole site, written for machines, is at:
+#   https://app-inspect-doc.vercel.app/llms.txt
+
 User-agent: *
 Allow: /
 
-# AI crawlers — explicitly allowed
-User-agent: GPTBot
+# --------------------------------------------------------------- search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# ------------------------------------------------- AI answers and AI Overviews
+# Grants use of the content for grounded answers and generative results.
+# Google-Extended is the one that governs AI Overviews and Gemini grounding; it is
+# separate from Googlebot, and leaving it out silently withholds the site from them.
+User-agent: Google-Extended
+Allow: /
+
+User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: ChatGPT-User
 Allow: /
 
-User-agent: PerplexityBot
+User-agent: GPTBot
 Allow: /
 
 User-agent: ClaudeBot
 Allow: /
 
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
 User-agent: anthropic-ai
 Allow: /
 
-User-agent: Applebot
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: MistralAI-User
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: DuckAssistBot
 Allow: /
 
 Sitemap: https://app-inspect-doc.vercel.app/sitemap.xml

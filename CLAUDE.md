@@ -25,8 +25,10 @@ rules, content policies, the design system, and the changelog.
    line. **Never invent a configuration field name.**
 3. **Navigation is generated, not written.** The sidebar, per-page sub-sections, the
    "On this page" rail, prev/next and search all come from the `NAV` tree in
-   `docs.js`. To add a docs page: create the HTML file, add a `NAV` entry, add a
-   `<url>` to `sitemap.xml`. Do not hand-write navigation into a page.
+   `docs.js`. To add a docs page: create the HTML file (copying its head block and
+   JSON-LD `@graph` from an existing page), add a `NAV` entry, add a `<url>` to
+   `sitemap.xml`, and add a line to the `llms.txt` page index. Do not hand-write
+   navigation into a page.
 4. **One canonical home per topic.** The de-duplication table in `README.md` says
    where each topic lives. Elsewhere, summarise in a line and link — never re-explain.
 5. **Never put a version number on the site** — not in snippets, headers, prose,
@@ -38,7 +40,10 @@ rules, content policies, the design system, and the changelog.
    change in both. Never hard-code a colour — use the tokens in `styles.css`.
 7. Keep `privacy.html` consistent with actual library behaviour and bump its
    "Last updated" date when it changes.
-8. The contact address lives only in `CONTACT_EMAIL` at the top of `docs.js`.
+8. **Structured data may only describe what is visible on the page**, carries no version
+   number, and takes its dates from `git log` rather than from guesswork. See
+   "Discovery — search engines and AI answers" in `README.md`.
+9. The contact address lives only in `CONTACT_EMAIL` at the top of `docs.js`.
 
 ## Writing style for docs pages
 

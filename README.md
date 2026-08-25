@@ -59,8 +59,10 @@ each other's structure:
 | Contact + per-page feedback line | `[data-contact-slot]`, `[data-feedback-line]` |
 
 **To add a documentation page:** create the HTML file (copy the chrome from any
-existing docs page), then add an entry to `NAV` in `docs.js` and a `<url>` to
-`sitemap.xml`. Nothing else needs touching.
+existing docs page, including its JSON-LD `@graph`, and swap the page-specific fields),
+then add an entry to `NAV` in `docs.js`, a `<url>` to `sitemap.xml`, and a line to the
+`llms.txt` page index. The full list is the discovery checklist at the end of
+"Discovery — search engines and AI answers" below.
 
 **The chrome is duplicated per page** — `<head>`, top bar, footer and the search
 dialog are real HTML on every page, deliberately, so the site works without JS and
@@ -110,7 +112,7 @@ If the address changes, update `docs.js` *and* `privacy.html`.
 | `docs.css` | Docs shell only: sidebar, TOC, prose typography, callouts, tables, prev/next, mobile drawer |
 | `script.js` | Theme toggle, syntax highlighting, copy buttons, support modal, mobile drawer |
 | `docs.js` | The `NAV` tree and everything generated from it (see above) |
-| `fevicon/` | Favicons and the wordmark logo (note the folder spelling: `fevicon`) — see "The logo" below |
+| `fevicon/` | Favicons, the wordmark logo and `og-image.png` (note the folder spelling: `fevicon`) — see "The logo" below |
 | `Qr_code.jpeg` | UPI payment QR for the Support section |
 | `sitemap.xml` | Search-engine sitemap; bump `lastmod` when a listed page changes |
 | `robots.txt` | Crawler rules (allows all crawlers, including AI crawlers) |
@@ -335,6 +337,89 @@ is a one-line summary with a link.
 - Never invent a configuration field name. If the library repo does not document it,
   do not put it on the site.
 
+## Discovery — search engines and AI answers
+
+Two audiences, one set of files. A person finds the site through a search result; an
+assistant finds it by fetching a page, reading `llms.txt`, or having been trained on it.
+Both want the same thing — a page that states plainly what one topic is and can be quoted
+without context — which is why the writing style above is also the SEO strategy. What
+follows is the machine-readable layer on top of it.
+
+**Every page carries the same head block.** It is duplicated per page like the rest of
+the chrome, deliberately, so it survives with JavaScript disabled and so a crawler that
+does not execute JS still sees it:
+
+| Tag | Why it is there |
+|---|---|
+| `<title>`, `description`, `canonical` | The four fields that name a page. A new page must change all of them |
+| `robots` with `max-snippet:-1, max-image-preview:large, max-video-preview:-1` | Removes the default snippet-length cap. Without it, a search engine may truncate the very paragraph that answers the question |
+| `og:*` + `twitter:*` | Link previews in Slack, X, LinkedIn and chat clients |
+| `article:published_time` / `article:modified_time` | Docs pages only. Dates come from `git log`, never invented |
+| One JSON-LD `@graph` | See below |
+
+**Structured data is one `@graph` per page, not scattered nodes.** Every page declares
+the same three shared entities by `@id` — `#person`, `#website`, `#software` — and then
+its own node. The graph is repeated in full on each page rather than referenced across
+pages, because a crawler that fetches one URL must be able to resolve it without
+fetching another.
+
+| Page | Its own node |
+|---|---|
+| `index.html` | `WebPage` + the full `SoftwareApplication` (with `featureList` and `softwareRequirements`) + `FAQPage` |
+| The 18 docs pages | `TechArticle` + `BreadcrumbList` (Home → Documentation → page) |
+| `privacy.html` | `WebPage` + `BreadcrumbList` — it is a policy, not a technical article |
+
+The `TechArticle` `keywords` are **the `topics` string from that page's `NAV` entry** in
+`docs.js`, deduplicated. That string already exists to drive ⌘K search, so the terms a
+reader would type and the terms a machine sees stay the same list, maintained once.
+`articleSection` is the `NAV` group title. Adding a page to `NAV` therefore gives you
+most of its structured data for free — but the JSON-LD itself is static HTML and has to
+be written into the page, so **adding a docs page now also means copying the `@graph`
+block and swapping its four page-specific fields**.
+
+Rules that are easy to break:
+
+- **No version number in JSON-LD.** `softwareVersion` was removed once already; the
+  site-wide rule covers structured data too.
+- **Only claim what is on the page.** `FAQPage` lives on `index.html` because that page
+  has a visible FAQ. Marking up questions a reader cannot see is a structured-data
+  violation, and it is also just a lie.
+- **Dates come from git.** `datePublished` is the file's first commit, `dateModified` its
+  last content commit. A metadata-only edit does not make a page newer.
+
+**`llms.txt` is written for a machine that will quote it.** It opens with a one-sentence
+definition, then an index where every page has a one-line description — so an assistant
+can pick the right page instead of guessing — then a **Common questions** section of
+direct question-and-answer pairs, which is the shape an answer engine lifts most readily.
+It closes with an **Attribution** section naming the two mistakes worth pre-empting:
+quoting a version number, and describing the library as a monitoring or crash-reporting
+*service*, which it is not. Keep it in sync with the pages; the pages win if they
+disagree.
+
+**`robots.txt` allows everything, on purpose.** For a free library's documentation,
+being in a model's weights and being quoted in an AI answer is distribution, not leakage.
+The two entries most often missed are `Google-Extended` (AI Overviews and Gemini
+grounding — governed separately from `Googlebot`) and `OAI-SearchBot` (ChatGPT search,
+separate from `GPTBot`). Omitting them silently withholds the site from those surfaces.
+
+**The preview card, `fevicon/og-image.png`,** is 1200×630 and rendered from HTML with
+headless Chrome — the site has no build step, so it is a one-off, regenerated by hand and
+committed. It uses the light theme's cream and teal, Manrope and JetBrains Mono, and the
+same logo asset as the header. Keep the important content away from the edges: chat
+clients crop. If the site's positioning line changes, regenerate it:
+
+```bash
+# render an HTML card at 1200x630 and save over fevicon/og-image.png
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
+  --window-size=1200,630 --virtual-time-budget=6000 \
+  --screenshot=fevicon/og-image.png "file://$PWD/card.html"
+```
+
+**When adding or editing a page, the discovery checklist is:** the four head fields, the
+`@graph` block, a `NAV` entry, a `<url>` in `sitemap.xml`, a line in the `llms.txt` page
+index, and a bumped `lastmod`.
+
 ## Design system
 
 - **Accent:** teal — `#145f5b` in light, `#4fd1c5` in dark. One amber for warnings.
@@ -497,6 +582,57 @@ site normally gives to "view source":
 | `docs.js` `GITHUB_URL` | Profile — it is only the fallback for the feedback line when `CONTACT_EMAIL` is empty |
 
 ## Changelog
+
+- **2026-08-25 (discovery: structured data, AI crawlers, preview card)** — The site had
+  ordinary SEO — titles, descriptions, canonicals, Open Graph, a sitemap, a good
+  `llms.txt` — and **structured data on exactly one page out of twenty**. An assistant
+  fetching `network.html` got prose and nothing machine-readable; a search engine got no
+  breadcrumb, no article type, no dates. Fixed across all twenty pages, and the whole
+  convention is now written down under "Discovery — search engines and AI answers".
+  **Structured data**: one JSON-LD `@graph` per page, declaring the same `#person`,
+  `#website` and `#software` entities by `@id` and repeating them in full on every page,
+  so one fetched URL resolves without a second request. Docs pages get `TechArticle` +
+  `BreadcrumbList`; `privacy.html` gets `WebPage`, because it is a policy and not a
+  technical article; the landing page's loose `SoftwareApplication` node became a graph
+  with `featureList` and `softwareRequirements`, and the `FAQPage` is now bound into it
+  rather than floating. `TechArticle` `keywords` and `articleSection` are **generated from
+  the `topics` and group title already in `NAV`**, so the ⌘K search vocabulary and the
+  machine-readable vocabulary are one maintained list; dates come from `git log`, not from
+  guesswork. **Crawler rules**: `robots.txt` was missing the two that decide whether the
+  site appears in AI answers at all — `Google-Extended` (AI Overviews and Gemini, governed
+  separately from `Googlebot`) and `OAI-SearchBot` (ChatGPT search, separate from
+  `GPTBot`) — plus Claude's search agents, Applebot-Extended and several others. All
+  allowed, with a comment explaining that for a free library's docs, being quoted is
+  distribution rather than leakage. **Snippets**: every page now sends
+  `max-snippet:-1, max-image-preview:large`, so the paragraph that answers the question
+  cannot be truncated by the default cap. **Preview card**: the site was serving a 180px
+  favicon as its `og:image`, which is why every shared link rendered as a tiny square.
+  There is now a real 1200×630 `fevicon/og-image.png`, rendered from HTML with headless
+  Chrome in the site's own cream-and-teal with Manrope and JetBrains Mono, and all twenty
+  pages moved to `summary_large_image` with dimensions and alt text. **`llms.txt`** gained
+  a one-sentence definition, a per-page description on every index entry so an assistant
+  can choose the right page instead of guessing, a **Common questions** block of direct
+  question-and-answer pairs, and an **Attribution** section that pre-empts the two things
+  a model is most likely to get wrong: quoting a version number, and calling the library a
+  monitoring or crash-reporting *service*. No page copy, layout, navigation or design
+  changed, and no library facts were re-synced — every claim added was already on the
+  site. `sitemap.xml` `lastmod` bumped to 2026-08-25.
+
+- **2026-08-25 (landing copy: release safety + quick start)** — Rewrote the two bands that
+  carry the most information per sentence. Both were accurate and both were hard to read:
+  facts were stacked into single long sentences joined by em-dashes, and the release-safety
+  band opened with "for two independent reasons", which asks the reader to hold a count in
+  their head across two paragraphs. Same facts, more paragraphs, one idea each. Release
+  safety now answers the heading in one line, then takes the stub, the build check that
+  gates the Maven Central release, and the runtime self-disable in turn, and says what each
+  *means* ("there is simply no inspection code in the APK for anyone to switch on") rather
+  than only listing its properties. Quick start now states the thing the old copy implied
+  but never said — **no initialisation call and no `Application` subclass**, because the
+  library auto-initialises through AndroidX Startup — and gives network capture its own
+  paragraph with the reason attached ("OkHttp only shows what its interceptors see"), since
+  "it has to go last" reads as an arbitrary rule without it. No new claims: the auto-init
+  wording was checked against the library README (auto-init via AndroidX Startup;
+  `Application` subclass "not required"). No structural, design or navigation change.
 
 - **2026-08-24 (sample app)** — Published
   [AppInspect-Sample-App](https://github.com/Suryansh1720001/AppInspect-Sample-App) is now
