@@ -1,7 +1,7 @@
 # AppInspect Website
 
 Documentation and marketing website for **AppInspect** — an Android in-app inspector
-library published on Maven Central (`io.github.suryansh1720001.appinspect`).
+library published on Maven Central (`io.github.appinspect`).
 
 Live at <https://app-inspect-doc.vercel.app/>.
 
@@ -23,8 +23,18 @@ All library claims on the website must match the library repository:
   uncommitted work.
 - When the library changes, sync the website and then update this file.
 
-Last synced with library: **version 0.8.0, library commit `5346b5d` plus local
-uncommitted changes (2026-08-24)**.
+Last synced with library: **version 1.0.0, library commit `20cb601` plus a local
+comment-only change to `build.gradle.kts` (2026-09-01)** — coordinates and links only.
+
+> **Known gap at this sync.** Library commit `52355ff` added a user-facing
+> **Network → API Analytics** view — an analytics icon beside the Network search bar, with
+> endpoint grouping, percentiles and grading, plus an `AppInspectAnalyticsConfig` block of
+> thresholds in the public API (library `README.md` "Network → API Analytics",
+> `docs/public-api.md#analytics-thresholds`, `Technology-Usages/13-network-analytics.md`).
+> **None of it is on the site.** `network.html` is its canonical home; the landing page's
+> feature count and the phone mockup would need looking at too. The 2026-09-01 sync
+> deliberately covered the namespace change only, so this is outstanding work, not a
+> decision to omit the feature.
 
 > **The site leads the release, deliberately.** The library is documented from its current
 > code, and the version is then published — so this line names the working-tree version,
@@ -312,11 +322,26 @@ is a one-line summary with a link.
   in prose, not in JSON-LD `softwareVersion`, not in `llms.txt`. Dependency snippets use
   the `<latest-version>` placeholder and link to Maven Central; anything else that wants
   to name a version links to the
-  [versions page](https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions)
+  [versions page](https://central.sonatype.com/artifact/io.github.appinspect/appinspect/versions)
   instead — the docs sidebar already carries it as "Released versions". The reason: the
   library releases far more often than this site is edited, so any number here turns
   into a lie. **The only place a version is written down is this README's "Last synced
   with library" line** — that is a maintenance record, not a user-facing claim.
+- **One artifact group, no migration notes.** The site names `io.github.appinspect` and
+  nothing else. Versions up to `0.8.0` were published under
+  `io.github.suryansh1720001.appinspect`, and that coordinate stays resolvable forever
+  because Maven Central is immutable — but it is deliberately absent from every page. The
+  library's own `docs/namespace-migration.md` records that the change happened with zero
+  downstream consumers, so there is nobody to migrate; and a migration note cannot be
+  written without naming `0.8.0`, which the no-version rule above forbids. A reader
+  arriving today needs one coordinate, not a history. If a real consumer ever surfaces,
+  the migration note belongs on `install.html`, not scattered.
+  **One exception, `llms.txt`.** Its Attribution section names the old group, because that
+  file exists to correct machines rather than inform readers, and a model trained on the
+  pre-1.0.0 documentation will otherwise emit the old coordinate with total confidence. It
+  is stated there as a thing to recognise as stale, and it needs no version number to say
+  so. That is the whole reason the exception is safe — do not read it as permission to put
+  the old group back on a page.
 - **Write for three readers at once** — a developer integrating it, a tester using it,
   and someone deciding whether it is safe to adopt. Lead each page with what the thing
   is for in plain language, then the specifics.
@@ -561,9 +586,9 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 
 ## External links used
 
-- Maven Central artifact: <https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/overview>
-- Maven Central versions: <https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions>
-- Sample app: <https://github.com/Suryansh1720001/AppInspect-Sample-App>
+- Maven Central artifact: <https://central.sonatype.com/artifact/io.github.appinspect/appinspect/overview>
+- Maven Central versions: <https://central.sonatype.com/artifact/io.github.appinspect/appinspect/versions>
+- Sample app: <https://github.com/appinspect/AppInspect-Sample-App>
 - GitHub profile: <https://github.com/Suryansh1720001>
 - LinkedIn: <https://www.linkedin.com/in/itssuryansh/>
 
@@ -572,6 +597,14 @@ own pages — if inbound links to those anchors ever matter, add redirects.
 **The library repository is private and stays private**, so nothing on the site links to
 source. The public GitHub artefact is the **sample app**, and it takes the slot a docs
 site normally gives to "view source":
+
+**Two accounts, and they are not interchangeable.** Code lives under the
+[`appinspect`](https://github.com/appinspect) organisation — that is where the sample app
+moved with the 1.0.0 namespace change, and it is the account the Maven namespace is
+verified against. The **person** is still
+[`Suryansh1720001`](https://github.com/Suryansh1720001), which is what the maintainer
+links point at. GitHub redirects the old sample-app URL, but the site names the org URL
+directly; never resolve a maintainer link to the org, or a code link to the profile.
 
 | Slot | Target |
 |---|---|
@@ -582,6 +615,38 @@ site normally gives to "view source":
 | `docs.js` `GITHUB_URL` | Profile — it is only the fallback for the feedback line when `CONTACT_EMAIL` is empty |
 
 ## Changelog
+
+- **2026-09-01 (artifact group `io.github.appinspect`)** — The library changed its Maven
+  groupId in 1.0.0, from `io.github.suryansh1720001.appinspect` to **`io.github.appinspect`**,
+  and moved its public code to the [`appinspect`](https://github.com/appinspect) GitHub
+  organisation. Both were one-way doors on the library side and pure find-and-replace here,
+  but they touched every page, because the coordinate is in the chrome: the top-bar Maven
+  Central icon, the sidebar's "Released versions" link and the footer all carry it on all
+  twenty pages. Changed: the group in both Gradle snippets (`install.html`, the landing
+  page's Quick start), the hero trust line, the `matchingFallbacks` error message on
+  `environments.html`, every `central.sonatype.com` href, and the JSON-LD `installUrl`,
+  `downloadUrl` and `sameAs` on `index.html`. The **sample app repo** moved to
+  `github.com/appinspect/AppInspect-Sample-App` — the old URL redirects, but the site now
+  names the new one directly, including the `git clone` command in `install.html`. The
+  **maintainer links did not move**: the Maintainer band, the footer's GitHub/LinkedIn pair,
+  every JSON-LD `#person` node, the `llms.txt` maintainer line and `docs.js` `GITHUB_URL` all
+  still point at the personal profile, which is what the library's own README does. That
+  split is now written down under "Which GitHub link goes where". **The old coordinate is
+  not mentioned anywhere on the site**, and that is now a content policy: the library's
+  `docs/namespace-migration.md` records the change as having zero downstream consumers, and
+  a migration note cannot be written without naming `0.8.0`, which the no-version rule
+  forbids. The single exception is `llms.txt`, whose Attribution section gained a third
+  bullet naming the old group explicitly — that file corrects machines rather than informs
+  readers, and a model trained on the pre-1.0.0 docs will otherwise emit the dead coordinate
+  confidently; saying so needs no version number. One small cleanup fell out of it — `install.html`'s first dependency snippet had
+  a `val appInspect = "…"` local that existed only to keep the old, longer group inside the
+  760px prose column; the new group fits inline, so the snippet is now literal coordinates a
+  reader can copy straight into a build file. The staging snippet keeps its `val group`,
+  where it dedupes the same string three times and earns its place. Verified `1.0.0` of both
+  `appinspect` and `appinspect-no-op` resolve under the new group before publishing the
+  links. `dateModified` bumped only on the five pages whose visible content changed
+  (`index`, `docs`, `install`, `environments`, `security`) — the other fifteen changed in
+  chrome only; `sitemap.xml` `lastmod` and the `llms.txt` date bumped to 2026-09-01.
 
 - **2026-08-25 (discovery: structured data, AI crawlers, preview card)** — The site had
   ordinary SEO — titles, descriptions, canonicals, Open Graph, a sitemap, a good
@@ -635,7 +700,7 @@ site normally gives to "view source":
   `Application` subclass "not required"). No structural, design or navigation change.
 
 - **2026-08-24 (sample app)** — Published
-  [AppInspect-Sample-App](https://github.com/Suryansh1720001/AppInspect-Sample-App) is now
+  [AppInspect-Sample-App](https://github.com/appinspect/AppInspect-Sample-App) is now
   linked from the site. It answers the one thing docs cannot: adding the library is two
   Gradle lines, but a reader still wants to *see* the inspector before wiring it into their
   own app. **`install.html#sample-app` is the canonical home** — a section directly under

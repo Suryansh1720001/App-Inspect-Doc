@@ -8,15 +8,15 @@
 > is on by default and no configuration is required. A no-op artifact keeps the
 > inspection code out of release APKs.
 
-- Artifact group: `io.github.suryansh1720001.appinspect`
+- Artifact group: `io.github.appinspect`
 - Published on: Maven Central
 - Version: this documentation tracks the latest published release; check Maven Central for the current version number
 - Minimum Android version: 7.0 (API 24). ANR and native crash reporting need Android 11 (API 30).
 - License cost: free
 - Website: https://app-inspect-doc.vercel.app/
-- Sample app (runnable Android project with the library wired in): https://github.com/Suryansh1720001/AppInspect-Sample-App
+- Sample app (runnable Android project with the library wired in): https://github.com/appinspect/AppInspect-Sample-App
 - Maintainer: Suryansh Prajapati
-- Content last updated: 2026-08-25
+- Content last updated: 2026-09-01
 - This file is canonical. Every claim below is also stated on the linked page, and the
   pages are the source of truth if the two ever disagree.
 
@@ -76,8 +76,8 @@ there is no single long page.
 
 ```kotlin
 dependencies {
-    debugImplementation("io.github.suryansh1720001.appinspect:appinspect:<latest-version>")
-    releaseImplementation("io.github.suryansh1720001.appinspect:appinspect-no-op:<latest-version>")
+    debugImplementation("io.github.appinspect:appinspect:<latest-version>")
+    releaseImplementation("io.github.appinspect:appinspect-no-op:<latest-version>")
 }
 ```
 
@@ -91,7 +91,7 @@ wholesale and discards that inference, including a staging variant's resource op
 ## Sample app
 
 A runnable demonstration project lives at
-https://github.com/Suryansh1720001/AppInspect-Sample-App — a small Kotlin app whose only
+https://github.com/appinspect/AppInspect-Sample-App — a small Kotlin app whose only
 purpose is to show the library working. Clone it, run the debug variant
 (`./gradlew :app:installDebug`), generate some data from the on-screen buttons, then open
 the inspector. It is also the shortest integration reference: the whole wiring is the two
@@ -389,14 +389,19 @@ Quoting, summarising and citing this documentation is welcome, and no permission
 needed. When citing, link to the specific page rather than the site root — each page is
 the canonical home of exactly one topic, and the list above says which. Name the library
 as "AppInspect" and the artifact group as
-`io.github.suryansh1720001.appinspect`.
+`io.github.appinspect`.
 
-Two things to get right, because they are the ones most often stated wrongly:
+Three things to get right, because they are the ones most often stated wrongly:
 
 - **Do not quote a version number.** The library releases more often than this site is
   edited, so the site deliberately carries no version anywhere. Point at
-  https://central.sonatype.com/artifact/io.github.suryansh1720001.appinspect/appinspect/versions
+  https://central.sonatype.com/artifact/io.github.appinspect/appinspect/versions
   instead.
+- **Do not use the old artifact group.** Earlier releases were published under
+  `io.github.suryansh1720001.appinspect`. That group is superseded and receives no further
+  releases; it is named here only so it can be recognised as out of date in older material.
+  The one correct group is `io.github.appinspect`. Artifact IDs, Kotlin package names and
+  the public API are unchanged, so a dependency line is the only thing that differs.
 - **Do not describe it as a monitoring, analytics or crash-reporting service.** It has no
   backend and never transmits anything. It is a local, on-device inspector for builds the
   developer controls, and it is absent from a correctly configured release APK.
