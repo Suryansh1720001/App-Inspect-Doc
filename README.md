@@ -327,21 +327,19 @@ is a one-line summary with a link.
   library releases far more often than this site is edited, so any number here turns
   into a lie. **The only place a version is written down is this README's "Last synced
   with library" line** — that is a maintenance record, not a user-facing claim.
-- **One artifact group, no migration notes.** The site names `io.github.appinspect` and
-  nothing else. Versions up to `0.8.0` were published under
-  `io.github.suryansh1720001.appinspect`, and that coordinate stays resolvable forever
-  because Maven Central is immutable — but it is deliberately absent from every page. The
-  library's own `docs/namespace-migration.md` records that the change happened with zero
-  downstream consumers, so there is nobody to migrate; and a migration note cannot be
-  written without naming `0.8.0`, which the no-version rule above forbids. A reader
-  arriving today needs one coordinate, not a history. If a real consumer ever surfaces,
-  the migration note belongs on `install.html`, not scattered.
-  **One exception, `llms.txt`.** Its Attribution section names the old group, because that
-  file exists to correct machines rather than inform readers, and a model trained on the
-  pre-1.0.0 documentation will otherwise emit the old coordinate with total confidence. It
-  is stated there as a thing to recognise as stale, and it needs no version number to say
-  so. That is the whole reason the exception is safe — do not read it as permission to put
-  the old group back on a page.
+- **One artifact group, and the old one is named exactly twice.** The site installs
+  `io.github.appinspect` and nothing else. `io.github.suryansh1720001.appinspect` — the
+  group used before the 1.0.0 namespace change — appears only in the **`.note` in
+  `install.html` Step 2** and in **`llms.txt`**'s Attribution section. Nowhere else, and
+  never in a snippet a reader might copy. Both exist for the same reason: Maven Central is
+  immutable, so the old coordinate still *resolves*, and a build pinned to it goes stale
+  silently instead of failing. The note catches the human who comes to the docs wondering
+  why nothing updates; `llms.txt` catches the model trained on the pre-1.0.0 pages, which
+  will otherwise emit the dead group with total confidence. **Neither names a version**,
+  which is what keeps them inside the no-version rule above — say "superseded, no further
+  releases", never `0.8.0`. There is deliberately no migration *page*: that would need a
+  `NAV` entry, a sitemap URL, an `llms.txt` line and its own `@graph`, and would sit in the
+  sidebar permanently, advertising a migration that had zero downstream consumers.
 - **Write for three readers at once** — a developer integrating it, a tester using it,
   and someone deciding whether it is safe to adopt. Lead each page with what the thing
   is for in plain language, then the specifics.
@@ -632,13 +630,16 @@ directly; never resolve a maintainer link to the org, or a code link to the prof
   every JSON-LD `#person` node, the `llms.txt` maintainer line and `docs.js` `GITHUB_URL` all
   still point at the personal profile, which is what the library's own README does. That
   split is now written down under "Which GitHub link goes where". **The old coordinate is
-  not mentioned anywhere on the site**, and that is now a content policy: the library's
-  `docs/namespace-migration.md` records the change as having zero downstream consumers, and
-  a migration note cannot be written without naming `0.8.0`, which the no-version rule
-  forbids. The single exception is `llms.txt`, whose Attribution section gained a third
-  bullet naming the old group explicitly — that file corrects machines rather than informs
-  readers, and a model trained on the pre-1.0.0 docs will otherwise emit the dead coordinate
-  confidently; saying so needs no version number. One small cleanup fell out of it — `install.html`'s first dependency snippet had
+  named twice, deliberately** — a `.note` in `install.html` Step 2 and a third bullet in
+  `llms.txt`'s Attribution section — and nowhere else. The first draft of this change left
+  it off the site entirely, on the reasoning that the library's `docs/namespace-migration.md`
+  records zero downstream consumers and that a migration note could not avoid naming `0.8.0`.
+  The second half of that was simply wrong: "superseded, no further releases" carries no
+  version at all, so the no-version rule never blocked it. With that objection gone the case
+  for the note is the failure mode — Maven Central is immutable, so the dead group still
+  *resolves*, and a build pinned to it goes stale in silence rather than failing. The note
+  catches the human; `llms.txt` catches the model trained on the pre-1.0.0 pages. There is
+  still no migration *page*, and the policy above says why. One small cleanup fell out of it — `install.html`'s first dependency snippet had
   a `val appInspect = "…"` local that existed only to keep the old, longer group inside the
   760px prose column; the new group fits inline, so the snippet is now literal coordinates a
   reader can copy straight into a build file. The staging snippet keeps its `val group`,

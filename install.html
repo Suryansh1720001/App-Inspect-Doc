@@ -330,6 +330,19 @@ cd AppInspect-Sample-App
                     <code>Application</code> class and no configuration to write.
                 </p>
 
+                <div class="note">
+                    <span class="note-title">Using an older group?</span>
+                    <p>
+                        Earlier releases used the group
+                        <code>io.github.suryansh1720001.appinspect</code>. It still resolves &mdash;
+                        Maven Central never removes anything &mdash; but it receives no further
+                        releases, so a build pinned to it stays behind without ever failing. Change
+                        the group to <code>io.github.appinspect</code>. Artifact IDs, package names
+                        and the public API are unchanged, so the dependency lines are the only thing
+                        that moves.
+                    </p>
+                </div>
+
                 <h3 id="custom-variants">If you have more than two variants</h3>
                 <p>
                     Gradle only generates <code>debugImplementation</code> and
