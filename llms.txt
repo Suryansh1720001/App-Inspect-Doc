@@ -36,7 +36,8 @@ there is no single long page.
 - Introduction — https://app-inspect-doc.vercel.app/docs.html
   What AppInspect is, what it replaces, and how the pieces fit together.
 - Install — https://app-inspect-doc.vercel.app/install.html
-  Gradle dependencies per build variant, the OkHttp interceptor, and the sample app.
+  Gradle dependencies per build variant, the OkHttp interceptor (also Retrofit and Ktor),
+  and the sample app.
 - Builds and environments — https://app-inspect-doc.vercel.app/environments.html
   Where it runs, where it refuses to, and how a staging or UAT build opts in.
 - Compatibility — https://app-inspect-doc.vercel.app/compatibility.html
@@ -153,6 +154,42 @@ Last matters for two reasons: a `SHORT_CIRCUIT` mock skips every interceptor
 registered after AppInspect's, and last is where the request looks the way it goes
 out. The extension also installs a network-level interceptor so recorded events carry
 the final wire request headers, including an `Authorization` header added downstream.
+
+The rule is generic, not per-library: **if OkHttp is the engine underneath, AppInspect can
+capture it** — whatever sits on top. Two shapes cover almost everything:
+
+- **The library takes a client you built** — Retrofit, Apollo, Coil. Instrument the builder
+  above and hand it over: `Retrofit.Builder().client(instrumentedClient)`.
+- **The library builds its own and exposes the builder** — Ktor on the `OkHttp` engine
+  (`io.ktor:ktor-client-okhttp`), whose `engine { config { … } }` block takes an
+  `OkHttpClient.Builder.() -> Unit`.
+
+Not backed by OkHttp — Volley, Cronet, `HttpURLConnection`, a WebView, Ktor on a non-OkHttp
+engine — means nothing to hook: Network and Mocks stay empty, every other panel is unaffected.
+
+```kotlin
+val client = HttpClient(OkHttp) {
+    engine {
+        addInterceptor(authInterceptor)
+        config { addAppInspectInterceptor() }   // last
+    }
+}
+```
+
+Ktor specifics:
+
+- Ordering inside `engine { }` is preserved (`addInterceptor`, `addNetworkInterceptor` and
+  `config { }` all append to the same builder), so last still means last.
+- `engine { preconfigured = instrumentedClient }` is an equivalent route.
+- Mocking works — a mock is served from inside OkHttp, so Ktor never sees the difference.
+- `CIO`, `Android`, `Java` and `Darwin` expose no interceptor and capture nothing.
+- The OkHttp engine disables OkHttp's own redirect following and lets Ktor's `HttpRedirect`
+  plugin handle hops, so a redirect chain is one captured event per hop — as is each
+  `HttpRequestRetry` attempt.
+- Streaming and `MultiPartFormDataContent` uploads arrive as one-shot OkHttp bodies that
+  AppInspect will not drain, so those events record everything except the request body.
+  Byte-backed bodies — JSON via `ContentNegotiation`, form content, plain text — are captured
+  normally, and response bodies are never affected on any engine.
 
 `AppInspect.install()`, `AppInspect.open()` and the long-press trigger helpers do not
 exist in `appinspect-no-op`, so keep those calls in a debug-only source set. The
@@ -347,6 +384,15 @@ detection need Android 11 (API 30).
 `releaseImplementation` of `appinspect-no-op` — then one `addAppInspectInterceptor()`
 call on your OkHttp builder, added last. There is no initialisation call and no
 `Application` subclass to write.
+
+**Which HTTP client does it work with?** Any client backed by OkHttp — the interceptor is an
+`okhttp3.Interceptor`, so the engine underneath is what matters, not the library on top.
+Retrofit works unconditionally (it wraps an `OkHttpClient` you supply, so instrument that).
+Ktor works on the `OkHttp` engine, where `engine { config { addAppInspectInterceptor() } }`
+is the whole change; mocking works there too. Volley, Cronet, `HttpURLConnection`, WebView
+traffic and Ktor's `CIO`/`Android`/`Java`/`Darwin` engines cannot be captured — every
+non-network panel still works. See
+https://app-inspect-doc.vercel.app/install.html#other-clients.
 
 **How does a tester open it?** Shake the device, use the launcher shortcut, long-press a
 wired-up view, or tap a network notification.

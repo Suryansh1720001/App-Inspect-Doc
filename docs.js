@@ -22,7 +22,7 @@
                     url: "install.html",
                     title: "Install",
                     blurb: "Gradle dependencies per build variant and the OkHttp interceptor.",
-                    topics: "gradle maven central dependency debugImplementation releaseImplementation no-op interceptor okhttp setup sample app example project clone git demo runnable try it"
+                    topics: "gradle maven central dependency debugImplementation releaseImplementation no-op interceptor okhttp retrofit ktor ktor-client-okhttp engine preconfigured http client setup sample app example project clone git demo runnable try it"
                 },
                 {
                     url: "environments.html",
@@ -34,7 +34,7 @@
                     url: "compatibility.html",
                     title: "Compatibility",
                     blurb: "minSdk, AndroidX, and why Compose and Kotlin are not required.",
-                    topics: "compatibility requirements minSdk 24 androidx compose not required java only host okhttp compileOnly workmanager security-crypto agp kotlin version api level degradation apk size"
+                    topics: "compatibility requirements minSdk 24 androidx compose not required java only host okhttp retrofit ktor cio engine compileOnly workmanager security-crypto agp kotlin version api level degradation apk size"
                 },
                 {
                     url: "open-inspector.html",

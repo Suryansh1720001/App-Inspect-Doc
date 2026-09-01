@@ -23,8 +23,9 @@ All library claims on the website must match the library repository:
   uncommitted work.
 - When the library changes, sync the website and then update this file.
 
-Last synced with library: **version 1.0.0, library commit `20cb601` plus a local
-comment-only change to `build.gradle.kts` (2026-09-01)** — coordinates and links only.
+Last synced with library: **version 1.0.0, library commit `ae84ff8` (2026-09-01)** —
+coordinates and links, plus the Retrofit/Ktor integration surface read out of
+`AppInspectOkHttpInterceptor.kt` and `AppInspectOkHttpCaptureSupport.kt`.
 
 > **Known gap at this sync.** Library commit `52355ff` added a user-facing
 > **Network → API Analytics** view — an analytics icon beside the Network search bar, with
@@ -264,7 +265,7 @@ Other pages may summarise a topic in a line or two **with a link**, never re-exp
 
 | Topic | Canonical home |
 |---|---|
-| Gradle setup, variants, the OkHttp interceptor, why it goes last, wire headers | `install.html` |
+| Gradle setup, variants, the OkHttp interceptor, why it goes last, wire headers, wiring it through Retrofit or Ktor and Ktor's engine caveats | `install.html` |
 | Build tiers, the scenario table, `isDebuggable`, the opt-in resource, `matchingFallbacks`, testing on a release-like build, R8 / consumer rules | `environments.html` |
 | Host requirements: minSdk, AndroidX, Compose/Kotlin not required, Java hosts, the `compileOnly` integrations, API-level degradation | `compatibility.html` |
 | Entry points (shake, shortcut, long press, notification tap, `open()`), own-task behaviour, panel navigation | `open-inspector.html` |
@@ -613,6 +614,62 @@ directly; never resolve a maintainer link to the org, or a code link to the prof
 | `docs.js` `GITHUB_URL` | Profile — it is only the fallback for the feedback line when `CONTACT_EMAIL` is empty |
 
 ## Changelog
+
+- **2026-09-01 (which HTTP clients does it work with?)** — The site described network capture
+  purely as an OkHttp feature and never said **Retrofit** or **Ktor** on any of the twenty pages,
+  which left the most common adoption question unanswerable by anyone who did not already know
+  that Ktor has a pluggable engine. The fix is deliberately framed as a **generic rule, not a
+  per-library list**: capture is an `okhttp3.Interceptor`, so *if OkHttp is the engine underneath,
+  AppInspect can see the traffic* — whatever sits on top. Named setups follow as examples of two
+  shapes, which is what a reader actually needs to act: libraries that **take a client you built**
+  (Retrofit, Apollo, Coil — instrument the builder and hand it over) and libraries that **build
+  their own and expose the builder** (Ktor on the `OkHttp` engine, whose
+  `OkHttpConfig.config { }` takes an `OkHttpClient.Builder.() -> Unit` and so accepts
+  `addAppInspectInterceptor()` unchanged). Anything not on OkHttp — Volley, Cronet,
+  `HttpURLConnection`, a WebView, Ktor on `CIO`/`Android`/`Java`/`Darwin` — has nothing to hook,
+  and no panel but Network and Mocks is affected either way.
+  **`install.html#other-clients` is the canonical home** — a third `<h3>` under Step 3, after
+  "Why the order matters" and "You get the real wire headers", both of which it leans on rather
+  than restating. It carries the generic rule, the two shapes as a list, one Ktor snippet (the
+  only case that needs one, since the builder is a level down), and the Ktor specifics as **bullet
+  points rather than paragraphs** — a first pass wrote them as three dense prose blocks and read
+  like a spec appendix; the information is unchanged, the shape is scannable. Those bullets: order
+  inside `engine { }` is preserved so last still means last; `preconfigured` is an equivalent
+  route; mocking works because a mock is served from inside OkHttp; non-OkHttp engines capture
+  nothing (and switching engine to gain capture is the host's call, not a recommendation the docs
+  should make); a redirect is one event per hop, because the engine defaults to
+  `followRedirects(false)` + `followSslRedirects(false)` and leaves hops to Ktor's `HttpRedirect`
+  plugin above OkHttp — same for each `HttpRequestRetry` attempt; and streaming /
+  `MultiPartFormDataContent` request bodies show as omitted, because Ktor converts them to a
+  `StreamRequestBody` with `isOneShot() = true` and AppInspect will not drain a body it cannot put
+  back. Byte-backed content (JSON via `ContentNegotiation`, form, text) is captured normally, and
+  response bodies use `peekBody` so they are never affected on any engine. All of that was read
+  out of `OkHttpConfig.kt`, `OkHttpEngine.kt` and `StreamRequestBody.kt` in `ktorio/ktor` and out
+  of `AppInspectOkHttpCaptureSupport.kt` in the library, not from memory.
+  Everywhere else got a summary and a link, per the de-duplication rule: `compatibility.html`
+  widened the OkHttp row of the `compileOnly` table and gained a paragraph on what "has OkHttp"
+  actually means, `network.html` extended "what is captured" by one paragraph, and
+  `install.html`'s Step 4 troubleshooting now names a non-OkHttp Ktor engine as the second likely
+  cause of an empty Network panel. `llms.txt` got the fullest treatment, since a model answering
+  this question is the likeliest route to it: the generic rule, the two shapes, the Ktor snippet
+  and the specifics as a bullet list under Host compatibility, plus a **"Which HTTP client does it
+  work with?"** entry in Common questions — phrased generically on purpose, so the answer covers
+  clients neither the docs nor the reader thought to name. Search vocabulary added in both places
+  it is duplicated — `NAV.topics` in `docs.js` and the generated `keywords` in each page's
+  JSON-LD — for `install` and `compatibility`; `install.html`'s four description strings now say
+  "(Retrofit and Ktor included)". `dateModified` bumped on the three pages whose visible content
+  changed (`install`, `compatibility`, `network`); `sitemap.xml` already read 2026-09-01. **No new
+  page, no version number, and no `<h4>`** — `docs.css` styles one but no page had ever used it,
+  and the three-bolded-lead-ins pattern already on this page keeps the "On this page" rail to one
+  new entry instead of two.
+  **The library repo was corrected in the same pass**, because the omission was not only the
+  site's: `appinspect-network-okhttp/README.md` claimed "a host on Ktor, Volley, Cronet, or
+  `HttpURLConnection` gets every other panel", which reads as *Ktor cannot be captured* and is
+  wrong for the `OkHttp` engine. Fixed there and in the matching `build.gradle.kts` comment, plus
+  a new "Retrofit, Ktor, and other clients on OkHttp" section in that module README, a bulleted
+  paragraph in the root `README.md`, a "Which HTTP clients this covers" subsection in
+  `docs/integration-quickstart.md`, an "Installing through a library that owns the client" table in
+  `Technology-Usages/02-networking.md`, and one new cheat-sheet row in `Technology-Usages/README.md`.
 
 - **2026-09-01 (artifact group `io.github.appinspect`)** — The library changed its Maven
   groupId in 1.0.0, from `io.github.suryansh1720001.appinspect` to **`io.github.appinspect`**,

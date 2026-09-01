@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Install | AppInspect docs</title>
-    <meta name="description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor, and what to guard by variant.">
+    <meta name="description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor (Retrofit and Ktor included), and what to guard by variant.">
     <meta name="theme-color" content="#fdfbf5" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1211" media="(prefers-color-scheme: dark)">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -17,7 +17,7 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://app-inspect-doc.vercel.app/install.html">
     <meta property="og:title" content="Install — AppInspect docs">
-    <meta property="og:description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor, and what to guard by variant.">
+    <meta property="og:description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor (Retrofit and Ktor included), and what to guard by variant.">
     <meta property="og:image" content="https://app-inspect-doc.vercel.app/fevicon/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -28,7 +28,7 @@
     <meta property="article:author" content="Suryansh Prajapati">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Install — AppInspect docs">
-    <meta name="twitter:description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor, and what to guard by variant.">
+    <meta name="twitter:description" content="Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor (Retrofit and Ktor included), and what to guard by variant.">
     <meta name="twitter:image" content="https://app-inspect-doc.vercel.app/fevicon/og-image.png">
     <meta name="twitter:image:alt" content="AppInspect — the Android inspector that lives inside your app.">
 
@@ -103,7 +103,7 @@
           "url": "https://app-inspect-doc.vercel.app/install.html",
           "name": "Install",
           "headline": "Install",
-          "description": "Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor, and what to guard by variant.",
+          "description": "Add AppInspect to an Android project: Gradle dependencies per build variant, the OkHttp interceptor (Retrofit and Ktor included), and what to guard by variant.",
           "inLanguage": "en",
           "datePublished": "2026-08-21",
           "dateModified": "2026-09-01",
@@ -127,7 +127,7 @@
           "articleSection": "Getting started",
           "proficiencyLevel": "Beginner",
           "dependencies": "Android 7.0 (API 24) or later; AndroidX. Jetpack Compose and Kotlin are not required.",
-          "keywords": "gradle, maven, central, dependency, debugImplementation, releaseImplementation, no-op, interceptor, okhttp, setup, sample, app, example, project, clone, git, demo, runnable, try, it"
+          "keywords": "gradle, maven, central, dependency, debugImplementation, releaseImplementation, no-op, interceptor, okhttp, retrofit, ktor, ktor-client-okhttp, engine, preconfigured, http, client, setup, sample, app, example, project, clone, git, demo, runnable, try, it"
         },
         {
           "@type": "BreadcrumbList",
@@ -415,6 +415,13 @@ dependencies {
                     <code>appinspect-no-op</code> and returns the builder untouched, so there is no
                     <code>if (BuildConfig.DEBUG)</code> to write.
                 </p>
+                <p>
+                    If something else builds the client for you &mdash; Retrofit, Ktor, or any other
+                    library sitting on OkHttp &mdash; that same line is still the whole integration.
+                    It just goes in a slightly different place; see
+                    <a href="#other-clients">Retrofit, Ktor, and other clients built on OkHttp</a>
+                    below.
+                </p>
 
                 <h3 id="why-last">Why the order matters</h3>
                 <p>
@@ -457,6 +464,99 @@ dependencies {
                     share an export: see the <a href="qa-checklist.html">QA checklist</a>.
                 </p>
 
+                <h3 id="other-clients">Retrofit, Ktor, and other clients built on OkHttp</h3>
+                <p>
+                    Nothing above is specific to calling OkHttp directly. Capture is an ordinary
+                    OkHttp interceptor, so the rule is generic: <strong>if OkHttp is the engine
+                    underneath, AppInspect can see the traffic</strong> &mdash; whatever library sits
+                    on top of it. Instrument the <code>OkHttpClient</code> your stack actually uses
+                    and everything on this page still holds: the ordering rule, the wire headers,
+                    <a href="mocks.html">mocking</a>, and the no-op substitution in release.
+                </p>
+                <p>
+                    Two shapes cover almost every library:
+                </p>
+                <ul>
+                    <li>
+                        <strong>It takes a client you built</strong> &mdash; <strong>Retrofit</strong>,
+                        Apollo, Coil, Glide's OkHttp loader. Instrument the builder exactly as above
+                        and hand the finished client over:
+                        <code>Retrofit.Builder().client(instrumentedClient)</code>. Nothing else to do.
+                    </li>
+                    <li>
+                        <strong>It builds its own and exposes the builder</strong> &mdash;
+                        <strong>Ktor</strong> on the <code>OkHttp</code> engine. Reach the builder one
+                        level down, through <code>engine { config { &hellip; } }</code>.
+                    </li>
+                </ul>
+                <p>
+                    If OkHttp is <em>not</em> underneath &mdash; Volley, Cronet,
+                    <code>HttpURLConnection</code>, a WebView, or Ktor on a non-OkHttp engine &mdash;
+                    there is nothing to hook, and the Network and Mocks panels stay empty. No other
+                    panel is affected either way; none of them involve HTTP.
+                </p>
+
+                <p>
+                    Ktor is the one worth a snippet, since it needs
+                    <code>io.ktor:ktor-client-okhttp</code> and the extension goes a level deeper than
+                    you might expect:
+                </p>
+
+                <div class="snippet">
+                    <div class="snippet-head">
+                        <span class="snippet-file">Your Ktor client</span>
+                        <button class="copy-button" type="button">Copy</button>
+                    </div>
+<pre><code data-lang="kotlin">val client = HttpClient(OkHttp) {
+    install(ContentNegotiation) { json() }
+
+    engine {
+        addInterceptor(authInterceptor)      // your own, first
+        config {
+            addAppInspectInterceptor()      // last
+        }
+    }
+}</code></pre>
+                </div>
+
+                <ul>
+                    <li>
+                        <strong>Order is preserved.</strong> <code>addInterceptor</code>,
+                        <code>addNetworkInterceptor</code> and <code>config { }</code> all append to
+                        the same builder in the order you write them, so
+                        <a href="#why-last">last still means last</a>.
+                    </li>
+                    <li>
+                        <strong>Already build a client elsewhere?</strong> Instrument that builder and
+                        pass the result as
+                        <code>engine { preconfigured = instrumentedClient }</code> instead. Same
+                        outcome.
+                    </li>
+                    <li>
+                        <strong>Mocking works.</strong> A mock is served from inside OkHttp, so Ktor
+                        never learns the difference.
+                    </li>
+                    <li>
+                        <strong>Ktor's other engines capture nothing.</strong> <code>CIO</code>,
+                        <code>Android</code>, <code>Java</code> and <code>Darwin</code> are not OkHttp
+                        and expose no interceptor. Switching engine purely to get capture changes your
+                        networking stack &mdash; your call to make, not a recommendation.
+                    </li>
+                    <li>
+                        <strong>A redirect is several events, not one.</strong> The engine leaves
+                        redirects to Ktor's <code>HttpRedirect</code> plugin, which sits above OkHttp,
+                        so each hop is captured separately &mdash; as is each
+                        <code>HttpRequestRetry</code> attempt.
+                    </li>
+                    <li>
+                        <strong>Streaming and multipart request bodies show as omitted.</strong> Ktor
+                        sends those as one-shot bodies that can be read exactly once, and draining one
+                        to display it would break the request. The event is otherwise complete; JSON,
+                        form and text bodies are captured normally, and response bodies are never
+                        affected on any engine.
+                    </li>
+                </ul>
+
                 <h2 id="verify">Step 4 &mdash; check that it worked</h2>
                 <ol>
                     <li>Install and launch a debug build.</li>
@@ -466,8 +566,10 @@ dependencies {
                 <p>
                     If the inspector opens but Network is empty, the interceptor is not on the client
                     that made the call &mdash; a second <code>OkHttpClient</code> built somewhere else is
-                    the usual culprit. If nothing opens at all, the build is almost certainly not
-                    debuggable: see <a href="environments.html">builds and environments</a>.
+                    the usual culprit, and on Ktor it is usually a client that is not on the
+                    <a href="#other-clients">OkHttp engine</a>. If nothing opens at all, the build is almost
+                    certainly not debuggable: see
+                    <a href="environments.html">builds and environments</a>.
                 </p>
 
                 <h2 id="host-controlled">Optional &mdash; change a default</h2>

@@ -24,7 +24,7 @@
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:alt" content="AppInspect — the Android inspector that lives inside your app. Network, mocks, storage, WorkManager, crashes, ANRs and a live logcat tail, on the device.">
     <meta property="article:published_time" content="2026-08-23">
-    <meta property="article:modified_time" content="2026-08-24">
+    <meta property="article:modified_time" content="2026-09-01">
     <meta property="article:author" content="Suryansh Prajapati">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Compatibility — AppInspect docs">
@@ -106,7 +106,7 @@
           "description": "What AppInspect needs from your project: minSdk 24, AndroidX, no Compose or Kotlin requirement, optional OkHttp / WorkManager integrations, and what does less on older devices.",
           "inLanguage": "en",
           "datePublished": "2026-08-23",
-          "dateModified": "2026-08-24",
+          "dateModified": "2026-09-01",
           "image": "https://app-inspect-doc.vercel.app/fevicon/og-image.png",
           "isPartOf": {
             "@id": "https://app-inspect-doc.vercel.app/#website"
@@ -127,7 +127,7 @@
           "articleSection": "Getting started",
           "proficiencyLevel": "Beginner",
           "dependencies": "Android 7.0 (API 24) or later; AndroidX. Jetpack Compose and Kotlin are not required.",
-          "keywords": "compatibility, requirements, minSdk, 24, androidx, compose, not, required, java, only, host, okhttp, compileOnly, workmanager, security-crypto, agp, kotlin, version, api, level, degradation, apk, size"
+          "keywords": "compatibility, requirements, minSdk, 24, androidx, compose, not, required, java, only, host, okhttp, retrofit, ktor, cio, engine, compileOnly, workmanager, security-crypto, agp, kotlin, version, api, level, degradation, apk, size"
         },
         {
           "@type": "BreadcrumbList",
@@ -331,7 +331,7 @@ new OkHttpClient.Builder()
                             <tr><th>Library</th><th>If your app has it</th><th>If it does not</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td><strong>OkHttp</strong> (4.x+)</td><td><a href="network.html">Network capture</a> and <a href="mocks.html">mocking</a> work. Your version wins.</td><td>Every other panel works; the interceptor class is simply never loaded.</td></tr>
+                            <tr><td><strong>OkHttp</strong> (4.x+)</td><td><a href="network.html">Network capture</a> and <a href="mocks.html">mocking</a> work &mdash; directly, or through anything layered on it. Your version wins.</td><td>Every other panel works; the interceptor class is simply never loaded.</td></tr>
                             <tr><td><strong>WorkManager</strong></td><td>The <a href="workmanager.html">Work</a> panel reads work specs and decodes their <code>Data</code> blobs.</td><td>The panel is empty &mdash; there is no work database to read.</td></tr>
                             <tr><td><strong>androidx.security-crypto</strong></td><td><code>EncryptedSharedPreferences</code> files are decrypted for read-only <a href="storage.html">inspection</a>.</td><td>Those files show as opaque. Ordinary preferences are unaffected.</td></tr>
                         </tbody>
@@ -349,6 +349,15 @@ new OkHttpClient.Builder()
                 <p>
                     If you are still on OkHttp 3.x, upgrade to 4.x before adding network capture; the
                     interceptor is compiled against the 4.x API. The other panels do not care either way.
+                </p>
+                <p>
+                    &ldquo;Has OkHttp&rdquo; means the engine underneath, not the library you call
+                    from. <strong>Retrofit</strong> counts, and so does <strong>Ktor</strong> when the
+                    client uses the <code>OkHttp</code> engine; Ktor's <code>CIO</code>,
+                    <code>Android</code>, <code>Java</code> and <code>Darwin</code> engines have no
+                    interceptor to hook, so those two panels stay empty while everything else works
+                    normally. The wiring for both, and the Ktor-specific behaviour worth knowing
+                    about, is on <a href="install.html#other-clients">the install page</a>.
                 </p>
 
                 <h2 id="api-levels">What does less on older devices</h2>
